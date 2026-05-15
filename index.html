@@ -766,7 +766,9 @@ function getProgress(s){
 // ═══════════════════════════════════════════════════
 function renderLoginAccounts(){
   const list=document.getElementById('acct-list');
+  if(!list)return;
   list.innerHTML='';
+  if(!OWNERS||!OWNERS.length){OWNERS=JSON.parse(JSON.stringify(DEFAULT_OWNERS));}
   // Admin first, then others
   const sorted=[...OWNERS].sort((a,b)=>{
     if(a.role==='admin'&&b.role!=='admin')return -1;
@@ -1491,8 +1493,10 @@ function refresh(){
 // ═══════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════
-loadData();
-renderLoginAccounts();
+document.addEventListener('DOMContentLoaded', function() {
+  loadData();
+  renderLoginAccounts();
+});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeD();});
 </script>
 </body>
