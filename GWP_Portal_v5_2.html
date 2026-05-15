@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GWP Supply Chain Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#09090f;--ink2:#1e1e2e;--ink3:#52526e;--ink4:#8f8fa8;--ink5:#c4c4d4;
+  --bg:#f4f4f7;--surface:#ffffff;--surface2:#f9f9fb;--surface3:#f0f0f4;
+  --bd:#e4e4ec;--bd2:#d0d0dc;
+  --blue:#2455e8;--blue2:#1a3fc4;--blue-lt:#eff3fe;--blue-bd:#bfcefb;
+  --green:#0f9d58;--green-lt:#f0fdf6;--green-bd:#a7f0c4;
+  --amber:#d97706;--amber-lt:#fffbeb;--amber-bd:#fde68a;
+  --red:#dc2626;--red-lt:#fef2f2;--red-bd:#fecaca;
+  --teal:#0d9488;--teal-lt:#f0fdfa;--teal-bd:#99f6e4;
+  --purple:#7c3aed;--purple-lt:#f5f3ff;--purple-bd:#ddd6fe;
+  --slate:#475569;--slate-lt:#f8fafc;--slate-bd:#cbd5e1;
+  --font:'DM Sans',system-ui,sans-serif;
+  --display:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+  --r:8px;--r-sm:5px;--r-lg:14px;--r-xl:20px;
+  --sh-sm:0 1px 3px rgba(9,9,15,.06),0 1px 2px rgba(9,9,15,.04);
+  --sh:0 4px 14px rgba(9,9,15,.08),0 2px 6px rgba(9,9,15,.04);
+  --sh-lg:0 20px 60px rgba(9,9,15,.14),0 8px 20px rgba(9,9,15,.06);
+  --topbar:52px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:var(--font)}
+button{cursor:pointer}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+
+/* LOGIN */
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--ink);position:fixed;inset:0;z-index:1000;transition:opacity .35s ease;background-image:radial-gradient(ellipse 50% 60% at 15% 70%,rgba(36,85,232,.22) 0%,transparent 100%),radial-gradient(ellipse 40% 40% at 85% 15%,rgba(124,58,237,.14) 0%,transparent 100%)}
+.login-card{background:var(--surface);border-radius:var(--r-xl);padding:36px;width:100%;max-width:440px;box-shadow:var(--sh-lg)}
+.brand-row{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.brand-badge{width:40px;height:40px;background:var(--ink);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.brand-text{font-family:var(--display);font-size:18px;font-weight:700;letter-spacing:-.3px}
+.brand-text span{color:var(--ink4);font-weight:500}
+.login-h{font-family:var(--display);font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--ink3);margin-bottom:24px}
+.acct-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--ink4);margin-bottom:8px}
+.acct-list{display:flex;flex-direction:column;gap:6px;margin-bottom:20px;max-height:320px;overflow-y:auto;padding-right:2px}
+.acct-item{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1.5px solid var(--bd);border-radius:var(--r);cursor:pointer;transition:all .15s;position:relative;flex-shrink:0}
+.acct-item:hover{border-color:var(--blue-bd);background:var(--blue-lt)}
+.acct-item.sel{border-color:var(--blue);background:var(--blue-lt)}
+.acct-item.sel::after{content:'✓';position:absolute;right:13px;font-size:13px;font-weight:700;color:var(--blue)}
+.acct-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.acct-info{flex:1;min-width:0}
+.acct-name{font-size:13px;font-weight:600}
+.acct-email{font-size:11px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acct-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;flex-shrink:0}
+.b-admin{background:#fef3c7;color:#92400e}.b-handler{background:var(--blue-lt);color:var(--blue2)}
+.login-btn{width:100%;padding:12px;background:var(--ink);color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:600;font-family:var(--display);transition:all .15s}
+.login-btn:hover:not(:disabled){background:var(--ink2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(9,9,15,.2)}
+.login-btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* APP SHELL */
+#app{display:none;min-height:100vh}
+.topbar{position:sticky;top:0;z-index:100;height:var(--topbar);background:var(--ink);border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;padding:0 20px;gap:0}
+.tb-brand{display:flex;align-items:center;gap:8px;font-family:var(--display);font-size:14px;font-weight:700;color:#fff;letter-spacing:-.3px;margin-right:20px;flex-shrink:0}
+.tb-brand-ico{width:28px;height:28px;background:var(--blue);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.tb-nav{display:flex;gap:2px;flex:1}
+.tb-btn{padding:6px 12px;border-radius:6px;font-size:13px;font-weight:400;color:#94a3b8;background:none;border:none;transition:all .12s;white-space:nowrap}
+.tb-btn:hover{background:rgba(255,255,255,.07);color:#e2e8f0}
+.tb-btn.active{background:rgba(255,255,255,.12);color:#fff;font-weight:500}
+.tb-btn.admin-tab{color:#fbbf24}
+.tb-btn.admin-tab.active{background:rgba(251,191,36,.15);color:#fbbf24}
+.tb-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+.tb-user{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border-radius:20px;padding:4px 12px 4px 4px}
+.tb-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff}
+.tb-uname{font-size:12px;color:#e2e8f0;font-weight:500}
+.tb-role{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px}
+.tb-role-admin{background:#fef3c7;color:#92400e}.tb-role-handler{background:var(--blue-lt);color:var(--blue2)}
+.tb-logout{font-size:11px;color:#64748b;background:none;border:none;padding:6px 8px;border-radius:6px;transition:color .1s}
+.tb-logout:hover{color:#94a3b8}
+
+/* MAIN */
+.main{max-width:1240px;margin:0 auto;padding:24px 20px 60px}
+.page{display:none}
+.page.active{display:block}
+.page-header{margin-bottom:22px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.ph-left .page-title{font-family:var(--display);font-size:20px;font-weight:800;letter-spacing:-.4px}
+.ph-left .page-sub{font-size:13px;color:var(--ink3);margin-top:3px}
+.ph-right{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--r);font-size:13px;font-weight:600;border:none;transition:all .15s;white-space:nowrap;cursor:pointer}
+.btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:var(--blue2);transform:translateY(-1px);box-shadow:0 4px 10px rgba(36,85,232,.3)}
+.btn-secondary{background:var(--surface);color:var(--ink2);border:1px solid var(--bd2)}.btn-secondary:hover{background:var(--surface2)}
+.btn-success{background:var(--green);color:#fff}.btn-success:hover{background:#0a7a44}
+.btn-danger{background:var(--red);color:#fff}.btn-danger:hover{background:#b91c1c}
+.btn-sm{padding:6px 12px;font-size:12px}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(138px,1fr));gap:12px;margin-bottom:24px}
+.kpi-card{background:var(--surface);border:1px solid var(--bd);border-radius:var(--r-lg);padding:18px;position:relative;overflow:hidden;box-shadow:var(--sh-sm);cursor:pointer;transition:all .15s}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:var(--sh)}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi-blue::before{background:var(--blue)}.kpi-green::before{background:var(--green)}
+.kpi-amber::before{background:var(--amber)}.kpi-red::before{background:var(--red)}
+.kpi-teal::before{background:var(--teal)}.kpi-slate::before{background:var(--slate)}
+.kpi-purple::before{background:var(--purple)}
+.kpi-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--ink4);margin-bottom:8px}
+.kpi-val{font-family:var(--display);font-size:28px;font-weight:800;letter-spacing:-1.5px;line-height:1;margin-bottom:4px}
+.kpi-sub{font-size:11px;color:var(--ink3)}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--bd);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-sm)}
+.card-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--bd)}
+.card-title{font-size:13px;font-weight:600}
+.card-action{font-size:11px;color:var(--blue);font-weight:500;background:none;border:none;padding:4px 8px;border-radius:5px;cursor:pointer;transition:background .1s}
+.card-action:hover{background:var(--blue-lt)}
+
+/* ALERTS */
+.alert{border-radius:var(--r);padding:13px 16px;display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;animation:slideIn .3s ease}
+.alert-red{background:var(--red-lt);border:1px solid var(--red-bd)}.alert-amber{background:var(--amber-lt);border:1px solid var(--amber-bd)}.alert-green{background:var(--green-lt);border:1px solid var(--green-bd)}
+.alert-icon{font-size:16px;flex-shrink:0;margin-top:1px}.alert-content{flex:1}
+.alert-title{font-size:13px;font-weight:600;margin-bottom:3px}.alert-body{font-size:12px;line-height:1.6}
+.alert-red .alert-title{color:var(--red)}.alert-red .alert-body{color:#7f1d1d}
+.alert-amber .alert-title{color:var(--amber)}.alert-amber .alert-body{color:#78350f}
+.alert-green .alert-title{color:var(--green)}.alert-green .alert-body{color:#14532d}
+@keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.b-open{background:var(--blue-lt);color:var(--blue2)}.b-open::before{background:var(--blue)}
+.b-completed{background:var(--teal-lt);color:var(--teal)}.b-completed::before{background:var(--teal)}
+.b-pending{background:var(--slate-lt);color:var(--slate)}.b-pending::before{background:var(--slate)}
+.b-delayed{background:var(--amber-lt);color:var(--amber)}.b-delayed::before{background:var(--amber);animation:blink 1.5s infinite}
+.b-approved{background:var(--green-lt);color:var(--green)}.b-approved::before{background:var(--green)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.fb{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+.fb-air{background:var(--purple-lt);color:var(--purple)}.fb-ocean{background:var(--blue-lt);color:var(--blue2)}
+.perm-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:4px;font-size:10px;font-weight:600}
+.perm-admin{background:#fef3c7;color:#92400e}.perm-ro{background:var(--blue-lt);color:var(--blue2)}.perm-brand{background:var(--green-lt);color:var(--green)}
+
+/* DASH GRID */
+.dash-grid{display:grid;grid-template-columns:1fr 300px;gap:18px}
+.recent-item{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .08s}
+.recent-item:last-child{border-bottom:none}
+.recent-item:hover{background:var(--surface2)}
+.ri-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ri-info{flex:1;min-width:0}
+.ri-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ri-meta{font-size:11px;color:var(--ink4);margin-top:1px}
+.dist-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.dist-label{font-size:11px;color:var(--ink3);width:76px;text-align:right;flex-shrink:0}
+.dist-track{flex:1;height:7px;background:var(--surface3);border-radius:4px;overflow:hidden}
+.dist-fill{height:100%;border-radius:4px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.dist-ct{font-size:12px;font-weight:600;width:20px}
+.qs-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.qs-row:last-child{margin-bottom:0}
+.qs-lbl{font-size:12px;color:var(--ink3);display:flex;align-items:center;gap:6px}
+.qs-dot{width:7px;height:7px;border-radius:50%}
+.qs-val{font-size:13px;font-weight:600}
+
+/* FILTERS */
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.search-wrap{position:relative;flex:1;min-width:180px;max-width:280px}
+.search-ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--ink4);pointer-events:none}
+.search-input,.filter-sel{padding:9px 12px;border:1px solid var(--bd2);border-radius:var(--r);font-size:13px;background:var(--surface);color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s}
+.search-input{width:100%;padding-left:32px}
+.search-input:focus,.filter-sel:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(36,85,232,.08)}
+.chip{padding:8px 13px;border:1px solid var(--bd2);border-radius:var(--r);font-size:12px;font-weight:500;background:var(--surface);color:var(--ink3);cursor:pointer;transition:all .1s}
+.chip:hover{background:var(--surface2)}.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.res-ct{margin-left:auto;font-size:12px;color:var(--ink4);align-self:center;flex-shrink:0}
+
+/* TABLE */
+.tbl-card{background:var(--surface);border:1px solid var(--bd);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-sm)}
+.tbl{width:100%;border-collapse:collapse}
+.tbl thead tr{background:var(--surface2);border-bottom:1px solid var(--bd2)}
+.tbl th{padding:10px 14px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--ink4);text-align:left;white-space:nowrap}
+.tbl tbody tr{border-bottom:1px solid var(--bd);cursor:pointer;transition:background .08s}
+.tbl tbody tr:last-child{border-bottom:none}
+.tbl tbody tr:hover{background:var(--surface2)}
+.tbl td{padding:12px 14px;font-size:13px;vertical-align:middle}
+.td-prod{font-weight:600}
+.td-job{font-family:var(--mono);font-size:10px;color:var(--ink4);margin-top:2px}
+.eta-ok{font-size:12px;color:var(--ink3)}.eta-soon{font-size:12px;color:var(--amber);font-weight:600}.eta-over{font-size:12px;color:var(--red);font-weight:600}
+.upd-prev{font-size:11px;color:var(--ink3);max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-over{background:rgba(220,38,38,.03)!important}.row-soon{background:rgba(217,119,6,.025)!important}.row-done{opacity:.6}
+.empty-st{padding:56px 20px;text-align:center}
+.empty-ico{font-size:36px;margin-bottom:10px}
+.empty-title{font-size:15px;font-weight:600;margin-bottom:5px}
+.empty-sub{font-size:13px;color:var(--ink3)}
+.icon-btn{width:30px;height:30px;border-radius:6px;border:1px solid var(--bd2);background:var(--surface);font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .1s;cursor:pointer}
+.icon-btn:hover{background:var(--surface2)}
+.icon-btn.del:hover{background:var(--red-lt);border-color:var(--red-bd);color:var(--red)}
+.icon-btn.edit:hover{background:var(--blue-lt);border-color:var(--blue-bd);color:var(--blue)}
+.tbl-actions{display:flex;gap:5px;align-items:center}
+
+/* ADMIN PANEL */
+.admin-layout{display:grid;grid-template-columns:250px 1fr;gap:20px;min-height:500px}
+.admin-sidebar{display:flex;flex-direction:column;gap:8px}
+.admin-nav-btn{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:var(--r);border:none;background:transparent;font-size:13px;font-weight:500;color:var(--ink3);text-align:left;transition:all .12s;width:100%;cursor:pointer}
+.admin-nav-btn:hover{background:var(--surface);color:var(--ink)}
+.admin-nav-btn.active{background:var(--surface);color:var(--ink);border:1px solid var(--bd);box-shadow:var(--sh-sm)}
+.admin-nav-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.admin-body{display:flex;flex-direction:column;gap:0}
+.admin-sec{display:none}
+.admin-sec.active{display:block}
+.admin-sec-title{font-family:var(--display);font-size:16px;font-weight:700;letter-spacing:-.3px;margin-bottom:16px}
+
+/* FORMS */
+.form-card{background:var(--surface);border:1px solid var(--bd);border-radius:var(--r-lg);padding:22px;box-shadow:var(--sh-sm);margin-bottom:16px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px;margin-bottom:13px}
+.form-full{grid-column:1/-1}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);display:flex;align-items:center;gap:4px}
+.req{color:var(--red);font-size:9px}
+.fi,.fs,.ft{padding:9px 11px;border:1px solid var(--bd2);border-radius:var(--r);font-size:13px;background:var(--surface);color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s;width:100%}
+.fi:focus,.fs:focus,.ft:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(36,85,232,.08)}
+.ft{resize:vertical;min-height:80px;font-size:12px;line-height:1.6}
+.fh{font-size:11px;color:var(--ink4);margin-top:2px}
+.form-divider{border:none;border-top:1px solid var(--bd);margin:18px 0}
+.form-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* USER CARDS */
+.user-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:16px}
+.user-card{background:var(--surface);border:1.5px solid var(--bd);border-radius:var(--r-lg);padding:18px;box-shadow:var(--sh-sm);transition:all .15s;position:relative}
+.user-card:hover{border-color:var(--bd2);box-shadow:var(--sh)}
+.user-card-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.user-av-lg{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0}
+.user-card-info{flex:1;min-width:0}
+.user-card-name{font-size:14px;font-weight:700}
+.user-card-email{font-size:11px;color:var(--ink3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-card-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.user-card-stat{font-size:11px;color:var(--ink3);padding:3px 8px;background:var(--surface2);border-radius:4px}
+.user-card-projects{font-size:11px;color:var(--ink3);margin-bottom:10px;line-height:1.5}
+.user-card-actions{display:flex;gap:7px;flex-wrap:wrap}
+.user-card-actions .btn-sm{font-size:11px;padding:5px 10px}
+.user-card-badge{position:absolute;top:12px;right:12px}
+
+/* PERMISSION MATRIX */
+.perm-matrix{background:var(--surface);border:1px solid var(--bd);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-sm);margin-bottom:16px}
+.perm-matrix-hd{display:grid;grid-template-columns:200px repeat(4,1fr);background:var(--surface2);border-bottom:1px solid var(--bd2)}
+.perm-matrix-hd>div{padding:10px 14px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--ink4)}
+.perm-row{display:grid;grid-template-columns:200px repeat(4,1fr);border-bottom:1px solid var(--bd);align-items:center}
+.perm-row:last-child{border-bottom:none}
+.perm-row:hover{background:var(--surface2)}
+.perm-row>div{padding:11px 14px;font-size:13px}
+.perm-name{font-weight:500}
+.perm-check{text-align:center;font-size:15px}
+.perm-yes{color:var(--green)}.perm-no{color:var(--ink5)}
+
+/* AUTO-ASSIGN BANNER */
+.auto-assign-banner{background:linear-gradient(135deg,#eff3fe 0%,#f5f3ff 100%);border:1px solid var(--blue-bd);border-radius:var(--r-lg);padding:18px 20px;display:flex;align-items:flex-start;gap:14px;margin-bottom:16px}
+.aab-icon{font-size:24px;flex-shrink:0}
+.aab-title{font-size:14px;font-weight:700;color:var(--blue2);margin-bottom:4px}
+.aab-body{font-size:12px;color:var(--ink3);line-height:1.7}
+.aab-highlight{display:inline-block;background:var(--blue-lt);color:var(--blue2);padding:1px 7px;border-radius:4px;font-weight:600;font-size:11px}
+
+/* DRAWER */
+#dbg{position:fixed;inset:0;background:rgba(9,9,15,.45);z-index:200;display:none;backdrop-filter:blur(3px)}
+#drawer{position:fixed;right:0;top:0;bottom:0;width:500px;max-width:98vw;background:var(--surface);z-index:201;overflow-y:auto;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);border-left:1px solid var(--bd);box-shadow:var(--sh-lg);overscroll-behavior:contain}
+#drawer.open{transform:translateX(0)}
+.d-top{padding:20px 22px 16px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--surface);z-index:1}
+.d-close{float:right;width:28px;height:28px;background:var(--surface2);border:none;border-radius:7px;font-size:14px;color:var(--ink3);display:flex;align-items:center;justify-content:center;transition:background .1s;line-height:1;cursor:pointer}
+.d-close:hover{background:var(--bd2)}
+.d-prod{font-family:var(--display);font-size:18px;font-weight:800;letter-spacing:-.3px;margin-bottom:4px}
+.d-job{font-family:var(--mono);font-size:11px;color:var(--ink4);margin-bottom:10px}
+.d-body{padding:20px 22px}
+.d-sec{margin-bottom:22px}
+.d-sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--ink4);margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--bd)}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ii label{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink4);display:block;margin-bottom:3px}
+.ii span{font-size:13px;font-weight:500}
+.prog-stages{display:flex;align-items:flex-start;gap:0;margin-bottom:6px}
+.prog-stage{flex:1;display:flex;flex-direction:column;align-items:center;position:relative}
+.prog-stage::before{content:'';position:absolute;left:50%;right:-50%;top:10px;height:2px;background:var(--bd2);z-index:0}
+.prog-stage:last-child::before{display:none}
+.prog-dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--bd2);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:9px;position:relative;z-index:1;flex-shrink:0}
+.prog-dot.done{background:var(--teal);border-color:var(--teal);color:#fff}
+.prog-dot.cur{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 0 0 3px rgba(36,85,232,.2)}
+.prog-lbl{font-size:8px;color:var(--ink4);margin-top:4px;text-align:center}
+.prog-lbl.done-lbl{color:var(--teal)}.prog-lbl.cur-lbl{color:var(--blue);font-weight:700}
+.tl-item{display:flex;gap:12px;padding-bottom:14px;position:relative}
+.tl-item::before{content:'';position:absolute;left:13px;top:25px;bottom:0;width:1px;background:var(--bd)}
+.tl-item:last-child::before{display:none}
+.tl-dot{width:26px;height:26px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--bd2);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;position:relative;z-index:1}
+.tl-dot.latest{background:var(--blue-lt);border-color:var(--blue-bd);color:var(--blue);font-weight:700}
+.tl-dot.arrived{background:var(--teal-lt);border-color:var(--teal-bd);color:var(--teal)}
+.tl-ct{flex:1;padding-top:4px}
+.tl-date{font-size:10px;font-family:var(--mono);color:var(--ink4);margin-bottom:3px}
+.tl-text{font-size:13px;color:var(--ink2);line-height:1.55}
+.email-chip{display:flex;align-items:center;gap:8px;padding:7px 11px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm);margin-bottom:6px}
+.email-chip:last-child{margin-bottom:0}
+.readonly-note{display:flex;align-items:flex-start;gap:8px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px;font-size:12px;color:var(--ink3);line-height:1.6}
+
+/* TOGGLE SWITCH */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bd)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-info{flex:1}
+.toggle-label{font-size:13px;font-weight:500}
+.toggle-desc{font-size:11px;color:var(--ink4);margin-top:2px}
+.toggle{position:relative;width:38px;height:22px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--bd2);border-radius:11px;cursor:pointer;transition:background .2s}
+.toggle-slider::before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.toggle input:checked+.toggle-slider{background:var(--blue)}
+.toggle input:checked+.toggle-slider::before{transform:translateX(16px)}
+
+/* TOAST */
+#toast-wrap{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:var(--ink);color:#fff;padding:11px 16px;border-radius:var(--r);font-size:13px;font-weight:500;box-shadow:var(--sh-lg);animation:toastIn .3s ease;pointer-events:all;display:flex;align-items:center;gap:8px;max-width:320px}
+.toast.success{background:var(--green)}.toast.error{background:var(--red)}.toast.warning{background:var(--amber)}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes toastOut{from{opacity:1}to{opacity:0;transform:translateY(10px)}}
+
+/* MODAL */
+#modal-bg{position:fixed;inset:0;background:rgba(9,9,15,.5);z-index:300;display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px)}
+#modal-bg.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--r-xl);padding:26px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:var(--sh-lg);animation:modalIn .22s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.modal-h{font-family:var(--display);font-size:18px;font-weight:800;letter-spacing:-.3px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between}
+.modal-close{width:28px;height:28px;border:none;background:var(--surface2);border-radius:7px;font-size:14px;color:var(--ink3);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .1s}
+.modal-close:hover{background:var(--bd)}
+
+/* RESPONSIVE */
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr}.admin-layout{grid-template-columns:1fr}}
+@media(max-width:768px){
+  .main{padding:16px 14px 50px}
+  .kpi-grid{grid-template-columns:repeat(3,1fr);gap:8px}
+  .kpi-val{font-size:22px}.kpi-card{padding:13px}
+  .hide-sm{display:none!important}
+  .tb-nav .tb-btn:not(.active){display:none}
+  .form-grid,.form-grid-3,.info-grid{grid-template-columns:1fr}
+  .user-grid{grid-template-columns:1fr}
+  .perm-matrix-hd,.perm-row{grid-template-columns:140px repeat(4,1fr)}
+}
+@media(max-width:480px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.login-card{padding:22px 18px}}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="brand-row">
+      <div class="brand-badge">📦</div>
+      <div class="brand-text">GWP <span>Supply Chain</span></div>
+    </div>
+    <div class="login-h">Welcome back</div>
+    <div class="login-sub">Select your account to continue</div>
+    <div class="acct-label">Sign in as</div>
+    <div class="acct-list" id="acct-list"><!-- populated by JS --></div>
+    <button class="login-btn" id="login-btn" disabled onclick="doLogin()">Sign in →</button>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+  <header class="topbar">
+    <div class="tb-brand"><div class="tb-brand-ico">📦</div>GWP Portal</div>
+    <nav class="tb-nav">
+      <button class="tb-btn active" onclick="goPage('dashboard',this)">Dashboard</button>
+      <button class="tb-btn" onclick="goPage('shipments',this)">Shipments</button>
+      <button class="tb-btn admin-tab" id="admin-tab" onclick="goPage('admin',this)" style="display:none">⚙ Admin</button>
+    </nav>
+    <div class="tb-right">
+      <div class="tb-user">
+        <div class="tb-av" id="tb-av"></div>
+        <span class="tb-uname" id="tb-name"></span>
+        <span class="tb-role" id="tb-role"></span>
+      </div>
+      <button class="tb-logout" onclick="doLogout()">← Exit</button>
+    </div>
+  </header>
+
+  <div class="main">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div class="ph-left">
+          <div class="page-title" id="dash-title">Dashboard</div>
+          <div class="page-sub" id="dash-sub"></div>
+        </div>
+        <div class="ph-right">
+          <button class="btn btn-secondary btn-sm" onclick="goPage('shipments',document.querySelectorAll('.tb-btn')[1])">All shipments</button>
+          <button class="btn btn-primary btn-sm admin-only" onclick="adminNav(document.querySelectorAll('.admin-nav-btn')[1],'a-add');goPage('admin',document.getElementById('admin-tab'))" style="display:none">+ Add Shipment</button>
+        </div>
+      </div>
+      <div id="alert-zone"></div>
+      <div class="kpi-grid" id="kpi-grid"></div>
+      <div class="dash-grid">
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="card"><div class="card-hd"><div class="card-title">Active Shipments</div><button class="card-action" onclick="goPage('shipments',document.querySelectorAll('.tb-btn')[1])">View all →</button></div><div id="dash-active"></div></div>
+          <div class="card"><div class="card-hd"><div class="card-title">Status Breakdown</div></div><div style="padding:16px 18px" id="dash-dist"></div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="card"><div class="card-hd"><div class="card-title">Summary</div></div><div style="padding:16px 18px" id="dash-qs"></div></div>
+          <div class="card admin-only" id="handler-card" style="display:none"><div class="card-hd"><div class="card-title">Brand Owners</div><button class="card-action" onclick="adminNav(document.querySelectorAll('.admin-nav-btn')[2],'a-users');goPage('admin',document.getElementById('admin-tab'))">Manage →</button></div><div style="padding:14px 18px" id="dash-owners"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SHIPMENTS ══ -->
+    <div class="page" id="page-shipments">
+      <div class="page-header">
+        <div class="ph-left"><div class="page-title">Shipments</div><div class="page-sub" id="ship-sub"></div></div>
+        <div class="ph-right admin-only" style="display:none">
+          <button class="btn btn-primary btn-sm" onclick="adminNav(document.querySelectorAll('.admin-nav-btn')[1],'a-add');goPage('admin',document.getElementById('admin-tab'))">+ Add Shipment</button>
+        </div>
+      </div>
+      <div class="filters">
+        <div class="search-wrap"><span class="search-ico">⌕</span><input class="search-input" id="srch" placeholder="Search product, job no, brand…" oninput="applyF()"></div>
+        <select class="filter-sel" id="f-status" onchange="applyF()"><option value="">All statuses</option><option value="Open">Active</option><option value="Completed">Completed</option><option value="Pending">Pending</option><option value="Delayed">Delayed</option></select>
+        <select class="filter-sel" id="f-freight" onchange="applyF()"><option value="">All freight</option><option value="Air">Air</option><option value="Ocean">Ocean</option></select>
+        <select class="filter-sel admin-only" id="f-handler" onchange="applyF()" style="display:none"><option value="">All handlers</option></select>
+        <button class="chip" id="chip-active" onclick="toggleActive()">Active only</button>
+        <div class="res-ct" id="res-ct"></div>
+      </div>
+      <div class="tbl-card">
+        <table class="tbl"><thead><tr><th>Product</th><th class="hide-sm">Handler</th><th>Status</th><th class="hide-sm">Freight</th><th class="hide-sm">ETA</th><th class="hide-sm">Latest Update</th></tr></thead>
+        <tbody id="ship-tbody"></tbody></table>
+        <div id="ship-empty" class="empty-st" style="display:none"><div class="empty-ico">📭</div><div class="empty-title">No shipments found</div><div class="empty-sub">Try adjusting your filters</div></div>
+      </div>
+    </div>
+
+    <!-- ══ ADMIN PANEL ══ -->
+    <div class="page" id="page-admin">
+      <div class="page-header">
+        <div class="ph-left"><div class="page-title">Admin Panel</div><div class="page-sub">Manage shipments, brand owners, and permissions</div></div>
+      </div>
+      <div class="admin-layout">
+        <div class="admin-sidebar">
+          <button class="admin-nav-btn active" onclick="adminNav(this,'a-records')"><div class="admin-nav-ico" style="background:#eff3fe">📋</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">All Records</div><div style="font-size:11px;color:var(--ink4)">View & edit shipments</div></div></button>
+          <button class="admin-nav-btn" onclick="adminNav(this,'a-add')"><div class="admin-nav-ico" style="background:#f0fdf6">➕</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Add Shipment</div><div style="font-size:11px;color:var(--ink4)">New entry form</div></div></button>
+          <button class="admin-nav-btn" onclick="adminNav(this,'a-users')"><div class="admin-nav-ico" style="background:#f5f3ff">👥</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Brand Owners</div><div style="font-size:11px;color:var(--ink4)">Add, edit, permissions</div></div></button>
+          <button class="admin-nav-btn" onclick="adminNav(this,'a-perms')"><div class="admin-nav-ico" style="background:#fef3c7">🔐</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Permissions</div><div style="font-size:11px;color:var(--ink4)">Access control matrix</div></div></button>
+          <button class="admin-nav-btn" onclick="adminNav(this,'a-update')"><div class="admin-nav-ico" style="background:#fffbeb">✏️</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Update Status</div><div style="font-size:11px;color:var(--ink4)">Quick status update</div></div></button>
+          <button class="admin-nav-btn" onclick="adminNav(this,'a-storage')"><div class="admin-nav-ico" style="background:#f0fdfa">💾</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Data & Backup</div><div style="font-size:11px;color:var(--ink4)">Export, import, restore</div></div></button>
+        </div>
+
+        <div class="admin-body">
+
+          <!-- ALL RECORDS -->
+          <div class="admin-sec active" id="a-records">
+            <div class="admin-sec-title">📋 All Shipment Records</div>
+            <div class="tbl-card"><table class="tbl"><thead><tr><th>Job No.</th><th>Product</th><th>Handler</th><th>Status</th><th>ETA</th><th>Actions</th></tr></thead><tbody id="admin-tbl-body"></tbody></table></div>
+          </div>
+
+          <!-- ADD SHIPMENT -->
+          <div class="admin-sec" id="a-add">
+            <div class="admin-sec-title">➕ Add New Shipment</div>
+            <div class="auto-assign-banner">
+              <div class="aab-icon">🤖</div>
+              <div>
+                <div class="aab-title">Auto-Assignment Active</div>
+                <div class="aab-body">When you enter a handler's email below, the system automatically checks if that brand owner exists. If not, a new profile is <span class="aab-highlight">created instantly</span> and the shipment is <span class="aab-highlight">assigned to them</span>. They will appear in the login screen and can access exactly this shipment — nothing more.</div>
+              </div>
+            </div>
+            <div class="form-card">
+              <div style="font-size:12px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Shipment Info</div>
+              <div class="form-grid">
+                <div class="fg"><label class="fl">Job No. <span class="req">*</span></label><input class="fi" id="f-jobno" placeholder="e.g. M0014850"><span class="fh">VSpeed tracking number</span></div>
+                <div class="fg"><label class="fl">Product Name <span class="req">*</span></label><input class="fi" id="f-product" placeholder="e.g. Custom Notebook"></div>
+                <div class="fg"><label class="fl">Brand / Client <span class="req">*</span></label><input class="fi" id="f-brand" placeholder="e.g. Bugucare"></div>
+                <div class="fg"><label class="fl">Quantity</label><input class="fi" id="f-qty" type="number" placeholder="e.g. 500"></div>
+                <div class="fg"><label class="fl">Freight Mode <span class="req">*</span></label><select class="fs" id="f-freight-sel"><option value="">Select mode</option><option value="Air">✈ Air Freight</option><option value="Ocean">🚢 Ocean Freight</option></select></div>
+                <div class="fg"><label class="fl">Status</label><select class="fs" id="f-status-sel"><option value="Open">Active / In Progress</option><option value="Pending">Pending</option><option value="Approved">Approved</option><option value="Delayed">Delayed</option><option value="Completed">Completed</option></select></div>
+                <div class="fg"><label class="fl">ETA Date</label><input class="fi" id="f-eta" type="date"><span class="fh">Expected arrival in Malaysia</span></div>
+                <div class="fg"><label class="fl">Unit Price</label><input class="fi" id="f-price" placeholder="e.g. 2.2 RMB"></div>
+              </div>
+              <hr class="form-divider">
+              <div style="font-size:12px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Handler & Auto-Assignment</div>
+              <div class="form-grid">
+                <div class="fg">
+                  <label class="fl">Handler Name <span class="req">*</span></label>
+                  <input class="fi" id="f-hname" placeholder="e.g. Sarah" oninput="onHandlerNameInput()">
+                  <span class="fh">Type name — existing handlers shown below</span>
+                </div>
+                <div class="fg">
+                  <label class="fl">Handler Email (Primary) <span class="req">*</span></label>
+                  <input class="fi" id="f-hem1" type="email" placeholder="handler@email.com" oninput="onHandlerEmailInput()">
+                  <span class="fh">Brand owner's login email</span>
+                </div>
+                <div class="fg">
+                  <label class="fl">Handler Email 2</label>
+                  <input class="fi" id="f-hem2" type="email" placeholder="secondary@email.com">
+                  <span class="fh">Optional — additional access</span>
+                </div>
+                <div class="fg">
+                  <label class="fl">Handler Email 3</label>
+                  <input class="fi" id="f-hem3" type="email" placeholder="Optional">
+                </div>
+              </div>
+              <!-- Auto-detect preview -->
+              <div id="auto-detect-preview" style="display:none;margin-bottom:14px"></div>
+              <!-- Quick select existing handler -->
+              <div style="margin-bottom:14px">
+                <div style="font-size:11px;color:var(--ink4);margin-bottom:6px">Or select an existing handler:</div>
+                <div id="existing-handlers-chips" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+              </div>
+              <hr class="form-divider">
+              <div style="font-size:12px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">First Status Update</div>
+              <div class="fg form-full">
+                <label class="fl">Initial Update Note</label>
+                <textarea class="ft" id="f-notes" placeholder="e.g. 12 May 26 - Goods received at China warehouse, awaiting shipment arrangement"></textarea>
+                <span class="fh">This becomes the first timeline entry</span>
+              </div>
+              <div style="height:14px"></div>
+              <div class="form-actions">
+                <button class="btn btn-primary" onclick="addShipment()">➕ Add Shipment & Auto-Assign</button>
+                <button class="btn btn-secondary" onclick="clearAddForm()">Clear form</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- BRAND OWNERS -->
+          <div class="admin-sec" id="a-users">
+            <div class="admin-sec-title" style="display:flex;align-items:center;justify-content:space-between">
+              <span>👥 Brand Owners & Handlers</span>
+              <button class="btn btn-primary btn-sm" onclick="openAddUserModal()">+ Add Brand Owner</button>
+            </div>
+            <div class="auto-assign-banner" style="margin-bottom:16px">
+              <div class="aab-icon">🔐</div>
+              <div>
+                <div class="aab-title">Row-Level Security</div>
+                <div class="aab-body">Each brand owner logs in with their email and sees <span class="aab-highlight">only their assigned shipments</span>. Adding a new owner here automatically adds them to the login screen. Assigning a shipment to their email instantly grants them visibility of that record.</div>
+              </div>
+            </div>
+            <div class="user-grid" id="user-grid"><!-- populated by JS --></div>
+          </div>
+
+          <!-- PERMISSIONS -->
+          <div class="admin-sec" id="a-perms">
+            <div class="admin-sec-title">🔐 Permission Matrix</div>
+            <div class="form-card" style="margin-bottom:16px">
+              <div style="font-size:13px;font-weight:600;margin-bottom:12px">What each role can do</div>
+              <div class="perm-matrix">
+                <div class="perm-matrix-hd"><div>Feature</div><div>Admin</div><div>Handler</div><div>Brand Owner</div><div>Viewer</div></div>
+                ${[
+                  ['View own shipments','✅','✅','✅','✅'],
+                  ['View all shipments','✅','❌','❌','❌'],
+                  ['Add new shipment','✅','❌','❌','❌'],
+                  ['Edit shipment status','✅','❌','❌','❌'],
+                  ['Update status notes','✅','❌','❌','❌'],
+                  ['Delete shipment','✅','❌','❌','❌'],
+                  ['Add brand owners','✅','❌','❌','❌'],
+                  ['View costing data','✅','❌','❌','❌'],
+                  ['Export data backup','✅','❌','❌','❌'],
+                  ['View timeline history','✅','✅','✅','✅'],
+                  ['Click tracking links','✅','✅','❌','✅'],
+                ].map(([feat,...vals])=>`<div class="perm-row"><div class="perm-name">${feat}</div>${vals.map(v=>`<div class="perm-check ${v==='✅'?'perm-yes':'perm-no'}">${v}</div>`).join('')}</div>`).join('')}
+              </div>
+            </div>
+            <div class="form-card">
+              <div style="font-size:13px;font-weight:600;margin-bottom:14px">Per-Owner Permission Toggles</div>
+              <div style="font-size:12px;color:var(--ink3);margin-bottom:14px">Select a brand owner to adjust their specific permissions:</div>
+              <div class="fg" style="margin-bottom:16px"><label class="fl">Select Brand Owner</label><select class="fs" id="perm-user-sel" onchange="loadUserPerms()"><option value="">Choose brand owner…</option></select></div>
+              <div id="perm-toggles" style="display:none">
+                <div class="toggle-row"><div class="toggle-info"><div class="toggle-label">View assigned shipments</div><div class="toggle-desc">See their projects and tracking info</div></div><label class="toggle"><input type="checkbox" id="perm-view" checked disabled><span class="toggle-slider"></span></label></div>
+                <div class="toggle-row"><div class="toggle-info"><div class="toggle-label">View status timeline</div><div class="toggle-desc">Full update history for their shipments</div></div><label class="toggle"><input type="checkbox" id="perm-timeline" checked onchange="saveUserPerm('timeline',this.checked)"><span class="toggle-slider"></span></label></div>
+                <div class="toggle-row"><div class="toggle-info"><div class="toggle-label">Click tracking links</div><div class="toggle-desc">Direct VSpeed link access</div></div><label class="toggle"><input type="checkbox" id="perm-tracking" checked onchange="saveUserPerm('tracking',this.checked)"><span class="toggle-slider"></span></label></div>
+                <div class="toggle-row"><div class="toggle-info"><div class="toggle-label">Account active</div><div class="toggle-desc">Disable to block login without deleting</div></div><label class="toggle"><input type="checkbox" id="perm-active" checked onchange="saveUserPerm('active',this.checked)"><span class="toggle-slider"></span></label></div>
+                <div style="margin-top:14px;padding:12px 14px;background:var(--surface2);border-radius:var(--r);font-size:12px;color:var(--ink3)">
+                  <strong>Shipments assigned to this owner:</strong><br>
+                  <div id="perm-assigned-list" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- QUICK UPDATE -->
+          <div class="admin-sec" id="a-update">
+            <div class="admin-sec-title">✏️ Quick Status Update</div>
+            <div class="form-card">
+              <div class="form-grid">
+                <div class="fg"><label class="fl">Shipment <span class="req">*</span></label><select class="fs" id="u-ship"><option value="">Choose shipment…</option></select></div>
+                <div class="fg"><label class="fl">New Status <span class="req">*</span></label><select class="fs" id="u-status"><option value="Open">Active / In Progress</option><option value="Pending">Pending</option><option value="Approved">Approved</option><option value="Delayed">Delayed</option><option value="Completed">Completed</option></select></div>
+                <div class="fg"><label class="fl">New ETA Date</label><input class="fi" id="u-eta" type="date"><span class="fh">Leave blank to keep current</span></div>
+                <div class="fg"><label class="fl">Current Location</label><input class="fi" id="u-loc" placeholder="e.g. VSpeed Warehouse, Subang"></div>
+              </div>
+              <div class="fg" style="margin-bottom:14px"><label class="fl">Update Note <span class="req">*</span></label><textarea class="ft" id="u-note" placeholder="e.g. 12 May 26 - Container arrived VSpeed warehouse, pending sorting for delivery"></textarea><span class="fh">Include the date prefix. This is added to the top of the timeline.</span></div>
+              <div class="form-actions">
+                <button class="btn btn-primary" onclick="quickUpdate()">💾 Save Update</button>
+                <button class="btn btn-secondary" onclick="previewUpdate()">👁 Preview</button>
+              </div>
+              <div id="u-preview" style="display:none;margin-top:12px"></div>
+            </div>
+          </div>
+
+          <!-- DATA & BACKUP -->
+          <div class="admin-sec" id="a-storage">
+            <div class="admin-sec-title">💾 Data & Backup</div>
+            <div class="form-card" style="margin-bottom:16px">
+              <div style="font-size:13px;font-weight:600;margin-bottom:12px">Storage Status</div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:14px">
+                <div style="background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r);padding:14px"><div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--ink4);margin-bottom:6px">Shipments</div><div style="font-family:var(--display);font-size:20px;font-weight:800" id="st-ships">0</div></div>
+                <div style="background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r);padding:14px"><div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--ink4);margin-bottom:6px">Brand Owners</div><div style="font-family:var(--display);font-size:20px;font-weight:800" id="st-users">0</div></div>
+                <div style="background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r);padding:14px"><div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--ink4);margin-bottom:6px">Last Saved</div><div style="font-size:12px;font-weight:500;margin-top:4px" id="st-date">—</div></div>
+                <div style="background:var(--green-lt);border:1px solid var(--green-bd);border-radius:var(--r);padding:14px"><div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--green);margin-bottom:6px">Auto-save</div><div style="font-size:12px;font-weight:600;color:var(--green)">Always ON</div></div>
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-primary" onclick="exportJSON()">📥 Export JSON Backup</button>
+                <button class="btn btn-secondary" onclick="exportCSV()">📊 Export CSV (Excel)</button>
+                <button class="btn btn-secondary" onclick="importJSON()">📤 Import Backup</button>
+                <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(this)">
+              </div>
+              <p style="font-size:11px;color:var(--ink4);margin-top:10px">💡 Export JSON monthly → save to Google Drive → label with date. To restore: Import JSON. The backup includes all shipments AND brand owner profiles.</p>
+            </div>
+            <div class="form-card">
+              <div style="font-size:13px;font-weight:600;margin-bottom:12px">Reset Options</div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-secondary" onclick="resetToDefault()">↩ Reset to Original Data</button>
+                <button class="btn btn-danger" onclick="confirmClear()">🗑 Clear All Data</button>
+              </div>
+              <p style="font-size:11px;color:var(--ink4);margin-top:10px">⚠️ Always export a backup before resetting.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- DETAIL DRAWER -->
+<div id="dbg" onclick="closeD()"></div>
+<div id="drawer">
+  <div class="d-top">
+    <button class="d-close" onclick="closeD()">✕</button>
+    <div class="d-prod" id="d-prod"></div>
+    <div class="d-job" id="d-jobno"></div>
+    <div id="d-badges" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+  </div>
+  <div class="d-body" id="d-body"></div>
+</div>
+
+<!-- ADD BRAND OWNER MODAL -->
+<div id="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-h">👤 Add New Brand Owner<button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="form-grid">
+      <div class="fg"><label class="fl">Full Name <span class="req">*</span></label><input class="fi" id="m-name" placeholder="e.g. Sarah Lim"></div>
+      <div class="fg"><label class="fl">Login Email <span class="req">*</span></label><input class="fi" id="m-email" type="email" placeholder="sarah@brand.com"><span class="fh">They log in with this email</span></div>
+    </div>
+    <div class="form-grid">
+      <div class="fg"><label class="fl">Brand / Company</label><input class="fi" id="m-brand" placeholder="e.g. Bugucare"></div>
+      <div class="fg"><label class="fl">Role</label><select class="fs" id="m-role"><option value="handler">Handler (read-only access)</option><option value="admin">Admin (full access)</option></select></div>
+    </div>
+    <div class="fg" style="margin-bottom:14px"><label class="fl">Avatar Color</label><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px" id="color-picker">
+      ${['#7c3aed','#0369a1','#065f46','#b45309','#0f766e','#be185d','#0369a1','#4f46e5','#b45309','#0f172a'].map((c,i)=>`<div onclick="selColor(this,'${c}')" style="width:28px;height:28px;background:${c};border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s" title="${c}"></div>`).join('')}
+    </div></div>
+    <div class="fg" style="margin-bottom:16px"><label class="fl">Notes / Access Note</label><input class="fi" id="m-notes" placeholder="e.g. Brand owner for Bugucare knee braces"></div>
+    <div id="modal-auto-assign-preview" style="display:none;margin-bottom:14px"></div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="addBrandOwner()">✅ Create Brand Owner</button>
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-wrap"></div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════
+// CORE DATA
+// ═══════════════════════════════════════════════════
+const DEFAULT_OWNERS = [
+  {key:'admin', name:'Admin', email:'admin@gwpteam.com', role:'admin', color:'#0f172a', brand:'GWP Team', notes:'Full system access', perms:{timeline:true,tracking:true,active:true}, createdAt:'2026-01-01'},
+  {key:'cindy', name:'Cindy', email:'lilian930308@gmail.com', role:'handler', color:'#7c3aed', brand:'Career Series / Magic Series', notes:'Handler for Career Series and Magic Series shipments', perms:{timeline:true,tracking:true,active:true}, createdAt:'2026-01-01'},
+  {key:'yanlin', name:'Yan Lin', email:'justtypicalylin@gmail.com', role:'handler', color:'#0369a1', brand:'URO360 / FIA', notes:'Handler for URO360 and FIA/PSA shipments', perms:{timeline:true,tracking:true,active:true}, createdAt:'2026-01-01'},
+  {key:'yunning', name:'Yun Ning', email:'yunning.theadspert@gmail.com', role:'handler', color:'#065f46', brand:'Master Nerv', notes:'Handler for Master Nerv product line', perms:{timeline:true,tracking:true,active:true}, createdAt:'2026-01-01'},
+  {key:'weiyao', name:'Wei Yao', email:'weiyao.amfmarketing@gmail.com', role:'handler', color:'#b45309', brand:'Bugucare', notes:'Handler for Bugucare knee braces', perms:{timeline:true,tracking:true,active:true}, createdAt:'2026-01-01'},
+];
+
+const DEFAULT_SHIPS = [
+  {id:1,jobNo:'M0014036',product:'Career Series Puzzle',brand:'Career Series',qty:1500,unitPrice:'2.2 RMB',freight:'Ocean',status:'Open',eta:'2026-05-09',arrivalDate:null,handler:'Cindy',emails:['lilian930308@gmail.com','goodplacetrading@gmail.com'],users:['cindy','admin'],updates:[{date:'08 May 26',text:'Container has arrived VSpeed warehouse & pending sorting for delivery'},{date:'07 May 26',text:'Completed Clearance, pending enter Warehouse'},{date:'06 May 26',text:'Waiting vessel to berth'},{date:'04 May 26',text:'Vessel Schedule Update — ETA Msia: 05 May 26'},{date:'01 May 26',text:'ETA remain 04 May 26'},{date:'28 Apr 26',text:'Vessel departed, ETD China: 25 Apr 26, ETA Msia: 04 May 26'},{date:'21 Apr 26',text:'Container transferred to another vessel due to overloading'},{date:'14 Apr 26',text:'Vessel depart, ETA port 23 Apr'},{date:'09 Apr 26',text:'ETA port on 21 Apr'}]},
+  {id:2,jobNo:'M0014095',product:'Magic Cube',brand:'Magic Series',qty:500,unitPrice:'3.0 RMB',freight:'Ocean',status:'Completed',eta:'2026-05-09',arrivalDate:'2026-05-09',handler:'Cindy',emails:['lilian930308@gmail.com','goodplacetrading@gmail.com'],users:['cindy','admin'],updates:[{date:'09 May 26',text:'Arrived at Packxpert'},{date:'08 May 26',text:'In transit for delivery'},{date:'06 May 26',text:'Container arrived VSpeed warehouse & pending sorting'},{date:'30 Apr 26',text:'Completed Clearance, pending enter Warehouse'},{date:'28 Apr 26',text:'Vessel Arrived port, waiting for customs clearance'},{date:'09 Apr 26',text:'Undergoing customs declaration at China port'}]},
+  {id:3,jobNo:'M0014084 / M0014097',product:'URO360 Shaker',brand:'URO360',qty:200,unitPrice:'2.9 RMB',freight:'Ocean',status:'Completed',eta:'2026-05-11',arrivalDate:'2026-05-11',handler:'Yan Lin',emails:['lilian930308@gmail.com','justtypicalylin@gmail.com'],users:['yanlin','admin'],updates:[{date:'11 May 26',text:'Arrived at Packxpert'},{date:'08 May 26',text:'In transit for delivery'},{date:'06 May 26',text:'Container arrived VSpeed warehouse & pending sorting'},{date:'05 May 26',text:'Proceed with shipping charges payment'},{date:'30 Apr 26',text:'Completed Clearance, pending enter Warehouse'},{date:'28 Apr 26',text:'Vessel Arrived port, waiting for customs clearance'},{date:'10 Apr 26',text:'Shipment under customs declaration in China'}]},
+  {id:4,jobNo:'SY6047274914',product:'Master Nerv Heating Socks',brand:'Master Nerv',qty:500,unitPrice:'1.25 RMB',freight:'Air',status:'Completed',eta:'2026-04-20',arrivalDate:'2026-04-20',handler:'Yun Ning',emails:['lilian930308@gmail.com','yunning.theadspert@gmail.com'],users:['yunning','admin'],updates:[{date:'20 Apr 26',text:'Arrived at Packxpert'},{date:'17 Apr 26',text:'Flight departed, transit before arriving Malaysia'},{date:'16 Apr 26',text:'Flight Arrangement scheduled on 17 Apr'},{date:'15 Apr 26',text:'In Shipment Packing'},{date:'14 Apr 26',text:'Payment made on 13 Apr, goods sent by air freight'},{date:'09 Apr 26',text:'Shipment in transit'},{date:'08 Apr 26',text:'In transit to China warehouse'}]},
+  {id:5,jobNo:'M0014771',product:'Master Nerv Shaker',brand:'Master Nerv',qty:500,unitPrice:'1.1 RMB',freight:'Ocean',status:'Open',eta:'2026-05-11',arrivalDate:null,handler:'Yun Ning',emails:['lilian930308@gmail.com','yunning.theadspert@gmail.com','jiawen.theadspert@gmail.com'],users:['yunning','admin'],updates:[{date:'11 May 26',text:'Arrived at Packxpert'},{date:'08 May 26',text:'In transit for delivery'},{date:'06 May 26',text:'Container arrived VSpeed warehouse & pending sorting'},{date:'05 May 26',text:'Completed clearance'},{date:'04 May 26',text:'Vessel Arrived, Pending Custom Clearance'},{date:'23 Apr 26',text:'Vessel departed, ETA Malaysia: 02 May 26'},{date:'08 Apr 26',text:'In production progress'}]},
+  {id:6,jobNo:'SY6047277040',product:'Master Nerv Patch',brand:'Master Nerv',qty:1000,unitPrice:'—',freight:'Air',status:'Completed',eta:'2026-05-05',arrivalDate:'2026-05-05',handler:'Yun Ning',emails:['lilian930308@gmail.com','yunning.theadspert@gmail.com'],users:['yunning','admin'],updates:[{date:'05 May 26',text:'Goods arrived & done inbounded'},{date:'04 May 26',text:'Arrived at Hub/Transit station'},{date:'02 May 26',text:'Arrived Msia, pending custom clearance'},{date:'01 May 26',text:'ETD China: 01 May 26, ETA HK: 02 May 26'},{date:'29 Apr 26',text:'Done payment, pending Air freight update'},{date:'23 Apr 26',text:'Goods arrived China warehouse, received PI for approval'}]},
+  {id:7,jobNo:'SY6047277224',product:'Bugucare Knee Braces (Cost-effective)',brand:'Bugucare',qty:3,unitPrice:'22.0 RMB',freight:'Air',status:'Completed',eta:'2026-05-08',arrivalDate:'2026-05-08',handler:'Wei Yao',emails:['lilian930308@gmail.com','weiyao.amfmarketing@gmail.com'],users:['weiyao','admin'],updates:[{date:'08 May 26',text:'Goods arrived Packxpert'},{date:'07 May 26',text:'Arrived Msia, in custom clearance'},{date:'05 May 26',text:'Shipment Off-Load — ETA: 07 May'},{date:'03 May 26',text:'In Shipment Packing at China'},{date:'30 Apr 26',text:'Payment done, shipment scheduled 03 May'},{date:'22 Apr 26',text:'Shipped out to China warehouse'}]},
+  {id:8,jobNo:'SY6047277294',product:'Bugucare Knee Braces (High-support)',brand:'Bugucare',qty:3,unitPrice:'10.48 RMB',freight:'Air',status:'Completed',eta:'2026-05-08',arrivalDate:'2026-05-08',handler:'Wei Yao',emails:['lilian930308@gmail.com','weiyao.amfmarketing@gmail.com'],users:['weiyao','admin'],updates:[{date:'08 May 26',text:'Goods arrived Packxpert'},{date:'07 May 26',text:'Arrived Msia, in custom clearance'},{date:'05 May 26',text:'Shipment Off-Load — ETA: 07 May'},{date:'03 May 26',text:'In Shipment Packing at China'},{date:'30 Apr 26',text:'Payment done, shipment scheduled 03 May'}]},
+  {id:9,jobNo:'SY6047278985 / SY6047278996',product:'FIA Analyzer & PSA Diagnostic Kits',brand:'FIA / PSA',qty:2,unitPrice:'—',freight:'Air',status:'Open',eta:null,arrivalDate:null,handler:'Yan Lin',emails:['lilian930308@gmail.com','justtypicalylin@gmail.com'],users:['yanlin','admin'],updates:[{date:'11 May 26',text:'Payment proceeded, pending approval'},{date:'07 May 26',text:'Goods arrived, proceed for shipping payment'},{date:'06 May 26',text:'Payment slip sent, goods sent to VSpeed warehouse China (SF1563824801242)'},{date:'04 May 26',text:'Payment completed, pending payment slip from bank'},{date:'28 Apr 26',text:'REVISED PI submitted, pending management approval'},{date:'23 Apr 26',text:'Pending PI approval from Siu Chong & Anden'}]},
+];
+
+// ═══════════════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════════════
+const SK_SHIPS  = 'gwp_ships_v5';
+const SK_OWNERS = 'gwp_owners_v5';
+const SK_META   = 'gwp_meta_v5';
+
+let SHIPS=[], OWNERS=[];
+
+function loadData(){
+  try{
+    const rs=localStorage.getItem(SK_SHIPS);
+    const ro=localStorage.getItem(SK_OWNERS);
+    if(rs) SHIPS=JSON.parse(rs); else{SHIPS=JSON.parse(JSON.stringify(DEFAULT_SHIPS));}
+    if(ro) OWNERS=JSON.parse(ro); else{OWNERS=JSON.parse(JSON.stringify(DEFAULT_OWNERS));}
+    if(!rs||!ro) saveData();
+  }catch(e){SHIPS=JSON.parse(JSON.stringify(DEFAULT_SHIPS));OWNERS=JSON.parse(JSON.stringify(DEFAULT_OWNERS));saveData();}
+}
+
+function saveData(){
+  localStorage.setItem(SK_SHIPS,JSON.stringify(SHIPS));
+  localStorage.setItem(SK_OWNERS,JSON.stringify(OWNERS));
+  localStorage.setItem(SK_META,JSON.stringify({saved:new Date().toISOString(),ships:SHIPS.length,owners:OWNERS.length}));
+}
+
+function nextId(){return SHIPS.length?Math.max(...SHIPS.map(s=>s.id))+1:1;}
+function genKey(name){return name.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'')+'_'+(Date.now()%10000);}
+
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+const VS_URL='https://system.vspeed.asia/index.php?route=information/order_tracking/search&order_tracking_search=';
+const SF_URL='https://www.sf-express.com/cgi-bin/waybill.cgi?lang=en_HK&AWB_NO=';
+const TODAY=new Date('2026-05-12');
+const STATUS_MAP={'Open':{cls:'b-open',lbl:'Active'},'Completed':{cls:'b-completed',lbl:'Completed'},'Pending':{cls:'b-pending',lbl:'Pending'},'Delayed':{cls:'b-delayed',lbl:'Delayed'},'Approved':{cls:'b-approved',lbl:'Approved'}};
+const COLORS=['#7c3aed','#0369a1','#065f46','#b45309','#0f766e','#be185d','#4f46e5','#b91c1c','#0369a1','#374151'];
+
+let CU=null, CUK=null, myShips=[], filtered=[], selUser=null, activeOnly=false;
+let modalColor='#7c3aed';
+
+// ═══════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════
+function daysTo(eta){if(!eta)return null;return Math.ceil((new Date(eta)-TODAY)/86400000);}
+function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'2-digit'});}
+function nowDateStr(){const d=new Date();return`${String(d.getDate()).padStart(2,'0')} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]} ${String(d.getFullYear()).slice(-2)}`;}
+function badge(st){const s=STATUS_MAP[st]||{cls:'b-pending',lbl:st};return`<span class="badge ${s.cls}">${s.lbl}</span>`;}
+function fbadge(f){if(!f)return'';return`<span class="fb ${f==='Air'?'fb-air':'fb-ocean'}">${f==='Air'?'✈':'🚢'} ${f}</span>`;}
+function trackUrl(s){const t=s.jobNo.split('/')[0].trim();return(t.startsWith('SF')&&!t.startsWith('SY'))?SF_URL+t:VS_URL+t;}
+function ownerByEmail(email){return OWNERS.find(o=>o.email===email);}
+function ownerByKey(key){return OWNERS.find(o=>o.key===key);}
+function ownerShips(ownerKey){const o=ownerByKey(ownerKey);if(!o)return[];return SHIPS.filter(s=>s.emails&&s.emails.includes(o.email));}
+function initials(name){return name.split(' ').map(p=>p[0]).join('').toUpperCase().slice(0,2);}
+function randColor(){return COLORS[Math.floor(Math.random()*COLORS.length)];}
+
+function toast(msg,type='',dur=3200){
+  const w=document.getElementById('toast-wrap');
+  const el=document.createElement('div');el.className='toast '+type;
+  el.innerHTML=`<span>${msg}</span>`;w.appendChild(el);
+  setTimeout(()=>{el.style.animation='toastOut .3s ease forwards';setTimeout(()=>el.remove(),300);},dur);
+}
+
+function getProgress(s){
+  const log=s.updates.map(u=>u.text.toLowerCase()).join(' ');
+  if(s.status==='Completed'||log.includes('packxpert')||log.includes('inbounded'))return 5;
+  if(log.includes('vspeed warehouse')||log.includes('sorting for delivery')||log.includes('in transit for delivery'))return 4;
+  if(log.includes('clearance')||log.includes('customs'))return 3;
+  if(log.includes('vessel depart')||log.includes('flight')||log.includes('etd')||log.includes('packing'))return 2;
+  if(log.includes('production')||log.includes('china warehouse')||log.includes('stuffed'))return 1;
+  return 0;
+}
+
+// ═══════════════════════════════════════════════════
+// LOGIN — dynamic from OWNERS array
+// ═══════════════════════════════════════════════════
+function renderLoginAccounts(){
+  const list=document.getElementById('acct-list');
+  list.innerHTML='';
+  // Admin first, then others
+  const sorted=[...OWNERS].sort((a,b)=>{
+    if(a.role==='admin'&&b.role!=='admin')return -1;
+    if(b.role==='admin'&&a.role!=='admin')return 1;
+    return a.name.localeCompare(b.name);
+  });
+  sorted.forEach(o=>{
+    if(o.perms&&o.perms.active===false)return; // skip inactive
+    const el=document.createElement('div');
+    el.className='acct-item';el.dataset.user=o.key;
+    el.onclick=()=>selAcct(el);
+    el.innerHTML=`
+      <div class="acct-av" style="background:${o.color||'#374151'}">${initials(o.name)}</div>
+      <div class="acct-info"><div class="acct-name">${o.name}</div><div class="acct-email">${o.email}</div></div>
+      <span class="acct-badge ${o.role==='admin'?'b-admin':'b-handler'}">${o.role==='admin'?'Admin':'Handler'}</span>`;
+    list.appendChild(el);
+  });
+}
+
+function selAcct(el){
+  document.querySelectorAll('.acct-item').forEach(x=>x.classList.remove('sel'));
+  el.classList.add('sel'); selUser=el.dataset.user;
+  document.getElementById('login-btn').disabled=false;
+}
+
+function doLogin(){
+  if(!selUser)return;
+  CU=ownerByKey(selUser); CUK=selUser;
+  if(!CU){toast('Account not found','error');return;}
+  if(CU.perms&&CU.perms.active===false){toast('This account is disabled. Contact admin.','error');return;}
+  myShips=CU.role==='admin'?[...SHIPS]:SHIPS.filter(s=>s.emails&&s.emails.includes(CU.email));
+  filtered=[...myShips];
+
+  if(CU.role==='admin'){
+    document.querySelectorAll('.admin-only').forEach(x=>x.style.display='');
+    document.getElementById('admin-tab').style.display='';
+    document.getElementById('handler-card').style.display='';
+    populateHandlerFilter();
+    populateUpdateDropdown();
+    populatePermUserSel();
+    renderExistingHandlerChips();
+    renderUserGrid();
+  }
+  const av=document.getElementById('tb-av');av.style.background=CU.color||'#374151';av.textContent=initials(CU.name);
+  document.getElementById('tb-name').textContent=CU.name;
+  const r=document.getElementById('tb-role');r.textContent=CU.role==='admin'?'Admin':'Handler';
+  r.className='tb-role '+(CU.role==='admin'?'tb-role-admin':'tb-role-handler');
+
+  const ls=document.getElementById('login-screen');
+  ls.style.opacity='0';ls.style.pointerEvents='none';
+  setTimeout(()=>ls.style.display='none',300);
+  document.getElementById('app').style.display='block';
+  renderDash();renderTable(filtered);renderAdminTbl();updateStorageInfo();
+}
+
+function doLogout(){location.reload();}
+
+// ═══════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════
+function goPage(page,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.tb-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  if(page==='admin')renderAdminTbl();
+}
+function adminNav(btn,sec){
+  document.querySelectorAll('.admin-nav-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.admin-sec').forEach(s=>s.classList.remove('active'));
+  document.getElementById(sec).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════
+function renderDash(){
+  const s=myShips, isAdmin=CU.role==='admin';
+  document.getElementById('dash-title').textContent=isAdmin?'All Shipments Overview':`${CU.name}'s Dashboard`;
+  document.getElementById('dash-sub').textContent=`${s.length} shipment${s.length!==1?'s':''} ${isAdmin?'across all handlers':'assigned to you'}`;
+
+  const active=s.filter(x=>x.status!=='Completed').length;
+  const completed=s.filter(x=>x.status==='Completed').length;
+  const soon=s.filter(x=>x.status!=='Completed'&&x.eta&&daysTo(x.eta)>=0&&daysTo(x.eta)<=3).length;
+  const pending=s.filter(x=>x.status==='Pending').length;
+  const delayed=s.filter(x=>x.status==='Delayed').length;
+  const overdue=s.filter(x=>x.status!=='Completed'&&x.eta&&daysTo(x.eta)<0).length;
+  const noEta=s.filter(x=>x.status!=='Completed'&&!x.eta).length;
+
+  // Alerts
+  const az=document.getElementById('alert-zone');az.innerHTML='';
+  if(overdue>0){
+    const names=s.filter(x=>x.status!=='Completed'&&x.eta&&daysTo(x.eta)<0).map(x=>`${x.product} (${Math.abs(daysTo(x.eta))}d overdue)`).join(', ');
+    az.innerHTML+=`<div class="alert alert-red"><div class="alert-icon">🔴</div><div class="alert-content"><div class="alert-title">${overdue} overdue shipment${overdue>1?'s':''} — action needed</div><div class="alert-body">${names}</div></div></div>`;
+  }
+  if(soon>0){
+    const names=s.filter(x=>x.status!=='Completed'&&x.eta&&daysTo(x.eta)>=0&&daysTo(x.eta)<=3).map(x=>`${x.product} (${fmtDate(x.eta)})`).join(', ');
+    az.innerHTML+=`<div class="alert alert-amber"><div class="alert-icon">⚠️</div><div class="alert-content"><div class="alert-title">${soon} arriving within 3 days</div><div class="alert-body">${names}</div></div></div>`;
+  }
+
+  // KPIs
+  document.getElementById('kpi-grid').innerHTML=[
+    {lbl:'Total',val:s.length,sub:'shipments',cls:'kpi-blue'},
+    {lbl:'Active',val:active,sub:'in progress',cls:'kpi-amber'},
+    {lbl:'Completed',val:completed,sub:'arrived',cls:'kpi-teal'},
+    {lbl:'Arriving ≤3 Days',val:soon,sub:'check now',cls:'kpi-red'},
+    {lbl:'Pending',val:pending,sub:'awaiting',cls:'kpi-slate'},
+    {lbl:'Delayed',val:delayed,sub:delayed?'needs attention':'all on track',cls:'kpi-green'},
+  ].map(k=>`<div class="kpi-card ${k.cls}"><div class="kpi-label">${k.lbl}</div><div class="kpi-val">${k.val}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
+
+  // Active list
+  const actShips=s.filter(x=>x.status!=='Completed').sort((a,b)=>{const da=daysTo(a.eta),db=daysTo(b.eta);if(da===null)return 1;if(db===null)return -1;return da-db;});
+  const dal=document.getElementById('dash-active');
+  dal.innerHTML=actShips.length?actShips.map(ship=>{
+    const d=daysTo(ship.eta);
+    let dot='#16a34a',meta=ship.handler+' · '+(ship.eta?fmtDate(ship.eta):'No ETA');
+    if(!ship.eta)dot='#dc2626';
+    else if(d<0){dot='#dc2626';meta=ship.handler+' · Overdue '+Math.abs(d)+'d';}
+    else if(d<=3){dot='#d97706';meta=ship.handler+' · ETA in '+d+'d';}
+    return`<div class="recent-item" onclick="openD(${ship.id})"><div class="ri-dot" style="background:${dot}"></div><div class="ri-info"><div class="ri-name">${ship.product}</div><div class="ri-meta">${meta}</div></div><div>${badge(ship.status)}</div></div>`;
+  }).join(''):'<div class="empty-st" style="padding:30px"><div class="empty-ico">🎉</div><div class="empty-title">All shipments completed</div></div>';
+
+  // Status dist
+  document.getElementById('dash-dist').innerHTML=[
+    {lbl:'Active',val:'Open',color:'#2455e8'},
+    {lbl:'Completed',val:'Completed',color:'#0d9488'},
+    {lbl:'Pending',val:'Pending',color:'#475569'},
+    {lbl:'Delayed',val:'Delayed',color:'#d97706'},
+  ].map(st=>{const n=s.filter(x=>x.status===st.val).length;const pct=s.length?Math.round(n/s.length*100):0;return`<div class="dist-row"><div class="dist-label">${st.lbl}</div><div class="dist-track"><div class="dist-fill" style="width:${pct}%;background:${st.color}"></div></div><div class="dist-ct">${n}</div></div>`;}).join('');
+
+  // Quick stats
+  const nx=s.filter(x=>x.status!=='Completed'&&x.eta).sort((a,b)=>new Date(a.eta)-new Date(b.eta))[0];
+  const done=s.filter(x=>x.arrivalDate).sort((a,b)=>new Date(b.arrivalDate)-new Date(a.arrivalDate))[0];
+  document.getElementById('dash-qs').innerHTML=[
+    {lbl:'Air freight',dot:'#7c3aed',val:s.filter(x=>x.freight==='Air').length+' shipments'},
+    {lbl:'Ocean freight',dot:'#2455e8',val:s.filter(x=>x.freight==='Ocean').length+' shipments'},
+    {lbl:'No ETA set',dot:'#dc2626',val:noEta+' items'},
+    {lbl:'Next arriving',dot:'#d97706',val:nx?fmtDate(nx.eta):'None'},
+    {lbl:'Brand owners',dot:'#7c3aed',val:OWNERS.filter(o=>o.role!=\'admin\').length+\' active\'},
+  ].map(r=>`<div class="qs-row"><div class="qs-lbl"><div class="qs-dot" style="background:${r.dot}"></div>${r.lbl}</div><div class="qs-val">${r.val}</div></div>`).join('');
+
+  // Brand owners in sidebar (admin)
+  if(isAdmin){
+    const handlers=OWNERS.filter(o=>o.role!=='admin');
+    document.getElementById('dash-owners').innerHTML=handlers.map(o=>{
+      const count=ownerShips(o.key).length;
+      const active=ownerShips(o.key).filter(s=>s.status!=='Completed').length;
+      return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="width:28px;height:28px;border-radius:50%;background:${o.color||'#666'};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0">${initials(o.name)}</div>
+        <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${o.name}</div><div style="font-size:10px;color:var(--ink4)">${o.brand||'—'}</div></div>
+        <div style="font-size:11px;color:var(--ink4)">${active} active</div>
+      </div>`;
+    }).join('')||'<div style="font-size:12px;color:var(--ink4);padding:10px 0">No brand owners yet</div>';
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// SHIPMENTS TABLE
+// ═══════════════════════════════════════════════════
+function renderTable(ships){
+  const tbody=document.getElementById('ship-tbody');
+  const empty=document.getElementById('ship-empty');
+  document.getElementById('res-ct').textContent=`${ships.length} record${ships.length!==1?'s':''}`;
+  document.getElementById('ship-sub').textContent=CU.role==='admin'?`All shipments — admin view`:`${ships.length} project${ships.length!==1?'s':''} for ${CU.name}`;
+  if(!ships.length){tbody.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  tbody.innerHTML=ships.map(s=>{
+    const d=daysTo(s.eta);
+    let etaCls='eta-ok',etaTxt=s.eta?fmtDate(s.eta):'—';
+    if(s.status!=='Completed'){if(!s.eta)etaCls='eta-over';else if(d<0){etaCls='eta-over';etaTxt+=` (${Math.abs(d)}d late)`;}else if(d<=3){etaCls='eta-soon';etaTxt+=` (${d}d)`;}}
+    const handlerOwner=OWNERS.find(o=>o.name===s.handler)||{color:'#666'};
+    const upd=s.updates[0];
+    const rowCls=s.status==='Completed'?'row-done':(!s.eta||d<0)?'row-over':(d<=3?'row-soon':'');
+    return`<tr class="${rowCls}" onclick="openD(${s.id})">
+      <td><div class="td-prod">${s.product}</div><div class="td-job">${s.jobNo}</div></td>
+      <td class="hide-sm"><div style="display:flex;align-items:center;gap:6px"><div style="width:22px;height:22px;border-radius:50%;background:${handlerOwner.color};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0">${initials(s.handler)}</div>${s.handler}</div></td>
+      <td>${badge(s.status)}</td>
+      <td class="hide-sm">${fbadge(s.freight)}</td>
+      <td class="hide-sm"><span class="${etaCls}">${etaTxt}</span></td>
+      <td class="hide-sm"><div class="upd-prev">${upd?upd.date+' — '+upd.text:'—'}</div></td>
+    </tr>`;
+  }).join('');
+}
+
+function applyF(){
+  const q=document.getElementById('srch').value.toLowerCase();
+  const st=document.getElementById('f-status').value;
+  const fr=document.getElementById('f-freight').value;
+  const h=document.getElementById('f-handler').value;
+  filtered=myShips.filter(s=>
+    (!q||s.product.toLowerCase().includes(q)||s.jobNo.toLowerCase().includes(q)||s.brand.toLowerCase().includes(q)||s.handler.toLowerCase().includes(q))&&
+    (!st||s.status===st)&&(!fr||s.freight===fr)&&(!h||s.handler===h)&&
+    (!activeOnly||s.status!=='Completed')
+  );
+  renderTable(filtered);
+}
+
+function toggleActive(){
+  activeOnly=!activeOnly;
+  document.getElementById('chip-active').classList.toggle('on',activeOnly);
+  applyF();
+}
+
+function populateHandlerFilter(){
+  const hf=document.getElementById('f-handler');
+  hf.innerHTML='<option value="">All handlers</option>';
+  [...new Set(SHIPS.map(s=>s.handler))].sort().forEach(h=>{
+    const o=document.createElement('option');o.value=h;o.textContent=h;hf.appendChild(o);
+  });
+}
+
+// ═══════════════════════════════════════════════════
+// DETAIL DRAWER
+// ═══════════════════════════════════════════════════
+function openD(id){
+  const s=SHIPS.find(x=>x.id===id);if(!s)return;
+  document.getElementById('d-prod').textContent=s.product;
+  document.getElementById('d-jobno').textContent='Job No: '+s.jobNo;
+  document.getElementById('d-badges').innerHTML=badge(s.status)+' '+fbadge(s.freight);
+  const isAdmin=CU.role==='admin', d=daysTo(s.eta);
+  const STAGES=['Ordered','Production','Shipped','Customs','Warehouse','Delivered'];
+  const ai=getProgress(s);
+
+  const progHtml=`<div class="d-sec"><div class="d-sec-title">📍 Shipment Progress</div><div class="prog-stages">
+    ${STAGES.map((lbl,i)=>{
+      const cls=i<ai?'done':i===ai?'cur':'';
+      const icon=i<ai?'✓':i===ai?'●':'○';
+      const lblCls=i<ai?'done-lbl':i===ai?'cur-lbl':'';
+      const lineColor=i<ai?'var(--teal)':'var(--bd2)';
+      const nextLine=i<STAGES.length-1?`<div style="position:absolute;left:50%;right:-50%;top:10px;height:2px;background:${lineColor};z-index:0"></div>`:'';
+      return`<div class="prog-stage">${nextLine}<div class="prog-dot ${cls}">${icon}</div><div class="prog-lbl ${lblCls}">${lbl}</div></div>`;
+    }).join('')}
+  </div></div>`;
+
+  const infoHtml=`<div class="d-sec"><div class="d-sec-title">📋 Details</div>
+    <div class="info-grid">
+      <div class="ii"><label>Brand</label><span>${s.brand}</span></div>
+      <div class="ii"><label>Quantity</label><span>${s.qty?.toLocaleString()||'—'}</span></div>
+      <div class="ii"><label>ETA Date</label><span>${fmtDate(s.eta)}${d!==null&&s.status!=='Completed'?` <small style="color:${d<0?'var(--red)':'var(--amber)'};">(${Math.abs(d)}d ${d<0?'overdue':'left'})</small>`:''}</span></div>
+      <div class="ii"><label>Freight</label><span>${s.freight||'—'}</span></div>
+      ${s.unitPrice&&s.unitPrice!=='—'?`<div class="ii"><label>Unit Price</label><span>${s.unitPrice}</span></div>`:''}
+      ${s.arrivalDate?`<div class="ii"><label>Arrived</label><span style="color:var(--teal);font-weight:700">${fmtDate(s.arrivalDate)}</span></div>`:''}
+    </div>
+    <div style="margin-top:12px"><a href="${trackUrl(s)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--blue-lt);color:var(--blue);border:1px solid var(--blue-bd);border-radius:var(--r-sm);font-size:12px;font-weight:600;text-decoration:none">🔗 Check VSpeed Tracking</a></div>
+  </div>`;
+
+  // Show handler with owner card
+  const handlerOwner=OWNERS.find(o=>o.name===s.handler);
+  const emailHtml=`<div class="d-sec"><div class="d-sec-title">👤 Handler & Access</div>
+    ${handlerOwner?`<div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:10px">
+      <div style="width:36px;height:36px;border-radius:50%;background:${handlerOwner.color};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff">${initials(handlerOwner.name)}</div>
+      <div><div style="font-size:13px;font-weight:600">${handlerOwner.name}</div><div style="font-size:11px;color:var(--ink4)">${handlerOwner.brand||''}</div></div>
+      <div style="margin-left:auto"><span class="perm-badge ${handlerOwner.role==='admin'?'perm-admin':'perm-ro'}">${handlerOwner.role==='admin'?'Admin':'Handler'}</span></div>
+    </div>`:''}
+    ${s.emails.map(e=>{const o=ownerByEmail(e);return`<div class="email-chip"><span style="font-size:12px">✉</span><span style="font-family:var(--mono);font-size:12px;color:var(--blue)">${e}</span>${o?`<span style="margin-left:auto;font-size:10px;color:var(--ink4)">${o.name}</span>`:''}</div>`;}).join('')}
+  </div>`;
+
+  const editHtml=isAdmin?`<div class="d-sec"><div class="d-sec-title">✏️ Edit <span style="font-size:9px;color:var(--blue);font-weight:400;text-transform:none;margin-left:4px">(Admin only)</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div class="fg"><label class="fl">Status</label><select class="fs" id="es${id}">${Object.entries(STATUS_MAP).map(([v,m])=>`<option value="${v}" ${s.status===v?'selected':''}>${m.lbl}</option>`).join('')}</select></div>
+      <div class="fg"><label class="fl">ETA Date</label><input class="fi" type="date" id="ee${id}" value="${s.eta||''}"></div>
+    </div>
+    <div class="fg" style="margin-bottom:10px"><label class="fl">Add Update Note</label><textarea class="ft" id="eu${id}" placeholder="e.g. ${nowDateStr()} - Container arrived VSpeed warehouse…" style="min-height:68px"></textarea></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary btn-sm" onclick="saveInline(${id})">💾 Save</button>
+      <button class="btn btn-danger btn-sm" onclick="confirmDelete(${id})">🗑 Delete</button>
+    </div>
+  </div>`:`<div class="d-sec"><div class="readonly-note">🔒 Read-only access. Contact admin for changes.</div></div>`;
+
+  const tlHtml=`<div class="d-sec"><div class="d-sec-title">🕐 Timeline (${s.updates.length})</div>
+    <div>${s.updates.map((u,i)=>{const arr=u.text.toLowerCase().includes('packxpert')||u.text.toLowerCase().includes('inbounded');return`<div class="tl-item"><div class="tl-dot ${i===0?'latest':arr?'arrived':''}${i===0?'':(arr?'arrived':'')}">${i===0?'★':arr?'🏁':'·'}</div><div class="tl-ct"><div class="tl-date">${u.date}</div><div class="tl-text">${u.text}</div></div></div>`;}).join('')}</div>
+  </div>`;
+
+  document.getElementById('d-body').innerHTML=progHtml+infoHtml+emailHtml+editHtml+tlHtml;
+  document.getElementById('dbg').style.display='block';
+  setTimeout(()=>document.getElementById('drawer').classList.add('open'),10);
+}
+
+function closeD(){document.getElementById('drawer').classList.remove('open');setTimeout(()=>document.getElementById('dbg').style.display='none',250);}
+
+function saveInline(id){
+  const s=SHIPS.find(x=>x.id===id);if(!s)return;
+  s.status=document.getElementById('es'+id).value;
+  const eta=document.getElementById('ee'+id).value;
+  if(eta)s.eta=eta;
+  if(s.status==='Completed'&&eta)s.arrivalDate=eta;
+  const note=document.getElementById('eu'+id).value.trim();
+  if(note)s.updates.unshift({date:nowDateStr(),text:note});
+  saveData();refresh();closeD();
+  toast('✅ Shipment updated','success');
+}
+
+function confirmDelete(id){
+  const s=SHIPS.find(x=>x.id===id);if(!s)return;
+  if(confirm(`Delete "${s.product}"?\nThis cannot be undone.`)){
+    SHIPS.splice(SHIPS.indexOf(s),1);saveData();refresh();closeD();
+    toast('🗑 Record deleted','');
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// AUTO-ASSIGNMENT ENGINE
+// ═══════════════════════════════════════════════════
+
+// Detect existing owner by email as user types
+function onHandlerEmailInput(){
+  const email=document.getElementById('f-hem1').value.trim().toLowerCase();
+  const preview=document.getElementById('auto-detect-preview');
+  if(!email||!email.includes('@')){preview.style.display='none';return;}
+  const existing=OWNERS.find(o=>o.email.toLowerCase()===email);
+  if(existing){
+    preview.style.display='block';
+    preview.innerHTML=`<div class="alert alert-green"><div class="alert-icon">✅</div><div class="alert-content"><div class="alert-title">Existing owner found: ${existing.name}</div><div class="alert-body">This shipment will be automatically assigned to <strong>${existing.name}</strong> (${existing.brand||'no brand'}). They will see it in their portal immediately after saving.</div></div></div>`;
+    document.getElementById('f-hname').value=existing.name;
+  } else {
+    preview.style.display='block';
+    preview.innerHTML=`<div class="alert alert-amber"><div class="alert-icon">🆕</div><div class="alert-content"><div class="alert-title">New owner will be created</div><div class="alert-body">No profile found for <strong>${email}</strong>. A new brand owner account will be <strong>automatically created</strong> when you save this shipment. Fill in their name above to complete the profile.</div></div></div>`;
+  }
+}
+
+function onHandlerNameInput(){
+  const name=document.getElementById('f-hname').value.trim().toLowerCase();
+  const existing=OWNERS.find(o=>o.name.toLowerCase()===name);
+  if(existing){document.getElementById('f-hem1').value=existing.email;onHandlerEmailInput();}
+}
+
+function renderExistingHandlerChips(){
+  const el=document.getElementById('existing-handlers-chips');
+  if(!el)return;
+  el.innerHTML=OWNERS.filter(o=>o.role!=='admin').map(o=>`
+    <button onclick="selectExistingHandler('${o.key}')" style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--bd2);border-radius:20px;font-size:12px;background:var(--surface);cursor:pointer;transition:all .12s" onmouseover="this.style.borderColor=this.style.background='${o.color}20'" onmouseout="this.style.borderColor='var(--bd2)';this.style.background='var(--surface)'">
+      <div style="width:18px;height:18px;border-radius:50%;background:${o.color};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff">${initials(o.name)}</div>
+      ${o.name}
+    </button>`).join('');
+}
+
+function selectExistingHandler(key){
+  const o=OWNERS.find(x=>x.key===key);if(!o)return;
+  document.getElementById('f-hname').value=o.name;
+  document.getElementById('f-hem1').value=o.email;
+  onHandlerEmailInput();
+}
+
+// The core auto-assign function
+function autoAssignOrCreateOwner(name, email, email2, email3){
+  if(!name||!email)return null;
+  // Check if owner already exists
+  let owner=OWNERS.find(o=>o.email.toLowerCase()===email.toLowerCase());
+  if(owner){
+    // Already exists — just return the key
+    return owner.key;
+  }
+  // Create new owner automatically
+  const key=genKey(name);
+  const color=COLORS[OWNERS.length % COLORS.length];
+  const newOwner={
+    key, name, email,
+    role:'handler',
+    color,
+    brand:'',
+    notes:`Auto-created when shipment was added`,
+    perms:{timeline:true,tracking:true,active:true},
+    createdAt:new Date().toISOString().slice(0,10),
+  };
+  OWNERS.push(newOwner);
+  toast(`🆕 New brand owner created: ${name}`, '', 4000);
+  return key;
+}
+
+// ═══════════════════════════════════════════════════
+// ADD SHIPMENT (with auto-assign)
+// ═══════════════════════════════════════════════════
+function addShipment(){
+  const jobNo=document.getElementById('f-jobno').value.trim();
+  const product=document.getElementById('f-product').value.trim();
+  const brand=document.getElementById('f-brand').value.trim();
+  const freight=document.getElementById('f-freight-sel').value;
+  const status=document.getElementById('f-status-sel').value;
+  const eta=document.getElementById('f-eta').value;
+  const hname=document.getElementById('f-hname').value.trim();
+  const hem1=document.getElementById('f-hem1').value.trim();
+  const hem2=document.getElementById('f-hem2').value.trim();
+  const hem3=document.getElementById('f-hem3').value.trim();
+  const qty=document.getElementById('f-qty').value;
+  const price=document.getElementById('f-price').value.trim();
+  const notes=document.getElementById('f-notes').value.trim();
+
+  if(!jobNo||!product||!brand||!freight||!hname||!hem1){
+    toast('⚠ Fill in required fields (Job No, Product, Brand, Freight, Handler Name & Email)','warning');return;
+  }
+
+  // AUTO-ASSIGN: create or find the owner
+  const ownerKey=autoAssignOrCreateOwner(hname, hem1, hem2, hem3);
+  const owner=ownerByKey(ownerKey);
+
+  // Build emails list
+  const emails=[hem1,hem2,hem3].filter(Boolean);
+  // Always include admin email
+  if(!emails.includes('lilian930308@gmail.com')) emails.unshift('lilian930308@gmail.com');
+  // Remove the admin email duplicate if it's the handler email
+  const uniqueEmails=[...new Set(emails)];
+
+  // Build users list (owner key + admin)
+  const users=[ownerKey,'admin'].filter((v,i,a)=>a.indexOf(v)===i);
+
+  const newShip={
+    id:nextId(), jobNo, product, brand,
+    qty:qty?parseInt(qty):null,
+    unitPrice:price||'—',
+    freight, status,
+    eta:eta||null,
+    arrivalDate:status==='Completed'&&eta?eta:null,
+    handler:hname,
+    emails:uniqueEmails,
+    users,
+    updates:notes?[{date:nowDateStr(),text:notes}]:[{date:nowDateStr(),text:'Shipment record created'}],
+  };
+
+  SHIPS.push(newShip);
+
+  // Update owner's brand if it's new and brand is provided
+  if(owner&&(!owner.brand||owner.brand==='')&&brand){owner.brand=brand;}
+
+  saveData();
+  refresh();
+  clearAddForm();
+  renderLoginAccounts();
+  renderUserGrid();
+  renderExistingHandlerChips();
+  populateUpdateDropdown();
+  populateHandlerFilter();
+  populatePermUserSel();
+
+  toast(`✅ Shipment added & assigned to ${hname}`,'success');
+  updateStorageInfo();
+}
+
+function clearAddForm(){
+  ['f-jobno','f-product','f-brand','f-qty','f-eta','f-hname','f-hem1','f-hem2','f-hem3','f-price','f-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const fs=document.getElementById('f-freight-sel');if(fs)fs.value='';
+  const ss=document.getElementById('f-status-sel');if(ss)ss.value='Open';
+  const prev=document.getElementById('auto-detect-preview');if(prev)prev.style.display='none';
+}
+
+// ═══════════════════════════════════════════════════
+// BRAND OWNER MANAGEMENT
+// ═══════════════════════════════════════════════════
+function renderUserGrid(){
+  const el=document.getElementById('user-grid');if(!el)return;
+  const handlers=OWNERS.filter(o=>o.role!=='admin');
+  if(!handlers.length){el.innerHTML='<div class="empty-st"><div class="empty-ico">👥</div><div class="empty-title">No brand owners yet</div><div class="empty-sub">Add your first brand owner</div></div>';return;}
+  el.innerHTML=handlers.map(o=>{
+    const ships=ownerShips(o.key);
+    const active=ships.filter(s=>s.status!=='Completed').length;
+    const isActive=!o.perms||o.perms.active!==false;
+    return`<div class="user-card" style="${!isActive?'opacity:.6':''}">
+      <div class="user-card-badge"><span class="perm-badge ${isActive?'perm-ro':'perm-admin'}">${isActive?'Active':'Disabled'}</span></div>
+      <div class="user-card-head">
+        <div class="user-av-lg" style="background:${o.color||'#666'}">${initials(o.name)}</div>
+        <div class="user-card-info">
+          <div class="user-card-name">${o.name}</div>
+          <div class="user-card-email">${o.email}</div>
+        </div>
+      </div>
+      <div class="user-card-meta">
+        <span class="user-card-stat">📦 ${ships.length} shipment${ships.length!==1?'s':''}</span>
+        <span class="user-card-stat">🟢 ${active} active</span>
+        ${o.brand?`<span class="user-card-stat">🏷 ${o.brand}</span>`:''}
+      </div>
+      <div class="user-card-projects">${ships.length?'<strong>Projects:</strong> '+ships.map(s=>`<span style="display:inline-block;padding:1px 6px;background:var(--surface2);border-radius:3px;font-size:10px;margin:1px">${s.product}</span>`).join(''):'<span style="color:var(--ink4);font-size:12px">No shipments assigned yet</span>'}</div>
+      ${o.notes?`<div style="font-size:11px;color:var(--ink4);margin-bottom:10px;padding:7px;background:var(--surface2);border-radius:4px">${o.notes}</div>`:''}
+      <div class="user-card-actions">
+        <button class="btn btn-secondary btn-sm" onclick="editOwner('${o.key}')">✏️ Edit</button>
+        <button class="btn btn-secondary btn-sm" onclick="toggleOwnerActive('${o.key}')">${isActive?'🚫 Disable':'✅ Enable'}</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteOwner('${o.key}')">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openAddUserModal(){
+  document.getElementById('m-name').value='';
+  document.getElementById('m-email').value='';
+  document.getElementById('m-brand').value='';
+  document.getElementById('m-role').value='handler';
+  document.getElementById('m-notes').value='';
+  modalColor='#7c3aed';
+  document.querySelectorAll('#color-picker div').forEach(d=>d.style.border='2px solid transparent');
+  document.getElementById('modal-auto-assign-preview').style.display='none';
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
+
+function selColor(el,color){
+  modalColor=color;
+  document.querySelectorAll('#color-picker div').forEach(d=>d.style.border='2px solid transparent');
+  el.style.border='3px solid '+color;el.style.boxShadow='0 0 0 2px #fff, 0 0 0 4px '+color;
+}
+
+function addBrandOwner(){
+  const name=document.getElementById('m-name').value.trim();
+  const email=document.getElementById('m-email').value.trim();
+  const brand=document.getElementById('m-brand').value.trim();
+  const role=document.getElementById('m-role').value;
+  const notes=document.getElementById('m-notes').value.trim();
+  if(!name||!email){toast('⚠ Name and email are required','warning');return;}
+  if(OWNERS.find(o=>o.email.toLowerCase()===email.toLowerCase())){toast('⚠ An owner with this email already exists','warning');return;}
+  const key=genKey(name);
+  OWNERS.push({key,name,email,role,color:modalColor||randColor(),brand,notes,perms:{timeline:true,tracking:true,active:true},createdAt:new Date().toISOString().slice(0,10)});
+  saveData();
+  closeModal();renderLoginAccounts();renderUserGrid();populatePermUserSel();renderExistingHandlerChips();updateStorageInfo();
+  toast(`✅ Brand owner "${name}" created. They can now log in.`,'success');
+}
+
+function editOwner(key){
+  const o=OWNERS.find(x=>x.key===key);if(!o)return;
+  const newName=prompt('Edit name:',o.name);if(newName===null)return;
+  const newBrand=prompt('Edit brand/company:',o.brand||'');if(newBrand===null)return;
+  const newNotes=prompt('Edit notes:',o.notes||'');if(newNotes===null)return;
+  if(newName)o.name=newName;
+  if(newBrand!==null)o.brand=newBrand;
+  if(newNotes!==null)o.notes=newNotes;
+  saveData();renderUserGrid();renderLoginAccounts();renderDash();
+  toast('✅ Owner updated','success');
+}
+
+function toggleOwnerActive(key){
+  const o=OWNERS.find(x=>x.key===key);if(!o)return;
+  if(!o.perms)o.perms={timeline:true,tracking:true,active:true};
+  o.perms.active=!o.perms.active;
+  saveData();renderUserGrid();renderLoginAccounts();
+  toast(o.perms.active?`✅ ${o.name} re-enabled`:`🚫 ${o.name} disabled`,'');
+}
+
+function deleteOwner(key){
+  const o=OWNERS.find(x=>x.key===key);if(!o)return;
+  if(key==='admin'){toast('Cannot delete the admin account','error');return;}
+  if(!confirm(`Delete "${o.name}"?\n\nThis removes their login access but does NOT delete their assigned shipments.`))return;
+  OWNERS.splice(OWNERS.indexOf(o),1);
+  // Remove from shipment users arrays
+  SHIPS.forEach(s=>{s.users=s.users.filter(u=>u!==key);});
+  saveData();renderUserGrid();renderLoginAccounts();populatePermUserSel();renderExistingHandlerChips();renderAdminTbl();
+  toast(`🗑 "${o.name}" removed`,'');
+}
+
+// ═══════════════════════════════════════════════════
+// PERMISSIONS
+// ═══════════════════════════════════════════════════
+function populatePermUserSel(){
+  const sel=document.getElementById('perm-user-sel');if(!sel)return;
+  sel.innerHTML='<option value="">Choose brand owner…</option>';
+  OWNERS.filter(o=>o.role!=='admin').forEach(o=>{
+    const opt=document.createElement('option');opt.value=o.key;opt.textContent=o.name+' ('+o.email+')';sel.appendChild(opt);
+  });
+}
+
+function loadUserPerms(){
+  const key=document.getElementById('perm-user-sel').value;
+  const pt=document.getElementById('perm-toggles');
+  if(!key){pt.style.display='none';return;}
+  const o=OWNERS.find(x=>x.key===key);if(!o){pt.style.display='none';return;}
+  if(!o.perms)o.perms={timeline:true,tracking:true,active:true};
+  pt.style.display='block';
+  document.getElementById('perm-timeline').checked=o.perms.timeline!==false;
+  document.getElementById('perm-tracking').checked=o.perms.tracking!==false;
+  document.getElementById('perm-active').checked=o.perms.active!==false;
+  const ships=ownerShips(key);
+  const pal=document.getElementById('perm-assigned-list');
+  pal.innerHTML=ships.length?ships.map(s=>`<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:var(--surface3);border:1px solid var(--bd);border-radius:4px;font-size:11px">${badge(s.status)} ${s.product}</span>`).join(''):'<span style="font-size:12px;color:var(--ink4)">No shipments assigned yet</span>';
+}
+
+function saveUserPerm(permKey,val){
+  const key=document.getElementById('perm-user-sel').value;if(!key)return;
+  const o=OWNERS.find(x=>x.key===key);if(!o)return;
+  if(!o.perms)o.perms={timeline:true,tracking:true,active:true};
+  o.perms[permKey]=val;
+  saveData();
+  if(permKey==='active'){renderLoginAccounts();renderUserGrid();}
+  toast(`Permission updated for ${o.name}`,'',2000);
+}
+
+// ═══════════════════════════════════════════════════
+// ADMIN TABLE
+// ═══════════════════════════════════════════════════
+function renderAdminTbl(){
+  const tbody=document.getElementById('admin-tbl-body');if(!tbody)return;
+  tbody.innerHTML=SHIPS.map(s=>`<tr>
+    <td style="font-family:var(--mono);font-size:11px">${s.jobNo}</td>
+    <td style="font-weight:500">${s.product}</td>
+    <td>${s.handler}</td>
+    <td>${badge(s.status)}</td>
+    <td style="font-size:12px;color:var(--ink3)">${fmtDate(s.eta)}</td>
+    <td><div class="tbl-actions"><button class="icon-btn edit" onclick="openD(${s.id})" title="Edit">✏️</button><button class="icon-btn del" onclick="confirmDelete(${s.id})" title="Delete">🗑</button></div></td>
+  </tr>`).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// QUICK UPDATE
+// ═══════════════════════════════════════════════════
+function populateUpdateDropdown(){
+  const sel=document.getElementById('u-ship');if(!sel)return;
+  sel.innerHTML='<option value="">Choose shipment…</option>';
+  SHIPS.forEach(s=>{const o=document.createElement('option');o.value=s.id;o.textContent=`${s.product} (${s.jobNo})`;sel.appendChild(o);});
+}
+
+function quickUpdate(){
+  const id=parseInt(document.getElementById('u-ship').value);
+  const status=document.getElementById('u-status').value;
+  const eta=document.getElementById('u-eta').value;
+  const loc=document.getElementById('u-loc').value.trim();
+  const note=document.getElementById('u-note').value.trim();
+  if(!id){toast('⚠ Select a shipment','warning');return;}
+  if(!note){toast('⚠ Enter an update note','warning');return;}
+  const s=SHIPS.find(x=>x.id===id);if(!s)return;
+  s.status=status;
+  if(eta){s.eta=eta;if(status==='Completed')s.arrivalDate=eta;}
+  s.updates.unshift({date:nowDateStr(),text:note+(loc?` — Location: ${loc}`:'')});
+  saveData();refresh();
+  document.getElementById('u-ship').value='';document.getElementById('u-status').value='Open';
+  document.getElementById('u-eta').value='';document.getElementById('u-loc').value='';document.getElementById('u-note').value='';
+  document.getElementById('u-preview').style.display='none';
+  toast('✅ Status updated: '+s.product,'success');
+}
+
+function previewUpdate(){
+  const id=parseInt(document.getElementById('u-ship').value);
+  const note=document.getElementById('u-note').value.trim();
+  const status=document.getElementById('u-status').value;
+  if(!id||!note){toast('⚠ Select shipment and enter note first','warning');return;}
+  const s=SHIPS.find(x=>x.id===id);if(!s)return;
+  const pv=document.getElementById('u-preview');pv.style.display='block';
+  pv.innerHTML=`<div class="alert alert-green"><div class="alert-icon">👁</div><div class="alert-content"><div class="alert-title">Preview — ${s.product}</div><div class="alert-body"><strong>${nowDateStr()}</strong> — ${note}<br>Status: ${STATUS_MAP[s.status]?.lbl||s.status} → ${STATUS_MAP[status]?.lbl||status}</div></div></div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// DATA & BACKUP
+// ═══════════════════════════════════════════════════
+function updateStorageInfo(){
+  const meta=JSON.parse(localStorage.getItem(SK_META)||'{}');
+  const ss=document.getElementById('st-ships');if(ss)ss.textContent=SHIPS.length;
+  const su=document.getElementById('st-users');if(su)su.textContent=OWNERS.filter(o=>o.role!=='admin').length;
+  const sd=document.getElementById('st-date');if(sd)sd.textContent=meta.saved?new Date(meta.saved).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'—';
+}
+
+function exportJSON(){
+  const data={exported:new Date().toISOString(),version:'v5',shipments:SHIPS,owners:OWNERS};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');const d=new Date();
+  a.href=url;a.download=`GWP_backup_${d.getFullYear()}_${String(d.getMonth()+1).padStart(2,'0')}_${String(d.getDate()).padStart(2,'0')}.json`;
+  a.click();URL.revokeObjectURL(url);
+  toast('📥 JSON backup exported (includes owner profiles)','success');
+}
+
+function exportCSV(){
+  const headers=['Job No.','Product','Brand','Handler','Handler Email','Status','Freight','ETA','Arrival Date','Qty','Unit Price','Latest Update'];
+  const rows=SHIPS.map(s=>[s.jobNo,s.product,s.brand,s.handler,s.emails[0]||'',s.status,s.freight,s.eta||'',s.arrivalDate||'',s.qty||'',s.unitPrice||'',s.updates[0]?s.updates[0].date+' - '+s.updates[0].text:''].map(v=>`"${String(v).replace(/"/g,'""')}"`));
+  const csv=[headers.map(h=>`"${h}"`).join(','),...rows.map(r=>r.join(','))].join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');const d=new Date();
+  a.href=url;a.download=`GWP_shipments_${d.getFullYear()}_${String(d.getMonth()+1).padStart(2,'0')}_${String(d.getDate()).padStart(2,'0')}.csv`;
+  a.click();URL.revokeObjectURL(url);
+  toast('📊 CSV exported','success');
+}
+
+function importJSON(){document.getElementById('import-file').click();}
+function handleImport(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      const ships=data.shipments||data;
+      const owners=data.owners||null;
+      if(!Array.isArray(ships))throw new Error('Invalid');
+      if(confirm(`Import ${ships.length} shipments${owners?` and ${owners.length} owner profiles`:''} from "${file.name}"?\nThis replaces current data.`)){
+        SHIPS=ships;
+        if(owners&&Array.isArray(owners))OWNERS=owners;
+        saveData();refresh();renderLoginAccounts();renderUserGrid();populatePermUserSel();renderExistingHandlerChips();populateUpdateDropdown();populateHandlerFilter();
+        toast(`✅ Imported ${ships.length} shipments${owners?` + ${owners.length} owners`:''}`,'success');
+        updateStorageInfo();
+      }
+    }catch(err){toast('❌ Invalid backup file format','error');}
+  };
+  reader.readAsText(file);input.value='';
+}
+
+function resetToDefault(){
+  if(confirm('Reset to original data (9 shipments + 5 owners)?\nExport a backup first if needed.')){
+    SHIPS=JSON.parse(JSON.stringify(DEFAULT_SHIPS));
+    OWNERS=JSON.parse(JSON.stringify(DEFAULT_OWNERS));
+    saveData();refresh();renderLoginAccounts();renderUserGrid();populatePermUserSel();renderExistingHandlerChips();populateUpdateDropdown();populateHandlerFilter();
+    toast('↩ Reset to original data','');updateStorageInfo();
+  }
+}
+
+function confirmClear(){
+  const t=prompt('Type DELETE to confirm clearing all data.');
+  if(t==='DELETE'){SHIPS=[];OWNERS=[...DEFAULT_OWNERS.filter(o=>o.role==='admin')];saveData();refresh();renderLoginAccounts();renderUserGrid();
+    toast('🗑 Shipments cleared (admin kept)','');updateStorageInfo();}
+  else toast('Cancelled','');
+}
+
+// ═══════════════════════════════════════════════════
+// GLOBAL REFRESH
+// ═══════════════════════════════════════════════════
+function refresh(){
+  myShips=CU.role==='admin'?[...SHIPS]:SHIPS.filter(s=>s.emails&&s.emails.includes(CU.email));
+  filtered=myShips.filter(s=>{
+    const q=document.getElementById('srch').value.toLowerCase();
+    const st=document.getElementById('f-status').value;
+    const fr=document.getElementById('f-freight').value;
+    const h=document.getElementById('f-handler').value;
+    return(!q||s.product.toLowerCase().includes(q)||s.jobNo.toLowerCase().includes(q))&&
+      (!st||s.status===st)&&(!fr||s.freight===fr)&&(!h||s.handler===h)&&(!activeOnly||s.status!=='Completed');
+  });
+  renderDash();renderTable(filtered);renderAdminTbl();
+}
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+loadData();
+renderLoginAccounts();
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeD();});
+</script>
+</body>
+</html>
