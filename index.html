@@ -306,11 +306,32 @@ button{cursor:pointer}
       <div class="brand-badge">📦</div>
       <div class="brand-text">GWP <span>Supply Chain</span></div>
     </div>
-    <div class="login-h">Welcome back</div>
-    <div class="login-sub">Select your account to continue</div>
-    <div class="acct-label">Sign in as</div>
-    <div class="acct-list" id="acct-list"></div>
-    <button class="login-btn" id="login-btn" disabled onclick="doLogin()">Sign in →</button>
+    <div class="login-h">Sign in</div>
+    <div class="login-sub">Enter your email and password to access the portal</div>
+    <div id="login-error" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:#dc2626"></div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--ink3)">Email address</label>
+        <input id="login-email" type="email" placeholder="your@email.com"
+          style="padding:11px 14px;border:1.5px solid var(--bd2);border-radius:var(--r);font-size:14px;font-family:var(--font);outline:none;transition:border-color .15s;background:var(--surface);color:var(--ink)"
+          onkeydown="if(event.key==='Enter')document.getElementById('login-password').focus()"
+          oninput="clearLoginError()">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;position:relative">
+        <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--ink3)">Password</label>
+        <input id="login-password" type="password" placeholder="Enter your password"
+          style="padding:11px 14px;border:1.5px solid var(--bd2);border-radius:var(--r);font-size:14px;font-family:var(--font);outline:none;transition:border-color .15s;background:var(--surface);color:var(--ink);padding-right:44px"
+          onkeydown="if(event.key==='Enter')doLogin()"
+          oninput="clearLoginError()">
+        <button onclick="togglePassword()" tabindex="-1"
+          style="position:absolute;right:12px;bottom:11px;background:none;border:none;font-size:16px;cursor:pointer;color:var(--ink4);padding:0;line-height:1"
+          title="Show/hide password">👁</button>
+      </div>
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign in →</button>
+    <div style="margin-top:14px;padding:11px 13px;background:var(--surface2);border-radius:var(--r);font-size:11px;color:var(--ink4);line-height:1.6;text-align:center">
+      🔒 Your login details are private and secure.<br>Contact your admin if you need access or forgot your password.
+    </div>
   </div>
 </div>
 
@@ -494,6 +515,21 @@ button{cursor:pointer}
           <div class="admin-sec" id="a-guide">
             <div class="admin-sec-title">📖 How This Portal Works</div>
             <div class="form-card" style="margin-bottom:14px">
+              <div style="font-size:13px;font-weight:600;margin-bottom:12px">🔑 User Passwords — Default Credentials</div>
+              <div style="background:var(--amber-lt);border:1px solid var(--amber-bd);border-radius:var(--r);padding:12px 14px;margin-bottom:12px;font-size:12px;color:#78350f">
+                ⚠️ Share each user's password privately — do not share the full list. Change passwords by editing the HTML file and re-uploading to GitHub once.
+              </div>
+              <table style="width:100%;border-collapse:collapse;font-size:13px">
+                <thead><tr style="background:var(--surface2);border-bottom:1px solid var(--bd)">
+                  <th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--ink4)">Name</th>
+                  <th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--ink4)">Email</th>
+                  <th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--ink4)">Default Password</th>
+                  <th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--ink4)">Role</th>
+                </tr></thead>
+                <tbody id="creds-table"></tbody>
+              </table>
+            </div>
+            <div class="form-card" style="margin-bottom:14px">
               <div style="font-size:13px;font-weight:600;margin-bottom:12px">The live data flow</div>
               <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px">
                 <div style="padding:10px 14px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r);font-size:13px;font-weight:500;text-align:center"><div style="font-size:20px;margin-bottom:4px">📊</div>Google Sheets<div style="font-size:11px;color:var(--ink4);margin-top:2px">You update here</div></div>
@@ -507,7 +543,7 @@ button{cursor:pointer}
             <div class="form-card" style="margin-bottom:14px">
               <div style="font-size:13px;font-weight:600;margin-bottom:12px">Your GWP Tracker sheet link</div>
               <div style="padding:10px 12px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm);font-family:var(--mono);font-size:11px;color:var(--blue);word-break:break-all;margin-bottom:8px">https://script.google.com/macros/s/AKfycbyIOMgrhfIUcYtm_PCrdrS8VODhNoxj1j61YlOnWAkvn9vFgZdbwmwuh2UujhEms0Eg/exec</div>
-              <div style="font-size:12px;color:var(--ink4)">This is your Google Apps Script URL. It reads live from your GWP Tracker sheet. If you ever need to reset it, go to Google Apps Script → Deploy → Manage deployments to find this URL again.</div>
+              <div style="font-size:12px;color:var(--ink4)">This connects to your GWP Tracker Google Sheet via Apps Script. Live data updates every 60 seconds. If you ever need to reset it, go to Google Apps Script → Deploy → Manage deployments to find this URL again.</div>
             </div>
             <div class="form-card">
               <div style="font-size:13px;font-weight:600;margin-bottom:10px">When do you need to re-upload to GitHub?</div>
@@ -573,16 +609,21 @@ const COL = {
 // ═══════════════════════════════════════════════════
 // USERS — add new brand owners here
 // ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// SECURE USER CREDENTIALS
+// To add a new user: add an entry below with their email and password
+// To change a password: update the pwd field
+// To disable a user: set active: false
+// ADMIN DEFAULT PASSWORD: GWP@Admin2026
+// ═══════════════════════════════════════════════════
 const USERS = [
-  // Admin - uses lilian930308@gmail.com which appears in all shipment rows
-  {key:'admin',   name:'Admin',    email:'lilian930308@gmail.com',          role:'admin',   color:'#0f172a'},
-  // Brand owners - use their PRIMARY email (Handler Email 1 in sheet)
-  {key:'cindy',   name:'Cindy',    email:'goodplacetrading@gmail.com',      role:'handler', color:'#7c3aed'},
-  {key:'yanlin',  name:'Yan Lin',  email:'justtypicalylin@gmail.com',       role:'handler', color:'#0369a1'},
-  {key:'yunning', name:'Yun Ning', email:'yunning.theadspert@gmail.com',    role:'handler', color:'#065f46'},
-  {key:'weiyao',  name:'Wei Yao',  email:'weiyao.amfmarketing@gmail.com',   role:'handler', color:'#b45309'},
-  {key:'willson', name:'Willson',  email:'willsonq.theadspert@gmail.com',   role:'handler', color:'#0f766e'},
-  {key:'jiaw',    name:'Jia Wen',  email:'jiawen.theadspert@gmail.com',     role:'handler', color:'#4f46e5'},
+  {key:'admin',   name:'Admin',    email:'lilian930308@gmail.com',        pwd:'GWP@Admin2026',  role:'admin',   color:'#0f172a', active:true},
+  {key:'cindy',   name:'Cindy',    email:'goodplacetrading@gmail.com',    pwd:'Cindy@2026',     role:'handler', color:'#7c3aed', active:true},
+  {key:'yanlin',  name:'Yan Lin',  email:'justtypicalylin@gmail.com',     pwd:'YanLin@2026',    role:'handler', color:'#0369a1', active:true},
+  {key:'yunning', name:'Yun Ning', email:'yunning.theadspert@gmail.com',  pwd:'YunNing@2026',   role:'handler', color:'#065f46', active:true},
+  {key:'weiyao',  name:'Wei Yao',  email:'weiyao.amfmarketing@gmail.com', pwd:'WeiYao@2026',    role:'handler', color:'#b45309', active:true},
+  {key:'willson', name:'Willson',  email:'willsonq.theadspert@gmail.com', pwd:'Willson@2026',   role:'handler', color:'#0f766e', active:true},
+  {key:'jiaw',    name:'Jia Wen',  email:'jiawen.theadspert@gmail.com',   pwd:'JiaWen@2026',    role:'handler', color:'#4f46e5', active:true},
 ];
 
 // ═══════════════════════════════════════════════════
@@ -604,7 +645,7 @@ const STATUS_MAP = {
 // ═══════════════════════════════════════════════════
 let CU=null, CUK=null;
 let ALL_SHIPS=[], myShips=[], filtered=[];
-let selUser=null, activeOnly=false;
+let activeOnly=false;
 let refreshTimer=null, lastFetch=null;
 
 // ═══════════════════════════════════════════════════
@@ -783,35 +824,70 @@ function clearSyncBanners(){
 // LOGIN
 // ═══════════════════════════════════════════════════
 function renderLoginAccounts(){
-  const list=document.getElementById('acct-list');
-  if(!list)return;
-  list.innerHTML='';
-  const sorted=[...USERS].sort((a,b)=>{
-    if(a.role==='admin'&&b.role!=='admin')return -1;
-    if(b.role==='admin'&&a.role!=='admin')return 1;
-    return a.name.localeCompare(b.name);
-  });
-  sorted.forEach(u=>{
-    const el=document.createElement('div');
-    el.className='acct-item';el.dataset.user=u.key;
-    el.onclick=()=>selAcct(el);
-    el.innerHTML=`
-      <div class="acct-av" style="background:${u.color}">${initials(u.name)}</div>
-      <div class="acct-info"><div class="acct-name">${u.name}</div><div class="acct-email">${u.email}</div></div>
-      <span class="acct-badge ${u.role==='admin'?'b-admin':'b-handler'}">${u.role==='admin'?'Admin':'Handler'}</span>`;
-    list.appendChild(el);
+  // Email+password login — no account list to render
+  const emailInput = document.getElementById('login-email');
+  if(emailInput) emailInput.focus();
+}
+
+function clearLoginError(){
+  const err = document.getElementById('login-error');
+  if(err){ err.style.display='none'; err.textContent=''; }
+  ['login-email','login-password'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.borderColor='var(--bd2)';
   });
 }
 
-function selAcct(el){
-  document.querySelectorAll('.acct-item').forEach(x=>x.classList.remove('sel'));
-  el.classList.add('sel');selUser=el.dataset.user;
-  document.getElementById('login-btn').disabled=false;
+function showLoginError(msg){
+  const err = document.getElementById('login-error');
+  if(err){ err.textContent=msg; err.style.display='block'; }
+  ['login-email','login-password'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.borderColor='#dc2626';
+  });
 }
+
+function togglePassword(){
+  const pw = document.getElementById('login-password');
+  if(pw) pw.type = pw.type==='password'?'text':'password';
+}
+
+// Track failed attempts for rate limiting
+let loginAttempts=0, loginLocked=false;
 
 async function doLogin(){
-  if(!selUser)return;
-  CU=USERS.find(u=>u.key===selUser);CUK=selUser;
+  if(loginLocked){ showLoginError('Too many failed attempts. Please wait 30 seconds.'); return; }
+
+  const emailEl = document.getElementById('login-email');
+  const pwdEl   = document.getElementById('login-password');
+  if(!emailEl||!pwdEl) return;
+
+  const enteredEmail = emailEl.value.trim().toLowerCase();
+  const enteredPwd   = pwdEl.value;
+
+  if(!enteredEmail){ showLoginError('Please enter your email address.'); emailEl.focus(); return; }
+  if(!enteredPwd){   showLoginError('Please enter your password.'); pwdEl.focus(); return; }
+
+  // Find user by email (case-insensitive)
+  const matched = USERS.find(u=>u.email.toLowerCase()===enteredEmail);
+
+  // Validate password
+  if(!matched || matched.pwd !== enteredPwd || matched.active===false){
+    loginAttempts++;
+    if(loginAttempts>=5){
+      loginLocked=true;
+      showLoginError('Too many failed attempts. Locked for 30 seconds.');
+      setTimeout(()=>{ loginLocked=false; loginAttempts=0; clearLoginError(); }, 30000);
+    } else {
+      showLoginError(`Incorrect email or password. Please try again.`);
+    }
+    pwdEl.value='';
+    pwdEl.focus();
+    return;
+  }
+
+  loginAttempts=0;
+  CU=matched; CUK=matched.key;
   if(!CU)return;
 
   // Show loading screen while fetching data
@@ -855,7 +931,12 @@ async function doLogin(){
   startAutoRefresh();
 }
 
-function doLogout(){clearInterval(refreshTimer);location.reload();}
+function doLogout(){
+  clearInterval(refreshTimer);
+  // Clear sensitive data from memory
+  CU=null; CUK=null; ALL_SHIPS=[]; myShips=[]; filtered=[];
+  location.reload();
+}
 
 // ═══════════════════════════════════════════════════
 // AUTO-REFRESH
@@ -1108,19 +1189,40 @@ function renderUsersList(){
   const el=document.getElementById('users-list');if(!el)return;
   el.innerHTML=USERS.filter(u=>u.role!=='admin').map(u=>{
     const count=ALL_SHIPS.filter(s=>s.emails.some(e=>e.toLowerCase()===u.email.toLowerCase())).length;
-    return`<div style="display:flex;align-items:center;gap:12px;padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r)">
+    const isActive=u.active!==false;
+    return`<div style="display:flex;align-items:center;gap:12px;padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r);${!isActive?'opacity:.5':''}">
       <div style="width:36px;height:36px;border-radius:50%;background:${u.color};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0">${initials(u.name)}</div>
-      <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">${u.name}</div><div style="font-size:11px;color:var(--ink3)">${u.email}</div></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600">${u.name} ${!isActive?'<span style="font-size:10px;background:#fee2e2;color:#dc2626;padding:1px 6px;border-radius:4px">Disabled</span>':''}</div>
+        <div style="font-size:11px;color:var(--ink3)">${u.email}</div>
+      </div>
       <div style="font-size:12px;color:var(--ink4)">${count} shipment${count!==1?'s':''}</div>
     </div>`;
   }).join('');
+  // Populate credentials table
+  const ct=document.getElementById('creds-table');
+  if(ct){
+    ct.innerHTML=USERS.map(u=>`<tr style="border-bottom:1px solid var(--bd)">
+      <td style="padding:9px 12px;font-weight:500">${u.name}</td>
+      <td style="padding:9px 12px;font-family:var(--mono);font-size:12px;color:var(--blue)">${u.email}</td>
+      <td style="padding:9px 12px;font-family:var(--mono);font-size:12px">${u.pwd}</td>
+      <td style="padding:9px 12px"><span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:${u.role==='admin'?'#fef3c7':'var(--blue-lt)'};color:${u.role==='admin'?'#92400e':'var(--blue2)'}">${u.role==='admin'?'Admin':'Handler'}</span></td>
+    </tr>`).join('');
+  }
 }
 
 // ═══════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded',function(){
-  renderLoginAccounts();
+  renderLoginAccounts(); // focuses email input
+  // Add enter key on email to jump to password
+  const emailEl=document.getElementById('login-email');
+  const pwdEl=document.getElementById('login-password');
+  if(emailEl) emailEl.addEventListener('focus',()=>emailEl.style.borderColor='var(--blue)');
+  if(emailEl) emailEl.addEventListener('blur',()=>emailEl.style.borderColor='var(--bd2)');
+  if(pwdEl)   pwdEl.addEventListener('focus',()=>pwdEl.style.borderColor='var(--blue)');
+  if(pwdEl)   pwdEl.addEventListener('blur',()=>pwdEl.style.borderColor='var(--bd2)');
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeD();});
 </script>
