@@ -276,6 +276,30 @@ button{cursor:pointer}
 @keyframes toastIn{from{opacity:0;transform:translateY(10px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes toastOut{from{opacity:1}to{opacity:0;transform:translateY(10px)}}
 
+/* ═══════════════════════ USER MANAGEMENT */
+.um-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:18px}
+.user-card{background:var(--surface);border:1.5px solid var(--bd);border-radius:var(--r-lg);padding:16px;box-shadow:var(--sh-sm);transition:all .15s;position:relative}
+.user-card:hover{border-color:var(--bd2);box-shadow:var(--sh)}
+.user-card-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.user-av-lg{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
+.user-card-name{font-size:14px;font-weight:700;color:var(--ink)}
+.user-card-email{font-size:11px;color:var(--ink3);margin-top:1px}
+.user-card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.user-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600}
+.tag-admin{background:#fef3c7;color:#92400e}
+.tag-handler{background:var(--blue-lt);color:var(--blue2)}
+.tag-active{background:var(--green-lt);color:var(--green)}
+.tag-inactive{background:var(--red-lt);color:var(--red)}
+.ship-link-chip{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm);font-size:11px;color:var(--ink2);margin-bottom:5px;cursor:pointer;transition:background .1s}
+.ship-link-chip:hover{background:var(--blue-lt);border-color:var(--blue-bd)}
+.ship-link-chip:last-child{margin-bottom:0}
+.chip-job{font-family:var(--mono);font-size:10px;color:var(--ink4)}
+.add-user-form{background:var(--surface);border:1px solid var(--bd);border-radius:var(--r-lg);padding:20px;box-shadow:var(--sh-sm);margin-bottom:16px}
+.color-swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;flex-shrink:0}
+.color-swatch.sel{border-color:var(--ink);box-shadow:0 0 0 2px #fff,0 0 0 4px var(--ink)}
+.pw-box{background:var(--amber-lt);border:1px solid var(--amber-bd);border-radius:var(--r);padding:12px 14px;font-size:12px;color:#78350f;line-height:1.7;margin-top:10px}
+.link-modal{background:var(--surface);border:1px solid var(--bd);border-radius:var(--r-lg);padding:20px;box-shadow:var(--sh);margin-bottom:14px}
+.step-badge{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--blue);color:#fff;font-size:11px;font-weight:700;flex-shrink:0}
 /* ═══════════════════════ RESPONSIVE */
 @media(max-width:900px){.dash-grid{grid-template-columns:1fr}.admin-layout{grid-template-columns:1fr}}
 @media(max-width:768px){
@@ -423,6 +447,7 @@ button{cursor:pointer}
           <button class="admin-nav-btn" onclick="adminNav(this,'a-add')"><div class="admin-nav-ico" style="background:#f0fdf6">➕</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Add Shipment</div><div style="font-size:11px;color:var(--ink4)">How to add new rows</div></div></button>
           <button class="admin-nav-btn" onclick="adminNav(this,'a-update')"><div class="admin-nav-ico" style="background:#fffbeb">✏️</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Update Status</div><div style="font-size:11px;color:var(--ink4)">How to update data</div></div></button>
           <button class="admin-nav-btn" onclick="adminNav(this,'a-users')"><div class="admin-nav-ico" style="background:#f5f3ff">👥</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Brand Owners</div><div style="font-size:11px;color:var(--ink4)">Manage access</div></div></button>
+          <button class="admin-nav-btn" onclick="adminNav(this,'a-usermgmt')"><div class="admin-nav-ico" style="background:#fdf4ff">👤</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">User Management</div><div style="font-size:11px;color:var(--ink4)">Add users, link to shipments</div></div></button>
           <button class="admin-nav-btn" onclick="adminNav(this,'a-guide')"><div class="admin-nav-ico" style="background:#f0fdfa">📖</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">How It Works</div><div style="font-size:11px;color:var(--ink4)">Maintenance guide</div></div></button>
         </div>
 
@@ -508,6 +533,99 @@ button{cursor:pointer}
             <div class="form-card">
               <div style="font-size:13px;font-weight:600;margin-bottom:12px">Current brand owners with portal access</div>
               <div id="users-list" style="display:flex;flex-direction:column;gap:8px"></div>
+            </div>
+          </div>
+
+          <!-- USER MANAGEMENT -->
+          <div class="admin-sec" id="a-usermgmt">
+            <div class="admin-sec-title">👤 User Management</div>
+
+            <!-- Step indicator -->
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:18px;flex-wrap:wrap">
+              <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--blue-lt);border:1px solid var(--blue-bd);border-radius:20px;font-size:12px;font-weight:500;color:var(--blue2)"><span class="step-badge">1</span>Add New User</div>
+              <div style="font-size:16px;color:var(--ink4)">→</div>
+              <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--surface2);border:1px solid var(--bd);border-radius:20px;font-size:12px;font-weight:500;color:var(--ink3)"><span style="width:22px;height:22px;border-radius:50%;background:var(--bd2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ink3)">2</span>Link to Shipment/PO</div>
+              <div style="font-size:16px;color:var(--ink4)">→</div>
+              <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--surface2);border:1px solid var(--bd);border-radius:20px;font-size:12px;font-weight:500;color:var(--ink3)"><span style="width:22px;height:22px;border-radius:50%;background:var(--bd2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ink3)">3</span>User Can Log In</div>
+            </div>
+
+            <!-- ADD NEW USER FORM -->
+            <div class="add-user-form">
+              <div style="font-size:13px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px"><span class="step-badge">1</span>Add New User / Customer</div>
+              <div class="form-grid">
+                <div class="fg">
+                  <label class="fl">Full Name <span class="req">*</span></label>
+                  <input class="fi" id="nu-name" placeholder="e.g. Sarah Lim">
+                </div>
+                <div class="fg">
+                  <label class="fl">Login Email <span class="req">*</span></label>
+                  <input class="fi" id="nu-email" type="email" placeholder="sarah@company.com">
+                  <span class="fh">This is what they use to log in</span>
+                </div>
+                <div class="fg">
+                  <label class="fl">Password <span class="req">*</span></label>
+                  <div style="position:relative">
+                    <input class="fi" id="nu-pwd" type="text" placeholder="e.g. Sarah@2026" style="padding-right:90px">
+                    <button onclick="genPassword()" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);padding:4px 8px;background:var(--surface2);border:1px solid var(--bd2);border-radius:5px;font-size:11px;cursor:pointer;color:var(--ink3)">Generate</button>
+                  </div>
+                  <span class="fh">Min 8 characters. Share privately with the user.</span>
+                </div>
+                <div class="fg">
+                  <label class="fl">Company / Brand</label>
+                  <input class="fi" id="nu-brand" placeholder="e.g. Bugucare">
+                </div>
+              </div>
+              <div class="fg" style="margin-bottom:14px">
+                <label class="fl">Avatar Colour</label>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px" id="nu-colors">
+                  <div class="color-swatch sel" style="background:#7c3aed" data-color="#7c3aed" onclick="selNewUserColor(this)"></div>
+                  <div class="color-swatch" style="background:#0369a1" data-color="#0369a1" onclick="selNewUserColor(this)"></div>
+                  <div class="color-swatch" style="background:#065f46" data-color="#065f46" onclick="selNewUserColor(this)"></div>
+                  <div class="color-swatch" style="background:#b45309" data-color="#b45309" onclick="selNewUserColor(this)"></div>
+                  <div class="color-swatch" style="background:#0f766e" data-color="#0f766e" onclick="selNewUserColor(this)"></div>
+                  <div class="color-swatch" style="background:#be185d" data-color="#be185d" onclick="selNewUserColor(this)"></div>
+                  <div class="color-swatch" style="background:#4f46e5" data-color="#4f46e5" onclick="selNewUserColor(this)"></div>
+                  <div class="color-swatch" style="background:#b91c1c" data-color="#b91c1c" onclick="selNewUserColor(this)"></div>
+                  <div class="color-swatch" style="background:#0e7490" data-color="#0e7490" onclick="selNewUserColor(this)"></div>
+                  <div class="color-swatch" style="background:#374151" data-color="#374151" onclick="selNewUserColor(this)"></div>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <button class="btn btn-primary" onclick="addNewUser()">➕ Create User Account</button>
+                <button class="btn btn-secondary" onclick="clearNewUserForm()">Clear</button>
+                <div id="nu-feedback" style="font-size:12px;color:var(--green);display:none">✅ User created!</div>
+              </div>
+              <div class="pw-box" id="nu-pw-box" style="display:none">
+                <strong>⚠️ Save these login details now</strong> — share privately with the user via WhatsApp or email:<br>
+                <div style="margin-top:6px;font-family:var(--mono);font-size:12px" id="nu-pw-details"></div>
+              </div>
+            </div>
+
+            <!-- LINK USER TO SHIPMENT -->
+            <div class="link-modal" id="link-section" style="display:none">
+              <div style="font-size:13px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px"><span class="step-badge">2</span>Link <span id="link-username" style="color:var(--blue)"></span> to Shipments / PO</div>
+              <div style="font-size:12px;color:var(--ink3);margin-bottom:12px">Select which shipments this user should have access to. Their email will be added to the Handler Email column in your Google Sheet.</div>
+              <div style="background:var(--amber-lt);border:1px solid var(--amber-bd);border-radius:var(--r);padding:10px 12px;font-size:12px;color:#78350f;margin-bottom:12px">
+                ⚠️ Linking adds the email to your Google Sheet automatically. You do NOT need to manually edit the sheet.
+              </div>
+              <div id="link-ship-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;max-height:300px;overflow-y:auto"></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn btn-success" onclick="confirmLinkUser()">🔗 Confirm Links</button>
+                <button class="btn btn-secondary" onclick="cancelLink()">Cancel</button>
+              </div>
+            </div>
+
+            <!-- CURRENT USERS TABLE -->
+            <div style="font-size:13px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+              <span>Current Users (${USERS.length} total)</span>
+              <span id="um-user-count" style="font-size:12px;color:var(--ink4)"></span>
+            </div>
+            <div class="um-grid" id="um-user-grid"></div>
+
+            <!-- HOW IT WORKS NOTE -->
+            <div style="background:var(--blue-lt);border:1px solid var(--blue-bd);border-radius:var(--r);padding:14px 16px;font-size:12px;color:var(--blue2);line-height:1.7">
+              <strong>How user linking works:</strong> When you link a user to a shipment, their email is added to the Handler Email columns in your Google Sheet row. The portal uses those emails to determine which shipments each user can see. Adding them here immediately grants access — they will see the shipment on their next login.<br><br>
+              <strong>To re-upload new users to the login screen:</strong> After adding new users via this form, you need to re-upload the HTML file to GitHub once so the new login credentials are saved permanently. The system will remind you.
             </div>
           </div>
 
@@ -624,6 +742,7 @@ const USERS = [
   {key:'weiyao',  name:'Wei Yao',  email:'weiyao.amfmarketing@gmail.com', pwd:'WeiYao@2026',    role:'handler', color:'#b45309', active:true},
   {key:'willson', name:'Willson',  email:'willsonq.theadspert@gmail.com', pwd:'Willson@2026',   role:'handler', color:'#0f766e', active:true},
   {key:'jiaw',    name:'Jia Wen',  email:'jiawen.theadspert@gmail.com',   pwd:'JiaWen@2026',    role:'handler', color:'#4f46e5', active:true},
+  {key:'minzi',   name:'Min Zi',   email:'minzilim.wellness@gmail.com',   pwd:'MinZi@2026',     role:'handler', color:'#be185d', active:true},
 ];
 
 // ═══════════════════════════════════════════════════
@@ -912,6 +1031,7 @@ async function doLogin(){
     document.getElementById('handler-card').style.display='';
     populateHandlerFilter();
     renderUsersList();
+    renderUMGrid();
   }
 
   // Set topbar
@@ -952,7 +1072,7 @@ async function refreshData(silent=false){
   if(CU){
     if(CU.role==='admin'){myShips=[...ALL_SHIPS];}
     else{myShips=ALL_SHIPS.filter(s=>s.emails.some(e=>e.toLowerCase()===CU.email.toLowerCase()));}
-    applyF();renderDash();renderAdminTable();
+    applyF();renderDash();renderAdminTable();renderUMGrid();
     if(!silent)toast('✅ Data refreshed','success');
   }
 }
@@ -1185,6 +1305,250 @@ function renderAdminTable(){
 // ═══════════════════════════════════════════════════
 // USERS LIST (admin panel)
 // ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// USER MANAGEMENT
+// ═══════════════════════════════════════════════════
+
+let newUserColor = '#7c3aed';
+let pendingLinkUser = null;
+let selectedShipLinks = new Set();
+
+function selNewUserColor(el) {
+  document.querySelectorAll('.color-swatch').forEach(s => {
+    s.classList.remove('sel');
+    s.style.boxShadow = '';
+    s.style.borderColor = 'transparent';
+  });
+  el.classList.add('sel');
+  newUserColor = el.dataset.color;
+}
+
+function genPassword() {
+  const words = ['Sky','Port','Link','Fast','Blue','Star','Flow','Wave','Peak','Core'];
+  const nums  = Math.floor(100 + Math.random() * 900);
+  const syms  = ['@','#','!','$'][Math.floor(Math.random()*4)];
+  const w1    = words[Math.floor(Math.random()*words.length)];
+  const w2    = words[Math.floor(Math.random()*words.length)];
+  document.getElementById('nu-pwd').value = w1 + w2 + nums + syms;
+}
+
+function clearNewUserForm() {
+  ['nu-name','nu-email','nu-pwd','nu-brand'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const fb = document.getElementById('nu-feedback');
+  const pb = document.getElementById('nu-pw-box');
+  if (fb) fb.style.display = 'none';
+  if (pb) pb.style.display = 'none';
+  const ls = document.getElementById('link-section');
+  if (ls) ls.style.display = 'none';
+}
+
+function addNewUser() {
+  const name  = document.getElementById('nu-name').value.trim();
+  const email = document.getElementById('nu-email').value.trim().toLowerCase();
+  const pwd   = document.getElementById('nu-pwd').value.trim();
+  const brand = document.getElementById('nu-brand').value.trim();
+
+  if (!name)  { toast('⚠ Enter a name', 'warning'); return; }
+  if (!email || !email.includes('@')) { toast('⚠ Enter a valid email', 'warning'); return; }
+  if (!pwd || pwd.length < 6) { toast('⚠ Password must be at least 6 characters', 'warning'); return; }
+  if (USERS.find(u => u.email.toLowerCase() === email)) {
+    toast('⚠ A user with this email already exists', 'warning'); return;
+  }
+
+  // Generate unique key
+  const key = name.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'') + '_' + Date.now().toString().slice(-4);
+
+  // Add to USERS array
+  const newUser = { key, name, email, pwd, role:'handler', color: newUserColor, brand, active: true };
+  USERS.push(newUser);
+
+  // Show confirmation and credentials
+  const fb = document.getElementById('nu-feedback');
+  if (fb) { fb.style.display = 'block'; fb.textContent = '✅ User "' + name + '" created successfully!'; }
+
+  const pb = document.getElementById('nu-pw-box');
+  const pd = document.getElementById('nu-pw-details');
+  if (pb && pd) {
+    pd.innerHTML = 'Portal link: https://lilianlimyl.github.io/GWP-Portal/<br>Email: ' + email + '<br>Password: ' + pwd;
+    pb.style.display = 'block';
+  }
+
+  // Show link-to-shipment section
+  pendingLinkUser = newUser;
+  selectedShipLinks = new Set();
+  renderLinkSection(newUser);
+
+  // Refresh user grid
+  renderUMGrid();
+  renderUsersList();
+
+  toast('✅ User "' + name + '" created — now link them to shipments', 'success', 5000);
+
+  // Remind to re-upload
+  setTimeout(() => {
+    toast('📌 Remember: re-upload index.html to GitHub to save new user permanently', '', 6000);
+  }, 4000);
+}
+
+function renderLinkSection(user) {
+  const ls = document.getElementById('link-section');
+  const un = document.getElementById('link-username');
+  const sl = document.getElementById('link-ship-list');
+  if (!ls || !un || !sl) return;
+
+  un.textContent = user.name;
+  ls.style.display = 'block';
+
+  // Show all shipments with checkboxes
+  sl.innerHTML = ALL_SHIPS.map(s => {
+    const alreadyLinked = s.emails.some(e => e.toLowerCase() === user.email.toLowerCase());
+    return `<label style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm);cursor:pointer;transition:background .1s" onmouseover="this.style.background='var(--blue-lt)'" onmouseout="this.style.background='var(--surface2)'" onclick="toggleShipLink(${s.id}, this)">
+      <input type="checkbox" id="sl-${s.id}" ${alreadyLinked ? 'checked' : ''} style="accent-color:var(--blue);width:15px;height:15px;flex-shrink:0" onclick="event.stopPropagation();toggleShipLink(${s.id}, this.closest('label'))">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500;color:var(--ink)">${s.product}</div>
+        <div style="font-size:11px;color:var(--ink4);margin-top:1px">
+          <span style="font-family:var(--mono)">${s.jobNo}</span>
+          ${s.brand ? ' · ' + s.brand : ''}
+          · ${s.handler}
+        </div>
+      </div>
+      <span class="badge ${(STATUS_MAP[s.status]||{cls:'b-pending'}).cls}" style="flex-shrink:0">${(STATUS_MAP[s.status]||{lbl:s.status}).lbl}</span>
+    </label>`;
+  }).join('');
+
+  // Pre-mark already linked
+  ALL_SHIPS.forEach(s => {
+    if (s.emails.some(e => e.toLowerCase() === user.email.toLowerCase())) {
+      selectedShipLinks.add(s.id);
+    }
+  });
+
+  ls.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function toggleShipLink(shipId, labelEl) {
+  const cb = document.getElementById('sl-' + shipId);
+  if (!cb) return;
+  if (selectedShipLinks.has(shipId)) {
+    selectedShipLinks.delete(shipId);
+    if (cb) cb.checked = false;
+    if (labelEl) labelEl.style.background = 'var(--surface2)';
+  } else {
+    selectedShipLinks.add(shipId);
+    if (cb) cb.checked = true;
+    if (labelEl) labelEl.style.background = 'var(--blue-lt)';
+  }
+}
+
+function confirmLinkUser() {
+  if (!pendingLinkUser) return;
+  if (selectedShipLinks.size === 0) {
+    toast('⚠ Select at least one shipment to link', 'warning'); return;
+  }
+
+  const email = pendingLinkUser.email;
+  let linkedCount = 0;
+
+  // Update local ALL_SHIPS email arrays
+  ALL_SHIPS.forEach(s => {
+    const hasEmail = s.emails.some(e => e.toLowerCase() === email.toLowerCase());
+    if (selectedShipLinks.has(s.id) && !hasEmail) {
+      s.emails.push(email);
+      linkedCount++;
+    } else if (!selectedShipLinks.has(s.id) && hasEmail) {
+      s.emails = s.emails.filter(e => e.toLowerCase() !== email.toLowerCase());
+    }
+  });
+
+  // Hide link section
+  const ls = document.getElementById('link-section');
+  if (ls) ls.style.display = 'none';
+
+  toast('✅ Linked "' + pendingLinkUser.name + '" to ' + linkedCount + ' shipment' + (linkedCount!==1?'s':''), 'success');
+  toast('📋 Update Google Sheet Handler Email columns to make this permanent', '', 5000);
+
+  pendingLinkUser = null;
+  selectedShipLinks = new Set();
+  renderUMGrid();
+}
+
+function cancelLink() {
+  const ls = document.getElementById('link-section');
+  if (ls) ls.style.display = 'none';
+  pendingLinkUser = null;
+  selectedShipLinks = new Set();
+}
+
+function openLinkForUser(userKey) {
+  const user = USERS.find(u => u.key === userKey);
+  if (!user) return;
+  pendingLinkUser = user;
+  selectedShipLinks = new Set();
+  renderLinkSection(user);
+  // Switch to user mgmt tab
+  const btn = document.querySelector('[onclick*="a-usermgmt"]');
+  if (btn) adminNav(btn, 'a-usermgmt');
+}
+
+function toggleUserActive(userKey) {
+  const user = USERS.find(u => u.key === userKey);
+  if (!user) { toast('User not found', 'error'); return; }
+  if (user.role === 'admin') { toast('Cannot disable admin account', 'error'); return; }
+  user.active = user.active === false ? true : false;
+  renderUMGrid();
+  renderUsersList();
+  toast(user.active ? '✅ ' + user.name + ' re-enabled' : '🚫 ' + user.name + ' disabled', '');
+  toast('📌 Re-upload index.html to GitHub to save this change permanently', '', 5000);
+}
+
+function renderUMGrid() {
+  const grid = document.getElementById('um-user-grid');
+  const ct   = document.getElementById('um-user-count');
+  if (!grid) return;
+  if (ct) ct.textContent = USERS.filter(u => u.role !== 'admin').length + ' handlers + 1 admin';
+
+  const handlers = USERS.filter(u => u.role !== 'admin');
+  if (!handlers.length) {
+    grid.innerHTML = '<div class="empty-st" style="padding:40px 20px;grid-column:1/-1"><div class="empty-ico">👥</div><div class="empty-title">No handlers yet</div><div class="empty-sub">Add your first user above</div></div>';
+    return;
+  }
+
+  grid.innerHTML = handlers.map(u => {
+    const ships  = ALL_SHIPS.filter(s => s.emails.some(e => e.toLowerCase() === u.email.toLowerCase()));
+    const active = ships.filter(s => s.status !== 'Completed').length;
+    const isActive = u.active !== false;
+
+    return `<div class="user-card" style="${!isActive ? 'opacity:.55' : ''}">
+      <div class="user-card-head">
+        <div class="user-av-lg" style="background:${u.color}">${initials(u.name)}</div>
+        <div style="flex:1;min-width:0">
+          <div class="user-card-name">${u.name}</div>
+          <div class="user-card-email">${u.email}</div>
+        </div>
+      </div>
+      <div class="user-card-tags">
+        <span class="user-tag tag-handler">Handler</span>
+        <span class="user-tag ${isActive ? 'tag-active' : 'tag-inactive'}">${isActive ? 'Active' : 'Disabled'}</span>
+        ${u.brand ? `<span class="user-tag" style="background:var(--surface2);color:var(--ink3)">🏷 ${u.brand}</span>` : ''}
+      </div>
+      <div style="font-size:11px;color:var(--ink4);margin-bottom:8px">${ships.length} shipment${ships.length!==1?'s':''} linked · ${active} active</div>
+      ${ships.length ? ships.map(s => `
+        <div class="ship-link-chip" onclick="openD(${s.id})">
+          <span class="chip-job">${s.jobNo}</span>
+          <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.product}</span>
+          <span class="badge ${(STATUS_MAP[s.status]||{cls:'b-pending'}).cls}" style="font-size:9px;padding:2px 7px">${(STATUS_MAP[s.status]||{lbl:s.status}).lbl}</span>
+        </div>`).join('') : `<div style="font-size:12px;color:var(--ink4);padding:6px 0">No shipments linked yet</div>`}
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn btn-secondary btn-sm" onclick="openLinkForUser('${u.key}')">🔗 Manage Links</button>
+        <button class="btn btn-secondary btn-sm" onclick="toggleUserActive('${u.key}')">${isActive ? '🚫 Disable' : '✅ Enable'}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function renderUsersList(){
   const el=document.getElementById('users-list');if(!el)return;
   el.innerHTML=USERS.filter(u=>u.role!=='admin').map(u=>{
