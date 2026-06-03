@@ -477,18 +477,16 @@ button{cursor:pointer}
             <div class="form-card">
               <div style="font-size:13px;font-weight:600;margin-bottom:12px">Column reference — what to fill in your Google Sheet</div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-                ${[
-                  ['Job No','M0014036 or SY6047277224'],
-                  ['Product Name','Career Series Puzzle'],
-                  ['Handler','Cindy'],
-                  ['Handler Email 1','lilian930308@gmail.com'],
-                  ['Handler Email 2','goodplacetrading@gmail.com'],
-                  ['Status','Open / Completed / Pending / Delayed'],
-                  ['ETA Date','09/05/2026'],
-                  ['Freight Mode','Air or Ocean'],
-                  ['Latest Update','12 May 26 - Goods arrived at warehouse'],
-                  ['Full Status Log','All previous updates here'],
-                ].map(([k,v])=>`<div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">${k}</div><div style="font-size:12px;color:var(--ink2)">${v}</div></div>`).join('')}
+                <div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">Job No</div><div style="font-size:12px;color:var(--ink2)">M0014036 or SY6047277224</div></div>
+                <div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">Product Name</div><div style="font-size:12px;color:var(--ink2)">Career Series Puzzle</div></div>
+                <div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">Handler</div><div style="font-size:12px;color:var(--ink2)">Cindy</div></div>
+                <div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">Handler Email 1</div><div style="font-size:12px;color:var(--ink2)">lilian930308@gmail.com</div></div>
+                <div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">Handler Email 2</div><div style="font-size:12px;color:var(--ink2)">goodplacetrading@gmail.com</div></div>
+                <div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">Status</div><div style="font-size:12px;color:var(--ink2)">Open / Completed / Pending / Delayed</div></div>
+                <div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">ETA Date</div><div style="font-size:12px;color:var(--ink2)">09/05/2026</div></div>
+                <div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">Freight Mode</div><div style="font-size:12px;color:var(--ink2)">Air or Ocean</div></div>
+                <div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">Latest Update</div><div style="font-size:12px;color:var(--ink2)">12 May 26 - Goods arrived at warehouse</div></div>
+                <div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">Full Status Log</div><div style="font-size:12px;color:var(--ink2)">All previous updates here</div></div>
               </div>
             </div>
           </div>
@@ -617,7 +615,7 @@ button{cursor:pointer}
 
             <!-- CURRENT USERS TABLE -->
             <div style="font-size:13px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
-              <span>Current Users (${USERS.length} total)</span>
+              <span id="um-title">Current Users</span>
               <span id="um-user-count" style="font-size:12px;color:var(--ink4)"></span>
             </div>
             <div class="um-grid" id="um-user-grid"></div>
