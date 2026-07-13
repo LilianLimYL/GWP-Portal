@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GWP Supply Chain Portal</title>
+<title>GWP Portal & Logistics</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════ DESIGN TOKENS */
@@ -362,7 +362,7 @@ button{cursor:pointer}
 <!-- APP -->
 <div id="app">
   <header class="topbar">
-    <div class="tb-brand"><div class="tb-brand-ico">📦</div>GWP Portal</div>
+    <div class="tb-brand"><div class="tb-brand-ico">📦</div>GWP Portal &amp; Logistics</div>
     <nav class="tb-nav">
       <button class="tb-btn active" onclick="goPage('dashboard',this)">Dashboard</button>
       <button class="tb-btn" onclick="goPage('shipments',this)">Shipments</button>
@@ -438,13 +438,14 @@ button{cursor:pointer}
     <!-- ADMIN -->
     <div class="page" id="page-admin">
       <div class="page-header">
-        <div class="ph-left"><div class="page-title">Admin Panel</div><div class="page-sub">Update your Google Sheet — changes reflect here within 60 seconds</div></div>
+        <div class="ph-left"><div class="page-title">Admin Panel</div><div class="page-sub">Edit records here — changes save to your Google Sheet automatically</div></div>
         <div class="ph-right"><button class="btn btn-secondary btn-sm" onclick="refreshData()">🔄 Refresh live data</button></div>
       </div>
       <div class="admin-layout">
         <div class="admin-sidebar">
           <button class="admin-nav-btn active" onclick="adminNav(this,'a-records')"><div class="admin-nav-ico" style="background:#eff3fe">📋</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">All Records</div><div style="font-size:11px;color:var(--ink4)">View current data</div></div></button>
           <button class="admin-nav-btn" onclick="adminNav(this,'a-add')"><div class="admin-nav-ico" style="background:#f0fdf6">➕</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Add Shipment</div><div style="font-size:11px;color:var(--ink4)">How to add new rows</div></div></button>
+          <button class="admin-nav-btn" onclick="adminNav(this,'a-compare')"><div class="admin-nav-ico" style="background:#fff1f2">📊</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Price Comparison</div><div style="font-size:11px;color:var(--ink4)">Supplier cost analysis</div></div></button>
           <button class="admin-nav-btn" onclick="adminNav(this,'a-update')"><div class="admin-nav-ico" style="background:#fffbeb">✏️</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Update Status</div><div style="font-size:11px;color:var(--ink4)">How to update data</div></div></button>
           <button class="admin-nav-btn" onclick="adminNav(this,'a-users')"><div class="admin-nav-ico" style="background:#f5f3ff">👥</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Brand Owners</div><div style="font-size:11px;color:var(--ink4)">Manage access</div></div></button>
           <button class="admin-nav-btn" onclick="adminNav(this,'a-usermgmt')"><div class="admin-nav-ico" style="background:#fdf4ff">👤</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">User Management</div><div style="font-size:11px;color:var(--ink4)">Add users, link to shipments</div></div></button>
@@ -457,62 +458,108 @@ button{cursor:pointer}
           <div class="admin-sec active" id="a-records">
             <div class="admin-sec-title">📋 Live Data from Google Sheets</div>
             <div id="sync-banner-admin"></div>
-            <div class="tbl-card"><table class="tbl"><thead><tr><th>Job No.</th><th>Product</th><th>Handler</th><th>Status</th><th>ETA</th><th>Last Update</th></tr></thead><tbody id="admin-tbl-body"></tbody></table></div>
+            <div class="tbl-card"><table class="tbl"><thead><tr><th>Job No.</th><th>Product</th><th>Handler</th><th>Status</th><th>ETA</th><th>Last Update</th><th></th></tr></thead><tbody id="admin-tbl-body"></tbody></table></div>
           </div>
 
-          <!-- ADD SHIPMENT -->
+          <!-- ADD / EDIT SHIPMENT -->
           <div class="admin-sec" id="a-add">
-            <div class="admin-sec-title">➕ How to Add a New Shipment</div>
-            <div class="guide-card">
-              <div class="guide-title">🔄 This portal reads live from your Google Sheet. To add a shipment:</div>
-              <div class="guide-steps">
-                <div class="guide-step"><span class="guide-step-num">1.</span><span>Open your <strong>GWP Master Tracker Google Sheet</strong></span></div>
-                <div class="guide-step"><span class="guide-step-num">2.</span><span>Go to the <strong>GWP Tracker</strong> tab at the bottom</span></div>
-                <div class="guide-step"><span class="guide-step-num">3.</span><span>Add a new row at the bottom with all the shipment details</span></div>
-                <div class="guide-step"><span class="guide-step-num">4.</span><span>Fill in: Job No, Product Name, Handler, Handler Email 1, Status, ETA Date, Freight Mode, Latest Update</span></div>
-                <div class="guide-step"><span class="guide-step-num">5.</span><span>Save the sheet → come back here → click <strong>🔄 Refresh live data</strong></span></div>
-                <div class="guide-step"><span class="guide-step-num">6.</span><span>The new shipment appears automatically. Brand owners see it within 60 seconds.</span></div>
-              </div>
-            </div>
+            <div class="admin-sec-title">➕ Add / Edit Shipment</div>
+            <div id="sync-banner-addedit"></div>
             <div class="form-card">
-              <div style="font-size:13px;font-weight:600;margin-bottom:12px">Column reference — what to fill in your Google Sheet</div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-                <div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">Job No</div><div style="font-size:12px;color:var(--ink2)">M0014036 or SY6047277224</div></div>
-                <div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">Product Name</div><div style="font-size:12px;color:var(--ink2)">Career Series Puzzle</div></div>
-                <div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">Handler</div><div style="font-size:12px;color:var(--ink2)">Cindy</div></div>
-                <div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">Handler Email 1</div><div style="font-size:12px;color:var(--ink2)">lilian930308@gmail.com</div></div>
-                <div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">Handler Email 2</div><div style="font-size:12px;color:var(--ink2)">goodplacetrading@gmail.com</div></div>
-                <div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">Status</div><div style="font-size:12px;color:var(--ink2)">Open / Completed / Pending / Delayed</div></div>
-                <div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">ETA Date</div><div style="font-size:12px;color:var(--ink2)">09/05/2026</div></div>
-                <div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">Freight Mode</div><div style="font-size:12px;color:var(--ink2)">Air or Ocean</div></div>
-                <div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">Latest Update</div><div style="font-size:12px;color:var(--ink2)">12 May 26 - Goods arrived at warehouse</div></div>
-                <div style="padding:10px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r-sm)"><div style="font-size:10px;font-weight:600;color:var(--ink4);text-transform:uppercase;margin-bottom:3px">Full Status Log</div><div style="font-size:12px;color:var(--ink2)">All previous updates here</div></div>
+              <div style="font-size:12px;color:var(--ink3);margin-bottom:14px;line-height:1.6">Enter a <strong>Job No.</strong> to add a new shipment, or an existing Job No. to edit it — matching is by Job No. so records never duplicate. Changes save straight to your Google Sheet.</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div><label class="fl">Job No. <span class="req">*</span></label><input class="fi" id="sh-jobno" placeholder="M0014036 / SY6047277224"></div>
+                <div><label class="fl">Product Name <span class="req">*</span></label><input class="fi" id="sh-product" placeholder="Career Series Puzzle"></div>
+                <div><label class="fl">Brand</label><input class="fi" id="sh-brand" placeholder="Brand name"></div>
+                <div><label class="fl">Handler</label><input class="fi" id="sh-handler" placeholder="Cindy"></div>
+                <div><label class="fl">Handler Email 1</label><input class="fi" id="sh-email1" placeholder="owner@email.com"></div>
+                <div><label class="fl">Handler Email 2</label><input class="fi" id="sh-email2" placeholder="optional"></div>
+                <div><label class="fl">Handler Email 3</label><input class="fi" id="sh-email3" placeholder="optional"></div>
+                <div><label class="fl">Status</label><select class="fi" id="sh-status"><option>Open</option><option>Pending</option><option>Delayed</option><option>Approved</option><option>Completed</option></select></div>
+                <div><label class="fl">ETA Date</label><input class="fi" id="sh-eta" type="date"></div>
+                <div><label class="fl">Arrival Date</label><input class="fi" id="sh-arrival" type="date"></div>
+                <div><label class="fl">Freight Mode</label><select class="fi" id="sh-freight"><option value="">—</option><option>Air</option><option>Ocean</option></select></div>
+                <div><label class="fl">Current Location</label><input class="fi" id="sh-location" placeholder="China warehouse"></div>
+                <div><label class="fl">Quantity</label><input class="fi" id="sh-qty" placeholder="5000"></div>
+              </div>
+              <div style="margin-top:12px"><label class="fl">Latest Update (date-prefixed)</label><input class="fi" id="sh-latest" placeholder="12 May 26 - Goods arrived at warehouse"></div>
+              <div style="margin-top:12px"><label class="fl">Full Status Log (one update per line, newest first)</label><textarea class="fi" id="sh-log" rows="4" placeholder="12 May 26 - Goods arrived at warehouse&#10;05 May 26 - Vessel departed"></textarea></div>
+
+              <div style="margin-top:16px;padding:14px;background:#fffbeb;border:1px solid var(--amber-bd);border-radius:var(--r)">
+                <div style="font-size:12px;font-weight:700;color:#92400e;margin-bottom:10px">💰 Cost (Admin only)</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+                  <div><label class="fl">Item Cost</label><input class="fi" id="sh-itemcost" type="number" step="0.01" placeholder="0.00" oninput="recalcLanded()"></div>
+                  <div><label class="fl">Logistics Cost</label><input class="fi" id="sh-logicost" type="number" step="0.01" placeholder="0.00" oninput="recalcLanded()"></div>
+                  <div><label class="fl">Total Landed Cost</label><input class="fi" id="sh-landed" type="number" step="0.01" placeholder="auto" oninput="markLandedOverride()"></div>
+                </div>
+                <label style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--ink3);cursor:pointer"><input type="checkbox" id="sh-landed-override" onchange="recalcLanded()" style="width:15px;height:15px;accent-color:var(--amber)"> Manual override (uncheck to auto-calc Item + Logistics)</label>
+              </div>
+
+              <div style="display:flex;gap:10px;margin-top:18px">
+                <button class="btn btn-primary" onclick="saveShipment()">💾 Save to Google Sheet</button>
+                <button class="btn btn-secondary" onclick="clearShipmentForm()">Clear</button>
               </div>
             </div>
           </div>
 
-          <!-- UPDATE STATUS -->
+          <!-- QUICK STATUS UPDATE -->
           <div class="admin-sec" id="a-update">
-            <div class="admin-sec-title">✏️ How to Update Shipment Status</div>
-            <div class="guide-card">
-              <div class="guide-title">📊 Daily update routine — takes 30 seconds per shipment</div>
-              <div class="guide-steps">
-                <div class="guide-step"><span class="guide-step-num">1.</span><span>Open <strong>GWP Master Tracker</strong> in Google Sheets</span></div>
-                <div class="guide-step"><span class="guide-step-num">2.</span><span>Find the shipment row by Job No or Product Name</span></div>
-                <div class="guide-step"><span class="guide-step-num">3.</span><span>Update the <strong>Status</strong> column (Open / Completed / Pending / Delayed)</span></div>
-                <div class="guide-step"><span class="guide-step-num">4.</span><span>Update the <strong>Latest Update</strong> column — paste your new status note with date prefix: <em>16 May 26 - Arrived at Packxpert</em></span></div>
-                <div class="guide-step"><span class="guide-step-num">5.</span><span>Update the <strong>ETA Date</strong> column if it changed</span></div>
-                <div class="guide-step"><span class="guide-step-num">6.</span><span>Save — the portal auto-refreshes within 60 seconds. No GitHub needed.</span></div>
+            <div class="admin-sec-title">✏️ Update Shipment Status</div>
+            <div id="sync-banner-quick"></div>
+            <div class="form-card">
+              <div style="font-size:12px;color:var(--ink3);margin-bottom:14px;line-height:1.6">Pick a shipment, change its status, append a dated update. Saves straight to the sheet and refreshes within 60 seconds.</div>
+              <div><label class="fl">Shipment</label><select class="fi" id="qu-ship" onchange="loadQuickShip()"><option value="">— Select a shipment —</option></select></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+                <div><label class="fl">Status</label><select class="fi" id="qu-status"><option>Open</option><option>Pending</option><option>Delayed</option><option>Approved</option><option>Completed</option></select></div>
+                <div><label class="fl">ETA Date</label><input class="fi" id="qu-eta" type="date"></div>
+              </div>
+              <div style="margin-top:12px"><label class="fl">New update note (a dated line is added to the log)</label><input class="fi" id="qu-note" placeholder="Arrived at Packxpert"></div>
+              <div style="display:flex;gap:10px;margin-top:18px">
+                <button class="btn btn-primary" onclick="quickUpdate()">💾 Save Update</button>
               </div>
             </div>
+          </div>
+
+          <!-- PRICE COMPARISON (admin only) -->
+          <div class="admin-sec" id="a-compare">
+            <div class="admin-sec-title">📊 Price Comparison</div>
+            <div id="sync-banner-compare"></div>
             <div class="form-card">
-              <div style="font-size:13px;font-weight:600;margin-bottom:10px">Status values to use in the sheet</div>
-              <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <span class="badge b-open">Open = Active in progress</span>
-                <span class="badge b-completed">Completed = Arrived</span>
-                <span class="badge b-pending">Pending = Awaiting action</span>
-                <span class="badge b-delayed">Delayed = Behind schedule</span>
+              <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:end">
+                <div style="flex:1;min-width:200px"><label class="fl">Comparison Title</label><input class="fi" id="cmp-title" placeholder="e.g. Exercise Towel — R1"></div>
+                <div><label class="fl">Upload Excel (.xlsx / .csv)</label><input class="fi" id="cmp-file" type="file" accept=".xlsx,.xls,.csv" onchange="handleCompareFile(event)"></div>
               </div>
+              <div style="font-size:11px;color:var(--ink4);margin-top:8px;line-height:1.6">Uses your existing comparison layout — attributes down the side, each supplier/manufacturer as a column. First sheet is read.</div>
+
+              <div id="cmp-preview" style="margin-top:16px;display:none">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                  <div style="font-size:13px;font-weight:700">Comparison Table</div>
+                  <div style="font-size:11px;color:var(--ink4)" id="cmp-dims"></div>
+                </div>
+                <div class="tbl-card" style="overflow:auto;max-height:520px"><table class="tbl" id="cmp-table"></table></div>
+
+                <div style="margin-top:16px">
+                  <div style="font-size:13px;font-weight:700;margin-bottom:8px">📎 Reference Photos</div>
+                  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                    <label class="btn btn-secondary btn-sm" style="cursor:pointer">➕ Attach Photo<input type="file" accept="image/*" multiple style="display:none" onchange="handleComparePhotos(event)"></label>
+                    <span style="font-size:11px;color:var(--ink4)" id="cmp-photo-hint">JPG / PNG — stored in your Google Drive</span>
+                  </div>
+                  <div id="cmp-photo-grid" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px"></div>
+                </div>
+
+                <div style="display:flex;gap:10px;margin-top:18px">
+                  <button class="btn btn-primary" onclick="saveComparison()">💾 Save Comparison</button>
+                  <button class="btn btn-secondary" onclick="resetComparison()">Clear</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                <div style="font-size:13px;font-weight:700">Saved Comparisons</div>
+                <button class="btn btn-secondary btn-sm" onclick="loadComparisons()">🔄 Reload</button>
+              </div>
+              <div id="cmp-saved-list"><div style="font-size:12px;color:var(--ink4)">No comparisons loaded yet.</div></div>
             </div>
           </div>
 
@@ -691,6 +738,7 @@ button{cursor:pointer}
 
 <div id="toast-wrap"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 'use strict';
 
@@ -699,6 +747,14 @@ button{cursor:pointer}
 // ═══════════════════════════════════════════════════
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyIOMgrhfIUcYtm_PCrdrS8VODhNoxj1j61YlOnWAkvn9vFgZdbwmwuh2UujhEms0Eg/exec';
 const REFRESH_INTERVAL_MS = 60000; // auto-refresh every 60 seconds
+
+// ═══════════════════════════════════════════════════
+// WRITE-BACK CONFIG (portal → Google Sheet)
+// SHARED_SECRET must match the SHARED_SECRET in your Apps Script Code.gs.
+// This is a deterrent, not a vault (it is visible in page source) — see setup guide.
+// ═══════════════════════════════════════════════════
+const WRITE_URL = SHEET_URL;                 // same Apps Script /exec endpoint (handles doPost)
+const SHARED_SECRET = 'GWP-Portal-4f8k2q-2026'; // <-- set the SAME value in Code.gs
 
 // ═══════════════════════════════════════════════════
 // COLUMN MAPPING — matches your GWP Tracker sheet columns
@@ -720,6 +776,10 @@ const COL = {
   qty:        'Quantity',
   latestUpd:  'Latest Update',
   status_upd: 'Status Update',
+  itemCost:   'Item Cost',
+  logiCost:   'Logistics Cost',
+  landedCost: 'Total Landed Cost',
+  landedOverride: 'Landed Override',
 };
 
 // ═══════════════════════════════════════════════════
@@ -815,6 +875,70 @@ function setSyncStatus(state, msg){
 }
 
 // ═══════════════════════════════════════════════════
+// WRITE-BACK HELPERS (portal → Apps Script → Google Sheet)
+// ═══════════════════════════════════════════════════
+function num(v){ if(v===''||v===null||v===undefined) return null; const n=Number(String(v).replace(/[^0-9.\-]/g,'')); return isNaN(n)?null:n; }
+
+// Total Landed Cost = Item Cost + Logistics Cost (auto), unless manually overridden.
+function computeLanded(ship){
+  if(ship.landedOverride && ship.landedCost!=='') return ship.landedCost;
+  const it=num(ship.itemCost), lo=num(ship.logiCost);
+  if(it===null && lo===null) return ship.landedCost||'';
+  return String((it||0)+(lo||0));
+}
+
+// Guard: only admins may write.
+// ═══════════════════════════════════════════════════
+// DEFAULT SORTING — active first, then completed; newest date → oldest
+// ═══════════════════════════════════════════════════
+function getSortDate(ship){
+  const cands=[ship.eta, ship.arrival];
+  if(ship.updates && ship.updates.length){
+    // updates[0] is newest; try to parse "09 Apr 26" style date
+    const u0=ship.updates[0];
+    if(u0 && u0.date){ const d=new Date(u0.date); if(!isNaN(d.getTime())) cands.push(u0.date); }
+  }
+  let best=null;
+  cands.forEach(c=>{ if(!c) return; const d=new Date(c); if(!isNaN(d.getTime())){ if(best===null||d>best) best=d; } });
+  return best; // Date or null
+}
+function sortShips(arr){
+  return arr.slice().sort((a,b)=>{
+    // 1) active shipments before completed
+    const aC=a.status==='Completed'?1:0, bC=b.status==='Completed'?1:0;
+    if(aC!==bC) return aC-bC;
+    // 2) newest date → oldest (null dates sink to the bottom of their group)
+    const da=getSortDate(a), db=getSortDate(b);
+    if(da===null && db===null) return 0;
+    if(da===null) return 1;
+    if(db===null) return -1;
+    return db-da;
+  });
+}
+
+function requireAdmin(){
+  if(!CU || CU.role!=='admin'){ toast('🔒 Admin only','error'); return false; }
+  return true;
+}
+
+// POST an action to the Apps Script. Returns {ok, data|error}.
+async function postToSheet(action, payload){
+  if(!requireAdmin()) return {ok:false, error:'not-admin'};
+  try{
+    const body=JSON.stringify({action, secret:SHARED_SECRET, payload});
+    // text/plain avoids a CORS preflight against Apps Script
+    const resp=await fetch(WRITE_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body});
+    const txt=await resp.text();
+    let data; try{ data=JSON.parse(txt); }catch(e){ throw new Error('Bad response: '+txt.slice(0,120)); }
+    if(data && data.ok===false) throw new Error(data.error||'Write failed');
+    return {ok:true, data};
+  }catch(err){
+    toast('⚠️ Save failed: '+err.message,'error',5000);
+    return {ok:false, error:err.message};
+  }
+}
+
+// ═══════════════════════════════════════════════════
 // CSV PARSER
 // ═══════════════════════════════════════════════════
 function parseCSV(text){
@@ -883,6 +1007,10 @@ async function fetchSheetData(){
       arrival:    String(r[COL.arrival]||'').trim(),
       location:   String(r[COL.location]||'').trim(),
       freight:    String(r[COL.freight]||'').trim()||detectFreight(String(r[COL.jobNo]||''),String(r[COL.status_upd]||'')),
+      itemCost:   String(r[COL.itemCost]||'').trim(),
+      logiCost:   String(r[COL.logiCost]||'').trim(),
+      landedCost: String(r[COL.landedCost]||'').trim(),
+      landedOverride: String(r[COL.landedOverride]||'').trim().toLowerCase()==='yes',
       emails:     [r[COL.email1],r[COL.email2],r[COL.email3]].map(e=>String(e||'').trim()).filter(Boolean),
       updates:    parseUpdates(r[COL.status_upd]||''),
     }));
@@ -1031,6 +1159,8 @@ async function doLogin(){
     populateHandlerFilter();
     renderUsersList();
     renderUMGrid();
+    populateQuickShips();
+    loadComparisons();
   }
 
   // Set topbar
@@ -1071,7 +1201,7 @@ async function refreshData(silent=false){
   if(CU){
     if(CU.role==='admin'){myShips=[...ALL_SHIPS];}
     else{myShips=ALL_SHIPS.filter(s=>s.emails.some(e=>e.toLowerCase()===CU.email.toLowerCase()));}
-    applyF();renderDash();renderAdminTable();renderUMGrid();
+    applyF();renderDash();renderAdminTable();renderUMGrid();populateQuickShips();
     if(!silent)toast('✅ Data refreshed','success');
   }
 }
@@ -1176,6 +1306,7 @@ function renderDash(){
 // SHIPMENTS TABLE
 // ═══════════════════════════════════════════════════
 function renderTable(ships){
+  ships=sortShips(ships);
   const tbody=document.getElementById('ship-tbody');
   const empty=document.getElementById('ship-empty');
   document.getElementById('res-ct').textContent=`${ships.length} record${ships.length!==1?'s':''}`;
@@ -1265,10 +1396,11 @@ function openD(id){
   </div>`;
 
   const isAdmin=CU.role==='admin';
-  const editHtml=isAdmin?`<div class="d-sec"><div class="d-sec-title">✏️ To Edit This Shipment</div>
-    <div style="padding:12px 14px;background:var(--blue-lt);border:1px solid var(--blue-bd);border-radius:var(--r);font-size:12px;color:var(--blue2);line-height:1.7">
-      Open your <strong>GWP Master Tracker Google Sheet</strong> → find Job No. <strong style="font-family:var(--mono)">${s.jobNo}</strong> → update the Status, ETA, or Latest Update columns → save → click 🔄 Refresh here.
+  const editHtml=isAdmin?`<div class="d-sec"><div class="d-sec-title">✏️ Edit This Shipment</div>
+    <div style="padding:12px 14px;background:var(--blue-lt);border:1px solid var(--blue-bd);border-radius:var(--r);font-size:12px;color:var(--blue2);line-height:1.7;margin-bottom:10px">
+      Edit Job No. <strong style="font-family:var(--mono)">${s.jobNo}</strong> in the portal — changes save straight to your Google Sheet.
     </div>
+    <button class="btn btn-primary btn-sm" onclick="closeD();editShipment(${s.id})">✏️ Edit in form</button>
   </div>`:`<div class="d-sec"><div class="readonly-note">🔒 Read-only access. Contact your admin for updates.</div></div>`;
 
   const updates=s.updates.length?s.updates:[{date:'',text:s.statusLog||'No updates available'}];
@@ -1276,7 +1408,15 @@ function openD(id){
     <div>${updates.map((u,i)=>{const arr=(u.text||'').toLowerCase().includes('packxpert')||(u.text||'').toLowerCase().includes('inbounded');return`<div class="tl-item"><div class="tl-dot ${i===0?'latest':arr?'arrived':''}">${i===0?'★':arr?'🏁':'·'}</div><div class="tl-ct"><div class="tl-date">${u.date}</div><div class="tl-text">${u.text}</div></div></div>`;}).join('')}</div>
   </div>`;
 
-  document.getElementById('d-body').innerHTML=progHtml+infoHtml+emailHtml+editHtml+tlHtml;
+  // Admin-only cost section (Item + Logistics = Total Landed Cost, auto with manual override)
+  const landed=computeLanded(s);
+  const costHtml=isAdmin?`<div class="d-sec"><div class="d-sec-title">💰 Cost (Admin only)</div>
+    <div class="info-grid">
+      <div class="ii"><label>Item Cost</label><span>${s.itemCost?s.itemCost:'—'}</span></div>
+      <div class="ii"><label>Logistics Cost</label><span>${s.logiCost?s.logiCost:'—'}</span></div>
+      <div class="ii"><label>Total Landed Cost</label><span style="font-weight:700">${landed!==''?landed:'—'}${s.landedOverride?' <small style="color:var(--amber)">(manual)</small>':' <small style="color:var(--ink4)">(auto)</small>'}</span></div>
+    </div></div>`:'';
+  document.getElementById('d-body').innerHTML=progHtml+infoHtml+costHtml+emailHtml+editHtml+tlHtml;
   document.getElementById('dbg').style.display='block';
   setTimeout(()=>document.getElementById('drawer').classList.add('open'),10);
 }
@@ -1288,17 +1428,273 @@ function closeD(){document.getElementById('drawer').classList.remove('open');set
 // ═══════════════════════════════════════════════════
 function renderAdminTable(){
   const tbody=document.getElementById('admin-tbl-body');if(!tbody)return;
-  tbody.innerHTML=ALL_SHIPS.map(s=>{
+  tbody.innerHTML=sortShips(ALL_SHIPS).map(s=>{
     const upd=s.updates[0];
-    return`<tr onclick="openD(${s.id})" style="cursor:pointer">
-      <td style="font-family:var(--mono);font-size:11px">${s.jobNo}</td>
-      <td style="font-weight:500">${s.product}</td>
-      <td>${s.handler}</td>
-      <td>${badge(s.status)}</td>
-      <td style="font-size:12px;color:var(--ink3)">${fmtDate(s.eta||s.arrival)}</td>
-      <td><div class="upd-prev" style="max-width:200px">${upd?upd.text:'—'}</div></td>
+    return`<tr style="cursor:pointer">
+      <td onclick="openD(${s.id})" style="font-family:var(--mono);font-size:11px">${s.jobNo}</td>
+      <td onclick="openD(${s.id})" style="font-weight:500">${s.product}</td>
+      <td onclick="openD(${s.id})">${s.handler}</td>
+      <td onclick="openD(${s.id})">${badge(s.status)}</td>
+      <td onclick="openD(${s.id})" style="font-size:12px;color:var(--ink3)">${fmtDate(s.eta||s.arrival)}</td>
+      <td onclick="openD(${s.id})"><div class="upd-prev" style="max-width:200px">${upd?upd.text:'—'}</div></td>
+      <td><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();editShipment(${s.id})">✏️ Edit</button></td>
     </tr>`;
   }).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// ADMIN: ADD / EDIT SHIPMENT  (writes to Google Sheet, upsert by Job No.)
+// ═══════════════════════════════════════════════════
+function toISO(d){ if(!d) return ''; const dt=new Date(d); return isNaN(dt.getTime())?'':dt.toISOString().slice(0,10); }
+
+function recalcLanded(){
+  const ov=document.getElementById('sh-landed-override');
+  const landed=document.getElementById('sh-landed');
+  if(ov && ov.checked){ landed.removeAttribute('readonly'); landed.style.opacity='1'; return; }
+  const it=parseFloat(document.getElementById('sh-itemcost').value)||0;
+  const lo=parseFloat(document.getElementById('sh-logicost').value)||0;
+  if(landed){ landed.value=(it||lo)?(it+lo).toFixed(2):''; landed.setAttribute('readonly','readonly'); landed.style.opacity='.7'; }
+}
+function markLandedOverride(){
+  const ov=document.getElementById('sh-landed-override');
+  if(ov && !ov.checked){ ov.checked=true; }
+  const landed=document.getElementById('sh-landed');
+  if(landed){ landed.removeAttribute('readonly'); landed.style.opacity='1'; }
+}
+
+// Prefill the form when admin clicks a shipment (Edit)
+function editShipment(id){
+  const s=ALL_SHIPS.find(x=>x.id===id); if(!s) return;
+  const set=(k,v)=>{const el=document.getElementById(k); if(el) el.value=v||'';};
+  set('sh-jobno',s.jobNo); set('sh-product',s.product); set('sh-brand',s.brand);
+  set('sh-handler',s.handler); set('sh-email1',s.email1); set('sh-email2',s.email2); set('sh-email3',s.email3);
+  set('sh-status',s.status||'Open'); set('sh-eta',toISO(s.eta)); set('sh-arrival',toISO(s.arrival));
+  set('sh-freight',s.freight); set('sh-location',s.location); set('sh-qty',s.qty);
+  set('sh-latest',s.latestUpd); set('sh-log',s.statusLog);
+  set('sh-itemcost',s.itemCost); set('sh-logicost',s.logiCost); set('sh-landed',s.landedCost);
+  const ov=document.getElementById('sh-landed-override'); if(ov) ov.checked=!!s.landedOverride;
+  recalcLanded();
+  const btn=document.querySelector('[onclick*="a-add"]'); if(btn) adminNav(btn,'a-add');
+}
+
+function clearShipmentForm(){
+  ['sh-jobno','sh-product','sh-brand','sh-handler','sh-email1','sh-email2','sh-email3','sh-eta','sh-arrival','sh-location','sh-qty','sh-latest','sh-log','sh-itemcost','sh-logicost','sh-landed'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
+  const st=document.getElementById('sh-status'); if(st) st.value='Open';
+  const fr=document.getElementById('sh-freight'); if(fr) fr.value='';
+  const ov=document.getElementById('sh-landed-override'); if(ov) ov.checked=false;
+}
+
+async function saveShipment(){
+  if(!requireAdmin()) return;
+  const val=id=>{const el=document.getElementById(id); return el?el.value.trim():'';};
+  const jobNo=val('sh-jobno'), product=val('sh-product');
+  if(!jobNo){ toast('⚠ Job No. is required (used as the unique key)','warning'); return; }
+  if(!product){ toast('⚠ Product Name is required','warning'); return; }
+  const override=document.getElementById('sh-landed-override').checked;
+  const row={};
+  row[COL.jobNo]=jobNo; row[COL.product]=product; row[COL.brand]=val('sh-brand');
+  row[COL.handler]=val('sh-handler'); row[COL.email1]=val('sh-email1'); row[COL.email2]=val('sh-email2'); row[COL.email3]=val('sh-email3');
+  row[COL.status]=val('sh-status'); row[COL.eta]=val('sh-eta'); row[COL.arrival]=val('sh-arrival');
+  row[COL.freight]=val('sh-freight'); row[COL.location]=val('sh-location'); row[COL.qty]=val('sh-qty');
+  row[COL.latestUpd]=val('sh-latest'); row[COL.status_upd]=val('sh-log');
+  row[COL.itemCost]=val('sh-itemcost'); row[COL.logiCost]=val('sh-logicost'); row[COL.landedCost]=val('sh-landed');
+  row[COL.landedOverride]=override?'Yes':'No';
+  toast('💾 Saving…','',2000);
+  const res=await postToSheet('upsertShipment',{keyField:COL.jobNo, row});
+  if(res.ok){ toast('✅ Saved to Google Sheet','success'); await refreshData(true); }
+}
+
+// ═══════════════════════════════════════════════════
+// ADMIN: QUICK STATUS UPDATE
+// ═══════════════════════════════════════════════════
+function populateQuickShips(){
+  const sel=document.getElementById('qu-ship'); if(!sel) return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">— Select a shipment —</option>'+
+    sortShips(ALL_SHIPS).map(s=>`<option value="${s.id}">${s.jobNo} · ${s.product} (${s.status})</option>`).join('');
+  if(cur) sel.value=cur;
+}
+function loadQuickShip(){
+  const id=parseInt(document.getElementById('qu-ship').value,10);
+  const s=ALL_SHIPS.find(x=>x.id===id); if(!s) return;
+  document.getElementById('qu-status').value=s.status||'Open';
+  document.getElementById('qu-eta').value=toISO(s.eta);
+}
+function todayPrefix(){
+  const d=new Date();
+  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'});
+}
+async function quickUpdate(){
+  if(!requireAdmin()) return;
+  const id=parseInt(document.getElementById('qu-ship').value,10);
+  const s=ALL_SHIPS.find(x=>x.id===id);
+  if(!s){ toast('⚠ Select a shipment','warning'); return; }
+  const status=document.getElementById('qu-status').value;
+  const eta=document.getElementById('qu-eta').value;
+  const note=document.getElementById('qu-note').value.trim();
+  const newLatest=note?`${todayPrefix()} - ${note}`:s.latestUpd;
+  const newLog=note?(newLatest+(s.statusLog?'\n'+s.statusLog:'')):s.statusLog;
+  const row={};
+  row[COL.jobNo]=s.jobNo; row[COL.product]=s.product; row[COL.brand]=s.brand;
+  row[COL.handler]=s.handler; row[COL.email1]=s.email1; row[COL.email2]=s.email2; row[COL.email3]=s.email3;
+  row[COL.status]=status; row[COL.eta]=eta; row[COL.arrival]=s.arrival;
+  row[COL.freight]=s.freight; row[COL.location]=s.location; row[COL.qty]=s.qty;
+  row[COL.latestUpd]=newLatest; row[COL.status_upd]=newLog;
+  row[COL.itemCost]=s.itemCost; row[COL.logiCost]=s.logiCost; row[COL.landedCost]=s.landedCost;
+  row[COL.landedOverride]=s.landedOverride?'Yes':'No';
+  toast('💾 Saving…','',2000);
+  const res=await postToSheet('upsertShipment',{keyField:COL.jobNo, row});
+  if(res.ok){ toast('✅ Status updated','success'); document.getElementById('qu-note').value=''; await refreshData(true); }
+}
+
+// ═══════════════════════════════════════════════════
+// ADMIN: PRICE COMPARISON MODULE  (Excel upload + photos → Drive/Sheet)
+// ═══════════════════════════════════════════════════
+let CMP_GRID=[];        // 2D array [row][col]
+let CMP_PHOTOS=[];      // [{name, url}]
+let CMP_EDIT_ID=null;   // id when editing a saved record
+let CMP_SAVED=[];       // cached saved comparisons
+
+function handleCompareFile(ev){
+  const file=ev.target.files&&ev.target.files[0];
+  if(!file) return;
+  if(typeof XLSX==='undefined'){ toast('⚠ Spreadsheet library not loaded — check your connection','error'); return; }
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      CMP_GRID=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false});
+      // trim fully-empty trailing rows/cols
+      CMP_GRID=CMP_GRID.filter(r=>r.some(c=>String(c).trim()!==''));
+      renderCompareTable();
+      const t=document.getElementById('cmp-title');
+      if(t&&!t.value.trim()){ t.value=(wb.SheetNames[0]||'Comparison'); }
+      document.getElementById('cmp-preview').style.display='block';
+      toast('✅ Excel parsed — '+CMP_GRID.length+' rows','success');
+    }catch(err){ toast('⚠ Could not read file: '+err.message,'error',5000); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function renderCompareTable(){
+  const tbl=document.getElementById('cmp-table');
+  if(!tbl) return;
+  const maxCols=CMP_GRID.reduce((m,r)=>Math.max(m,r.length),0);
+  document.getElementById('cmp-dims').textContent=CMP_GRID.length+' rows × '+maxCols+' cols';
+  let html='';
+  CMP_GRID.forEach((row,ri)=>{
+    html+='<tr>';
+    for(let c=0;c<maxCols;c++){
+      const v=row[c]!==undefined?String(row[c]):'';
+      const isAttr=c===0;
+      const isHeader=ri===0;
+      const style=isHeader
+        ? 'background:var(--surface3);font-weight:700;position:sticky;top:0;z-index:1'
+        : (isAttr?'font-weight:600;background:var(--surface2);position:sticky;left:0':'');
+      const tag=(isHeader||isAttr)?'th':'td';
+      html+='<'+tag+' style="'+style+';font-size:12px;white-space:nowrap;padding:7px 10px">'+esc(v)+'</'+tag+'>';
+    }
+    html+='</tr>';
+  });
+  tbl.innerHTML=html;
+}
+function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function fileToDataURL(file){
+  return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});
+}
+
+async function handleComparePhotos(ev){
+  const files=Array.from(ev.target.files||[]);
+  for(const file of files){
+    const dataUrl=await fileToDataURL(file);
+    // Show immediately from local data
+    const photo={name:file.name, url:dataUrl};
+    CMP_PHOTOS.push(photo);
+    renderComparePhotos();
+    // Try to upload to Drive via Apps Script; replace url on success
+    const res=await postToSheet('uploadPhoto',{name:file.name, dataUrl});
+    if(res.ok && res.data && res.data.url){
+      photo.url=res.data.url;
+      renderComparePhotos();
+    }else{
+      document.getElementById('cmp-photo-hint').textContent='⚠ Drive upload unavailable — photo kept locally until Apps Script is deployed';
+    }
+  }
+  ev.target.value='';
+}
+
+function renderComparePhotos(){
+  const g=document.getElementById('cmp-photo-grid');
+  if(!g) return;
+  g.innerHTML=CMP_PHOTOS.map((p,i)=>`<div style="position:relative;width:88px">
+    <img src="${p.url}" title="${esc(p.name)}" onclick="viewPhoto('${encodeURI(p.url)}')" style="width:88px;height:88px;object-fit:cover;border-radius:8px;border:1px solid var(--bd);cursor:pointer">
+    <button onclick="removeComparePhoto(${i})" title="Remove" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:none;background:var(--red);color:#fff;font-size:11px;cursor:pointer;line-height:1">×</button>
+  </div>`).join('');
+}
+function removeComparePhoto(i){ CMP_PHOTOS.splice(i,1); renderComparePhotos(); }
+
+function viewPhoto(url){
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:3000;display:flex;align-items:center;justify-content:center;padding:30px;cursor:zoom-out';
+  ov.onclick=()=>ov.remove();
+  ov.innerHTML='<img src="'+url+'" style="max-width:95%;max-height:95%;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.5)">';
+  document.body.appendChild(ov);
+}
+
+async function saveComparison(){
+  if(!requireAdmin()) return;
+  const title=document.getElementById('cmp-title').value.trim();
+  if(!title){ toast('⚠ Enter a comparison title','warning'); return; }
+  if(!CMP_GRID.length){ toast('⚠ Upload an Excel file first','warning'); return; }
+  const record={
+    id: CMP_EDIT_ID || ('CMP-'+Date.now()),
+    title,
+    createdAt: new Date().toISOString(),
+    grid: CMP_GRID,
+    photos: CMP_PHOTOS,
+  };
+  toast('💾 Saving comparison…','',2000);
+  const res=await postToSheet('saveComparison',{record});
+  if(res.ok){ toast('✅ Comparison saved','success'); CMP_EDIT_ID=record.id; loadComparisons(); }
+}
+
+async function loadComparisons(){
+  if(!CU||CU.role!=='admin') return;
+  const res=await postToSheet('listComparisons',{});
+  const list=document.getElementById('cmp-saved-list');
+  if(!res.ok){ if(list) list.innerHTML='<div style="font-size:12px;color:var(--ink4)">Could not load — deploy the Apps Script write API first.</div>'; return; }
+  CMP_SAVED=(res.data&&res.data.records)||[];
+  if(!list) return;
+  if(!CMP_SAVED.length){ list.innerHTML='<div style="font-size:12px;color:var(--ink4)">No saved comparisons yet.</div>'; return; }
+  list.innerHTML=CMP_SAVED.map(r=>{
+    const n=(r.photos&&r.photos.length)||0;
+    const d=r.createdAt?new Date(r.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'2-digit'}):'';
+    return `<div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:8px">
+      <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">${esc(r.title)}</div><div style="font-size:11px;color:var(--ink4)">${d} · ${n} photo${n!==1?'s':''}</div></div>
+      <button class="btn btn-secondary btn-sm" onclick="openComparison('${r.id}')">👁 Open</button>
+    </div>`;
+  }).join('');
+}
+
+function openComparison(id){
+  const r=CMP_SAVED.find(x=>x.id===id); if(!r) return;
+  CMP_EDIT_ID=r.id;
+  CMP_GRID=r.grid||[];
+  CMP_PHOTOS=r.photos||[];
+  document.getElementById('cmp-title').value=r.title||'';
+  renderCompareTable();
+  renderComparePhotos();
+  document.getElementById('cmp-preview').style.display='block';
+  document.getElementById('cmp-preview').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function resetComparison(){
+  CMP_GRID=[]; CMP_PHOTOS=[]; CMP_EDIT_ID=null;
+  document.getElementById('cmp-title').value='';
+  document.getElementById('cmp-file').value='';
+  document.getElementById('cmp-preview').style.display='none';
 }
 
 // ═══════════════════════════════════════════════════
