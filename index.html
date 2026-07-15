@@ -83,7 +83,7 @@ button{cursor:pointer}
 .tb-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff}
 .tb-uname{font-size:12px;color:#e2e8f0;font-weight:500}
 .tb-role{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px}
-.tb-role-admin{background:#fef3c7;color:#92400e}.tb-role-handler{background:var(--blue-lt);color:var(--blue2)}
+.tb-role-admin{background:#fef3c7;color:#92400e}.tb-role-handler{background:var(--blue-lt);color:var(--blue2)}.tb-role-ceo{background:#f3e8ff;color:#7e22ce}
 .tb-sync{font-size:11px;color:#64748b;display:flex;align-items:center;gap:5px}
 .sync-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;animation:pulse-sync 2s infinite}
 @keyframes pulse-sync{0%,100%{opacity:1}50%{opacity:.4}}
@@ -211,6 +211,25 @@ button{cursor:pointer}
 .admin-body{display:flex;flex-direction:column;gap:0}
 .admin-sec{display:none}.admin-sec.active{display:block}
 .admin-sec-title{font-size:16px;font-weight:700;letter-spacing:-.3px;margin-bottom:16px}
+.lc-tbl{border-collapse:collapse;width:100%;font-size:12.5px}
+.lc-tbl th,.lc-tbl td{border:1px solid var(--bd);padding:4px 8px;vertical-align:middle}
+.lc-attr{text-align:left;color:var(--ink3);background:var(--surface2);white-space:nowrap;font-size:12px;min-width:215px}
+.lc-col{background:var(--surface2);min-width:158px}
+.lc-cell{text-align:right}
+.lc-calc{font-variant-numeric:tabular-nums;color:var(--ink2);background:#fafafb}
+.lc-strong td{font-weight:700}
+.lc-strong .lc-attr,.lc-strong .lc-calc{font-weight:700;color:var(--ink)}
+.lc-lock{background:var(--green-lt)!important}
+.lc-lock.lc-calc{color:var(--green)!important}
+.lc-name{width:100%;border:1px solid var(--bd2);border-radius:5px;padding:4px 6px;font-size:12px;font-weight:600;text-align:center;background:var(--surface)}
+.lc-in{width:100%;border:1px solid var(--bd2);border-radius:5px;padding:4px 6px;font-size:12px;text-align:right;background:var(--surface);color:var(--ink)}
+.lc-in:focus,.lc-name:focus,.lc-lbl:focus{border-color:var(--blue);outline:none;box-shadow:0 0 0 2px rgba(36,85,232,.1)}
+.lc-dim{padding:4px 2px;text-align:center}
+.lc-lbl{width:145px;border:1px solid var(--bd2);border-radius:5px;padding:3px 6px;font-size:12px;background:var(--surface);color:var(--ink)}
+.lc-mini{font-size:10px;padding:2px 6px;border:1px solid var(--bd2);border-radius:4px;background:var(--surface);color:var(--ink3);cursor:pointer;line-height:1.4}
+.lc-mini:hover{background:var(--surface3);color:var(--ink)}
+.lc-sub{background:var(--ink);color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:5px 8px!important;text-align:left}
+
 
 /* ═══════════════════════ FORMS */
 .form-card{background:var(--surface);border:1px solid var(--bd);border-radius:var(--r-lg);padding:22px;box-shadow:var(--sh-sm);margin-bottom:16px}
@@ -393,7 +412,7 @@ button{cursor:pointer}
         </div>
         <div class="ph-right">
           <button class="btn btn-secondary btn-sm" onclick="refreshData()">🔄 Refresh data</button>
-          <button class="btn btn-primary btn-sm admin-only" onclick="adminNav(document.querySelectorAll('.admin-nav-btn')[1],'a-add');goPage('admin',document.getElementById('admin-tab'))" style="display:none">+ Add Shipment</button>
+          <button class="btn btn-primary btn-sm edit-only" onclick="adminNav(document.querySelectorAll('.admin-nav-btn')[1],'a-add');goPage('admin',document.getElementById('admin-tab'))" style="display:none">+ Add Shipment</button>
         </div>
       </div>
       <div id="sync-banner-zone"></div>
@@ -417,7 +436,7 @@ button{cursor:pointer}
         <div class="ph-left"><div class="page-title">Shipments</div><div class="page-sub" id="ship-sub"></div></div>
         <div class="ph-right">
           <button class="btn btn-secondary btn-sm" onclick="refreshData()">🔄 Refresh</button>
-          <button class="btn btn-primary btn-sm admin-only" onclick="adminNav(document.querySelectorAll('.admin-nav-btn')[1],'a-add');goPage('admin',document.getElementById('admin-tab'))" style="display:none">+ Add Shipment</button>
+          <button class="btn btn-primary btn-sm edit-only" onclick="adminNav(document.querySelectorAll('.admin-nav-btn')[1],'a-add');goPage('admin',document.getElementById('admin-tab'))" style="display:none">+ Add Shipment</button>
         </div>
       </div>
       <div class="filters">
@@ -444,12 +463,14 @@ button{cursor:pointer}
       <div class="admin-layout">
         <div class="admin-sidebar">
           <button class="admin-nav-btn active" onclick="adminNav(this,'a-records')"><div class="admin-nav-ico" style="background:#eff3fe">📋</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">All Records</div><div style="font-size:11px;color:var(--ink4)">View current data</div></div></button>
-          <button class="admin-nav-btn" onclick="adminNav(this,'a-add')"><div class="admin-nav-ico" style="background:#f0fdf6">➕</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Add Shipment</div><div style="font-size:11px;color:var(--ink4)">How to add new rows</div></div></button>
-          <button class="admin-nav-btn" onclick="adminNav(this,'a-compare')"><div class="admin-nav-ico" style="background:#fff1f2">📊</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Price Comparison</div><div style="font-size:11px;color:var(--ink4)">Supplier cost analysis</div></div></button>
-          <button class="admin-nav-btn" onclick="adminNav(this,'a-update')"><div class="admin-nav-ico" style="background:#fffbeb">✏️</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Update Status</div><div style="font-size:11px;color:var(--ink4)">How to update data</div></div></button>
-          <button class="admin-nav-btn" onclick="adminNav(this,'a-users')"><div class="admin-nav-ico" style="background:#f5f3ff">👥</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Brand Owners</div><div style="font-size:11px;color:var(--ink4)">Manage access</div></div></button>
-          <button class="admin-nav-btn" onclick="adminNav(this,'a-usermgmt')"><div class="admin-nav-ico" style="background:#fdf4ff">👤</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">User Management</div><div style="font-size:11px;color:var(--ink4)">Add users, link to shipments</div></div></button>
-          <button class="admin-nav-btn" onclick="adminNav(this,'a-guide')"><div class="admin-nav-ico" style="background:#f0fdfa">📖</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">How It Works</div><div style="font-size:11px;color:var(--ink4)">Maintenance guide</div></div></button>
+          <button class="admin-nav-btn edit-only" style="display:none" onclick="adminNav(this,'a-add')"><div class="admin-nav-ico" style="background:#f0fdf6">➕</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Add Shipment</div><div style="font-size:11px;color:var(--ink4)">How to add new rows</div></div></button>
+          <button class="admin-nav-btn" onclick="adminNav(this,'a-compare')"><div class="admin-nav-ico" style="background:#fff1f2">📊</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Price Comparison</div><div style="font-size:11px;color:var(--ink4)">Upload Excel (backup)</div></div></button>
+          <button class="admin-nav-btn" onclick="adminNav(this,'a-packaging');renderPackaging()"><div class="admin-nav-ico" style="background:#eef7f3">📦</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Packaging Details</div><div style="font-size:11px;color:var(--ink4)">Carton, volume &amp; freight</div></div></button>
+          <button class="admin-nav-btn" onclick="adminNav(this,'a-landed');renderLanded()"><div class="admin-nav-ico" style="background:#eff3fe">🧮</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Landed Cost Calculator</div><div style="font-size:11px;color:var(--ink4)">Per-shipment landed cost</div></div></button>
+          <button class="admin-nav-btn edit-only" style="display:none" onclick="adminNav(this,'a-update')"><div class="admin-nav-ico" style="background:#fffbeb">✏️</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Update Status</div><div style="font-size:11px;color:var(--ink4)">How to update data</div></div></button>
+          <button class="admin-nav-btn edit-only" style="display:none" onclick="adminNav(this,'a-users')"><div class="admin-nav-ico" style="background:#f5f3ff">👥</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Brand Owners</div><div style="font-size:11px;color:var(--ink4)">Manage access</div></div></button>
+          <button class="admin-nav-btn edit-only" style="display:none" onclick="adminNav(this,'a-usermgmt')"><div class="admin-nav-ico" style="background:#fdf4ff">👤</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">User Management</div><div style="font-size:11px;color:var(--ink4)">Add users, link to shipments</div></div></button>
+          <button class="admin-nav-btn edit-only" style="display:none" onclick="adminNav(this,'a-guide')"><div class="admin-nav-ico" style="background:#f0fdfa">📖</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">How It Works</div><div style="font-size:11px;color:var(--ink4)">Maintenance guide</div></div></button>
         </div>
 
         <div class="admin-body">
@@ -561,6 +582,22 @@ button{cursor:pointer}
               </div>
               <div id="cmp-saved-list"><div style="font-size:12px;color:var(--ink4)">No comparisons loaded yet.</div></div>
             </div>
+          </div>
+
+          <!-- PACKAGING DETAILS (admin only) -->
+          <div class="admin-sec" id="a-packaging">
+            <div class="admin-sec-title">📦 Packaging Details</div>
+            <div style="font-size:12px;color:var(--ink3);margin-bottom:14px;line-height:1.6">Single source of truth for carton, volume, weight &amp; ocean-freight data — same fields and formulas as your Excel. These figures flow automatically into the Landed Cost Calculator. Each shipment record is kept separate.</div>
+            <div class="form-card"><div id="pk-recordbar"></div></div>
+            <div class="form-card"><div id="pk-editor"></div></div>
+          </div>
+
+          <!-- LANDED COST CALCULATOR (admin only) -->
+          <div class="admin-sec" id="a-landed">
+            <div class="admin-sec-title">🧮 Landed Cost Calculator</div>
+            <div style="font-size:12px;color:var(--ink3);margin-bottom:14px;line-height:1.6">Multi-supplier comparison &amp; landed-cost per shipment — replicates your Excel exactly. Packaging figures are pulled from Packaging Details (no double entry). Lock in a supplier to mark the chosen one. Records are never combined.</div>
+            <div class="form-card"><div id="lc-recordbar"></div></div>
+            <div class="form-card"><div id="lc-editor"></div></div>
           </div>
 
           <!-- BRAND OWNERS -->
@@ -794,6 +831,8 @@ const COL = {
 // ═══════════════════════════════════════════════════
 const USERS = [
   {key:'admin',   name:'Admin',    email:'lilian930308@gmail.com',        pwd:'GWP@Admin2026',  role:'admin',   color:'#0f172a', active:true},
+  {key:'ceo',     name:'CEO',      email:'leesiuchong85@gmail.com',        pwd:'CEO@View2026',   role:'ceo',     color:'#0d9488', active:true},
+  {key:'md',      name:'MD',       email:'zhenghong.theadspert@gmail.com', pwd:'CEO@View2026',   role:'md',      color:'#7e22ce', active:true},
   {key:'cindy',   name:'Cindy',    email:'goodplacetrading@gmail.com',    pwd:'Cindy@2026',     role:'handler', color:'#7c3aed', active:true},
   {key:'yanlin',  name:'Yan Lin',  email:'justtypicalylin@gmail.com',     pwd:'YanLin@2026',    role:'handler', color:'#0369a1', active:true},
   {key:'yunning', name:'Yun Ning', email:'yunning.theadspert@gmail.com',  pwd:'YunNing@2026',   role:'handler', color:'#065f46', active:true},
@@ -916,14 +955,19 @@ function sortShips(arr){
   });
 }
 
+function isAdminUser(){return !!CU && CU.role==='admin';}
+function canViewAll(){return !!CU && (CU.role==='admin'||CU.role==='ceo'||CU.role==='md');}
+function canEdit(){return !!CU && CU.role==='admin';}
 function requireAdmin(){
   if(!CU || CU.role!=='admin'){ toast('🔒 Admin only','error'); return false; }
   return true;
 }
 
 // POST an action to the Apps Script. Returns {ok, data|error}.
+var LC_READ_ACTIONS=['listComparisons'];
 async function postToSheet(action, payload){
-  if(!requireAdmin()) return {ok:false, error:'not-admin'};
+  if(LC_READ_ACTIONS.indexOf(action)>=0){ if(!canViewAll()){ toast('🔒 Restricted','error'); return {ok:false, error:'no-access'}; } }
+  else if(!requireAdmin()) return {ok:false, error:'not-admin'};
   try{
     const body=JSON.stringify({action, secret:SHARED_SECRET, payload});
     // text/plain avoids a CORS preflight against Apps Script
@@ -1144,7 +1188,7 @@ async function doLogin(){
   document.getElementById('loading-screen').classList.remove('show');
 
   // Filter shipments by role
-  if(CU.role==='admin'){
+  if(canViewAll()){
     myShips=[...ALL_SHIPS];
   }else{
     myShips=ALL_SHIPS.filter(s=>s.emails.some(e=>e.toLowerCase()===CU.email.toLowerCase()));
@@ -1152,7 +1196,7 @@ async function doLogin(){
   filtered=[...myShips];
 
   // Show admin elements
-  if(CU.role==='admin'){
+  if(canViewAll()){
     document.querySelectorAll('.admin-only').forEach(x=>x.style.display='');
     document.getElementById('admin-tab').style.display='';
     document.getElementById('handler-card').style.display='';
@@ -1162,12 +1206,15 @@ async function doLogin(){
     populateQuickShips();
     loadComparisons();
   }
+  if(canEdit()){
+    document.querySelectorAll('.edit-only').forEach(x=>x.style.display='');
+  }
 
   // Set topbar
   const av=document.getElementById('tb-av');av.style.background=CU.color;av.textContent=initials(CU.name);
   document.getElementById('tb-name').textContent=CU.name;
-  const r=document.getElementById('tb-role');r.textContent=CU.role==='admin'?'Admin':'Handler';
-  r.className='tb-role '+(CU.role==='admin'?'tb-role-admin':'tb-role-handler');
+  const r=document.getElementById('tb-role');r.textContent=CU.role==='admin'?'Admin':(CU.role==='ceo'?'CEO':(CU.role==='md'?'MD':'Handler'));
+  r.className='tb-role '+(CU.role==='admin'?'tb-role-admin':((CU.role==='ceo'||CU.role==='md')?'tb-role-ceo':'tb-role-handler'));
 
   // Fade out login
   const ls=document.getElementById('login-screen');ls.style.opacity='0';ls.style.pointerEvents='none';
@@ -1199,7 +1246,7 @@ async function refreshData(silent=false){
   if(!silent)toast('🔄 Refreshing live data…','',2000);
   const ok=await fetchSheetData();
   if(CU){
-    if(CU.role==='admin'){myShips=[...ALL_SHIPS];}
+    if(canViewAll()){myShips=[...ALL_SHIPS];}
     else{myShips=ALL_SHIPS.filter(s=>s.emails.some(e=>e.toLowerCase()===CU.email.toLowerCase()));}
     applyF();renderDash();renderAdminTable();renderUMGrid();populateQuickShips();
     if(!silent)toast('✅ Data refreshed','success');
@@ -1226,7 +1273,7 @@ function adminNav(btn,sec){
 // DASHBOARD
 // ═══════════════════════════════════════════════════
 function renderDash(){
-  const s=myShips,isAdmin=CU.role==='admin';
+  const s=myShips,isAdmin=canViewAll();
   document.getElementById('dash-title').textContent=isAdmin?'All Shipments Overview':`${CU.name}'s Dashboard`;
   document.getElementById('dash-sub').textContent=`${s.length} shipment${s.length!==1?'s':''} ${isAdmin?'across all handlers':'assigned to you'} · Live from Google Sheets`;
 
@@ -1310,7 +1357,7 @@ function renderTable(ships){
   const tbody=document.getElementById('ship-tbody');
   const empty=document.getElementById('ship-empty');
   document.getElementById('res-ct').textContent=`${ships.length} record${ships.length!==1?'s':''}`;
-  document.getElementById('ship-sub').textContent=CU.role==='admin'?`All shipments — live from Google Sheets`:`${ships.length} project${ships.length!==1?'s':''} for ${CU.name}`;
+  document.getElementById('ship-sub').textContent=canViewAll()?`All shipments — live from Google Sheets`:`${ships.length} project${ships.length!==1?'s':''} for ${CU.name}`;
   if(!ships.length){tbody.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
   tbody.innerHTML=ships.map(s=>{
@@ -1401,7 +1448,7 @@ function openD(id){
       Edit Job No. <strong style="font-family:var(--mono)">${s.jobNo}</strong> in the portal — changes save straight to your Google Sheet.
     </div>
     <button class="btn btn-primary btn-sm" onclick="closeD();editShipment(${s.id})">✏️ Edit in form</button>
-  </div>`:`<div class="d-sec"><div class="readonly-note">🔒 Read-only access. Contact your admin for updates.</div></div>`;
+  </div>`:`<div class="d-sec"><div class="readonly-note">🔒 Contact your admin for updates.</div></div>`;
 
   const updates=s.updates.length?s.updates:[{date:'',text:s.statusLog||'No updates available'}];
   const tlHtml=`<div class="d-sec"><div class="d-sec-title">🕐 Status Timeline (${updates.length} entries)</div>
@@ -1410,7 +1457,7 @@ function openD(id){
 
   // Admin-only cost section (Item + Logistics = Total Landed Cost, auto with manual override)
   const landed=computeLanded(s);
-  const costHtml=isAdmin?`<div class="d-sec"><div class="d-sec-title">💰 Cost (Admin only)</div>
+  const costHtml=canViewAll()?`<div class="d-sec"><div class="d-sec-title">💰 Cost</div>
     <div class="info-grid">
       <div class="ii"><label>Item Cost</label><span>${s.itemCost?s.itemCost:'—'}</span></div>
       <div class="ii"><label>Logistics Cost</label><span>${s.logiCost?s.logiCost:'—'}</span></div>
@@ -1437,7 +1484,7 @@ function renderAdminTable(){
       <td onclick="openD(${s.id})">${badge(s.status)}</td>
       <td onclick="openD(${s.id})" style="font-size:12px;color:var(--ink3)">${fmtDate(s.eta||s.arrival)}</td>
       <td onclick="openD(${s.id})"><div class="upd-prev" style="max-width:200px">${upd?upd.text:'—'}</div></td>
-      <td><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();editShipment(${s.id})">✏️ Edit</button></td>
+      <td>${canEdit()?`<button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();editShipment(${s.id})">✏️ Edit</button>`:''}</td>
     </tr>`;
   }).join('');
 }
@@ -1661,7 +1708,7 @@ async function saveComparison(){
 }
 
 async function loadComparisons(){
-  if(!CU||CU.role!=='admin') return;
+  if(!canViewAll()) return;
   const res=await postToSheet('listComparisons',{});
   const list=document.getElementById('cmp-saved-list');
   if(!res.ok){ if(list) list.innerHTML='<div style="font-size:12px;color:var(--ink4)">Could not load — deploy the Apps Script write API first.</div>'; return; }
@@ -1983,6 +2030,227 @@ document.addEventListener('DOMContentLoaded',function(){
   if(pwdEl)   pwdEl.addEventListener('focus',()=>pwdEl.style.borderColor='var(--blue)');
   if(pwdEl)   pwdEl.addEventListener('blur',()=>pwdEl.style.borderColor='var(--bd2)');
 });
+
+// ═══════════════════════════════════════════════════
+// PACKAGING DETAILS + LANDED COST CALCULATOR ENGINE
+// Replicates the Excel (Towel-R1) calculation logic exactly.
+// Storage: in-portal (localStorage). Each shipment is its own record.
+// CEO/MD role = view-only (lcRO()); Admin = full edit.
+// ═══════════════════════════════════════════════════
+var LC_KEY='gwp_lc_records_v1';
+var LC_STATE={activeId:null,records:[]};
+function lcRO(){return (typeof canEdit==='function')?!canEdit():false;}
+function lcRoleLabel(){if(typeof CU==='undefined'||!CU)return '';return CU.role==='md'?'MD':(CU.role==='ceo'?'CEO':(CU.role==='admin'?'Admin':''));}
+function lcPersist(){try{localStorage.setItem(LC_KEY,JSON.stringify(LC_STATE));}catch(e){}}
+function lcLoad(){try{var s=localStorage.getItem(LC_KEY);if(s){LC_STATE=JSON.parse(s);}}catch(e){}}
+function lcUID(){return 'x'+Math.random().toString(36).slice(2,9);}
+function lcNum(v){var n=parseFloat(v);return isNaN(n)?0:n;}
+function lcVal(id){var e=document.getElementById(id);return e?e.value:'';}
+function lcFmt(n,dp){if(n===''||n===null||n===undefined||isNaN(n))return '—';return Number(n).toLocaleString('en-MY',{minimumFractionDigits:dp,maximumFractionDigits:dp});}
+function lcEsc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+
+function lcNewSupplier(name){return {id:lcUID(),name:name||'New Supplier',moq:'',unitPriceRMB:'',logo:'',delivery:'',courier:'',mockup:'',packMethod:'',packQty:'',L:'',W:'',H:'',freightRate:'410',packCharge:'',weightPerCartonInput:'',airFreight:'',markupPct:'20',extraVals:{}};}
+function lcNewRecord(jobNo,product){var r={id:lcUID(),jobNo:jobNo||'',product:product||'',exRate:'0.6',packFactor:'0.15',weightFactor:'0.11',minM3:'0.5',lockedSupId:null,extraFields:[],suppliers:[lcNewSupplier('Supplier A')]};LC_STATE.records.push(r);LC_STATE.activeId=r.id;lcPersist();return r;}
+function lcActiveRecord(){for(var i=0;i<LC_STATE.records.length;i++){if(LC_STATE.records[i].id===LC_STATE.activeId)return LC_STATE.records[i];}return null;}
+function lcSup(supId){var r=lcActiveRecord();if(!r)return null;for(var i=0;i<r.suppliers.length;i++){if(r.suppliers[i].id===supId)return r.suppliers[i];}return null;}
+
+// ─── Core Excel formulas ───
+function lcCompute(sup,rec){
+  var moq=lcNum(sup.moq);
+  var ex=lcNum(rec.exRate), minM3=lcNum(rec.minM3);
+  var packQty=lcNum(sup.packQty);
+  var packing=lcNum(sup.packCharge);                                  // Excel row 12 (per-supplier line item)
+  var totalCarton=packQty>0?moq/packQty:0;                            // Excel row 19: MOQ / packing qty/carton
+  var sizeM3=(lcNum(sup.L)*lcNum(sup.W)*lcNum(sup.H))/1000000;         // Excel col N: (L*W*H)/1,000,000
+  var totalM3=sizeM3*totalCarton;                                     // Excel col O: size/m3 * total cartons
+  var billedM3=Math.max(minM3,totalM3);                               // Excel col P: IF(total<0.5,0.5,total)
+  var weightPerCarton=lcNum(sup.weightPerCartonInput);                // Excel row 21
+  var totalWeights=totalCarton*weightPerCarton;                       // Excel row 22
+  var oceanFreight=lcNum(sup.freightRate)*billedM3;                   // Excel row 17: rate * billed m3
+  var extrasSum=0; (rec.extraFields||[]).forEach(function(f){extrasSum+=lcNum((sup.extraVals||{})[f.id]);});
+  var totalCostRMB=(moq*lcNum(sup.unitPriceRMB))+lcNum(sup.logo)+lcNum(sup.delivery)+lcNum(sup.courier)+lcNum(sup.mockup)+packing+extrasSum; // Excel row 13
+  var totalCostMYR=totalCostRMB*ex;                                   // Excel row 14: *rate
+  var unitPricePc=moq>0?totalCostMYR/moq:0;                           // Excel row 15
+  var air=lcNum(sup.airFreight);                                      // Excel row 16
+  var tax=oceanFreight*0.06;                                          // Excel row 23: ocean * 6% SST
+  var landed=totalCostMYR+air+oceanFreight+tax;                       // Excel row 24: Subtotal (MYR)
+  var avgPc=moq>0?landed/moq:0;                                       // Excel row 25
+  var markupPct=sup.markupPct===''?20:lcNum(sup.markupPct);
+  var markup=avgPc*(markupPct/100);                                   // Excel row 26
+  var grandTotalPc=avgPc+markup;                                      // Excel row 27
+  var grandTotalShip=landed*(1+markupPct/100);
+  return {packing:packing,totalCarton:totalCarton,sizeM3:sizeM3,totalM3:totalM3,billedM3:billedM3,weightPerCarton:weightPerCarton,totalWeights:totalWeights,oceanFreight:oceanFreight,totalCostRMB:totalCostRMB,totalCostMYR:totalCostMYR,unitPricePc:unitPricePc,tax:tax,landed:landed,avgPc:avgPc,markup:markup,grandTotalPc:grandTotalPc,grandTotalShip:grandTotalShip};
+}
+var LC_DP={packing:2,totalCarton:2,sizeM3:4,totalM3:4,billedM3:2,weightPerCarton:2,totalWeights:1,oceanFreight:2,totalCostRMB:2,totalCostMYR:2,unitPricePc:2,tax:2,landed:2,avgPc:2,markup:2,grandTotalPc:2,grandTotalShip:2};
+
+// ─── Live recompute (updates spans only, keeps input focus) ───
+function lcRecalc(){
+  var rec=lcActiveRecord();if(!rec)return;
+  rec.suppliers.forEach(function(sup){
+    var c=lcCompute(sup,rec);
+    document.querySelectorAll('[data-sup="'+sup.id+'"]').forEach(function(el){
+      var k=el.getAttribute('data-k');if(k in c){el.textContent=lcFmt(c[k],LC_DP[k]);}
+    });
+  });
+  lcPersist();
+}
+
+// ─── Input handlers (blocked for view-only roles) ───
+function lcInput(supId,key,val){if(lcRO())return;var s=lcSup(supId);if(s){s[key]=val;lcRecalc();}}
+function lcRecInput(key,val){if(lcRO())return;var r=lcActiveRecord();if(r){r[key]=val;lcRecalc();}}
+function lcSupName(supId,val){if(lcRO())return;var s=lcSup(supId);if(s){s.name=val;lcPersist();}}
+function lcExtraVal(supId,fid,val){if(lcRO())return;var s=lcSup(supId);if(s){s.extraVals=s.extraVals||{};s.extraVals[fid]=val;lcRecalc();}}
+function lcExtraLabel(fid,val){if(lcRO())return;var r=lcActiveRecord();if(!r)return;(r.extraFields||[]).forEach(function(f){if(f.id===fid)f.label=val;});lcPersist();}
+
+// ─── Formula fillers (Excel: packing = MOQ*factor, weight/carton = MOQ*factor) ───
+function lcFillPack(supId){if(lcRO())return;var r=lcActiveRecord();var s=lcSup(supId);if(s&&r){s.packCharge=(lcNum(s.moq)*lcNum(r.packFactor)).toFixed(2);renderPackaging();}}
+function lcFillPackAll(){if(lcRO())return;var r=lcActiveRecord();if(!r)return;r.suppliers.forEach(function(s){s.packCharge=(lcNum(s.moq)*lcNum(r.packFactor)).toFixed(2);});renderPackaging();}
+function lcFillWeight(supId){if(lcRO())return;var r=lcActiveRecord();var s=lcSup(supId);if(s&&r){s.weightPerCartonInput=(lcNum(s.moq)*lcNum(r.weightFactor)).toFixed(2);renderPackaging();}}
+function lcFillWeightAll(){if(lcRO())return;var r=lcActiveRecord();if(!r)return;r.suppliers.forEach(function(s){s.weightPerCartonInput=(lcNum(s.moq)*lcNum(r.weightFactor)).toFixed(2);});renderPackaging();}
+
+// ─── Record & structural management (blocked for view-only roles) ───
+function lcCreateRecord(sec){
+  if(lcRO())return;
+  var job=(lcVal('lc-newjob-'+sec)||'').trim(), prod=(lcVal('lc-newprod-'+sec)||'').trim();
+  if(!job){toast('⚠ Enter a Job No. to create a record','error');return;}
+  var dup=LC_STATE.records.some(function(r){return r.jobNo.trim().toLowerCase()===job.toLowerCase();});
+  if(dup){toast('⚠ A record with that Job No. already exists','error');return;}
+  lcNewRecord(job,prod);renderPackaging();renderLanded();toast('✓ Record created — '+job,'success');
+}
+function lcSelectRecord(id){LC_STATE.activeId=id;lcPersist();renderPackaging();renderLanded();}
+function lcDeleteRecord(){if(lcRO())return;var r=lcActiveRecord();if(!r)return;if(!confirm('Delete record '+(r.jobNo||'')+'? This cannot be undone.'))return;LC_STATE.records=LC_STATE.records.filter(function(x){return x.id!==r.id;});LC_STATE.activeId=LC_STATE.records.length?LC_STATE.records[0].id:null;lcPersist();renderPackaging();renderLanded();toast('Record deleted','success');}
+function lcAddSupplier(){if(lcRO())return;var r=lcActiveRecord();if(!r)return;r.suppliers.push(lcNewSupplier('Supplier '+String.fromCharCode(65+r.suppliers.length)));lcPersist();renderPackaging();renderLanded();}
+function lcRemoveSupplier(supId){if(lcRO())return;var r=lcActiveRecord();if(!r)return;if(r.suppliers.length<=1){toast('⚠ Keep at least one supplier','error');return;}r.suppliers=r.suppliers.filter(function(s){return s.id!==supId;});if(r.lockedSupId===supId)r.lockedSupId=null;lcPersist();renderPackaging();renderLanded();}
+function lcLock(supId){if(lcRO())return;var r=lcActiveRecord();if(!r)return;r.lockedSupId=(r.lockedSupId===supId?null:supId);lcPersist();renderPackaging();renderLanded();}
+function lcAddExtraField(){if(lcRO())return;var r=lcActiveRecord();if(!r)return;r.extraFields=r.extraFields||[];r.extraFields.push({id:lcUID(),label:'Other charge (RMB)'});lcPersist();renderLanded();}
+function lcRemoveExtraField(fid){if(lcRO())return;var r=lcActiveRecord();if(!r)return;r.extraFields=(r.extraFields||[]).filter(function(f){return f.id!==fid;});lcPersist();renderLanded();}
+function lcSaveRecord(){if(lcRO())return;lcPersist();toast('💾 Saved in this portal (stored locally)','success');}
+
+// ─── Shared record bar ───
+function lcRecordBarHTML(sec){
+  var opts=LC_STATE.records.map(function(r){return '<option value="'+r.id+'"'+(r.id===LC_STATE.activeId?' selected':'')+'>'+lcEsc(r.jobNo||'(no job)')+(r.product?' — '+lcEsc(r.product):'')+'</option>';}).join('');
+  var rec=lcActiveRecord();
+  var h='<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:end">'
+   +'<div style="min-width:230px"><label class="fl">Active shipment record</label>'
+   +(LC_STATE.records.length?'<select class="fi" onchange="lcSelectRecord(this.value)">'+opts+'</select>':'<div style="font-size:12px;color:var(--ink4);padding:9px 0">No records yet'+(lcRO()?'.':' — create one →')+'</div>')+'</div>';
+  if(!lcRO()){
+    h+='<div><label class="fl">New Job No.</label><input class="fi" id="lc-newjob-'+sec+'" placeholder="JOB-2041" style="width:150px"></div>'
+     +'<div><label class="fl">Product</label><input class="fi" id="lc-newprod-'+sec+'" placeholder="Exercise Towel" style="width:175px"></div>'
+     +'<button class="btn btn-primary btn-sm" onclick="lcCreateRecord(\''+sec+'\')">➕ Create record</button>'
+     +(rec?'<button class="btn btn-secondary btn-sm" onclick="lcDeleteRecord()">🗑 Delete</button>':'');
+  }else{
+    h+='<div style="align-self:center;font-size:11px;font-weight:600;color:var(--blue2);background:var(--blue-lt);padding:6px 12px;border-radius:20px">👁 '+lcRoleLabel()+' view</div>';
+  }
+  return h+'</div>';
+}
+
+// ─── Row builders ───
+function lcColHead(s,rec){
+  var locked=rec.lockedSupId===s.id, ro=lcRO();
+  var btns = ro
+    ? (locked?'<div style="text-align:center"><span class="lc-mini" style="background:var(--green-lt);color:var(--green);border-color:var(--green-bd)">✓ locked</span></div>':'')
+    : '<div style="display:flex;gap:6px;justify-content:center"><button class="lc-mini" onclick="lcLock(\''+s.id+'\')">'+(locked?'✓ locked':'lock in')+'</button><button class="lc-mini" onclick="lcRemoveSupplier(\''+s.id+'\')">✕</button></div>';
+  return '<th class="lc-col'+(locked?' lc-lock':'')+'"><div style="display:flex;flex-direction:column;gap:4px">'
+   +'<input class="lc-name" '+(ro?'disabled ':'')+'value="'+lcEsc(s.name)+'" oninput="lcSupName(\''+s.id+'\',this.value)">'
+   +btns+'</div></th>';
+}
+function lcInputRow(rec,label,key,type){
+  var d=lcRO()?'disabled ':'';
+  return '<tr><td class="lc-attr">'+label+'</td>'+rec.suppliers.map(function(s){
+    return '<td class="lc-cell'+(rec.lockedSupId===s.id?' lc-lock':'')+'"><input class="lc-in" '+d+'type="'+(type==='number'?'number':'text')+'" value="'+lcEsc(s[key])+'" oninput="lcInput(\''+s.id+'\',\''+key+'\',this.value)"></td>';
+  }).join('')+'</tr>';
+}
+function lcFormulaRow(rec,label,key,fn){
+  var ro=lcRO(), d=ro?'disabled ':'';
+  return '<tr><td class="lc-attr">'+label+(ro?'':' <button class="lc-mini" title="Fill all with formula" onclick="'+fn+'All()">ƒ all</button>')+'</td>'+rec.suppliers.map(function(s){
+    return '<td class="lc-cell'+(rec.lockedSupId===s.id?' lc-lock':'')+'"><div style="display:flex;gap:3px;align-items:center"><input class="lc-in" '+d+'type="number" value="'+lcEsc(s[key])+'" oninput="lcInput(\''+s.id+'\',\''+key+'\',this.value)">'+(ro?'':'<button class="lc-mini" title="Fill with formula" onclick="'+fn+'(\''+s.id+'\')">ƒ</button>')+'</div></td>';
+  }).join('')+'</tr>';
+}
+function lcDimRow(rec){
+  var d=lcRO()?'disabled ':'';
+  return '<tr><td class="lc-attr">Carton L × W × H (cm)</td>'+rec.suppliers.map(function(s){
+    var mk=function(k){return '<input class="lc-in lc-dim" '+d+'type="number" placeholder="'+k+'" value="'+lcEsc(s[k])+'" oninput="lcInput(\''+s.id+'\',\''+k+'\',this.value)">';};
+    return '<td class="lc-cell'+(rec.lockedSupId===s.id?' lc-lock':'')+'"><div style="display:flex;gap:3px">'+mk('L')+mk('W')+mk('H')+'</div></td>';
+  }).join('')+'</tr>';
+}
+function lcCalcRow(rec,label,key,strong){
+  return '<tr'+(strong?' class="lc-strong"':'')+'><td class="lc-attr">'+label+'</td>'+rec.suppliers.map(function(s){
+    return '<td class="lc-cell lc-calc'+(rec.lockedSupId===s.id?' lc-lock':'')+'"><span data-sup="'+s.id+'" data-k="'+key+'">—</span></td>';
+  }).join('')+'</tr>';
+}
+function lcExtraRows(rec){
+  var ro=lcRO(), d=ro?'disabled ':'';
+  return (rec.extraFields||[]).map(function(f){
+    return '<tr><td class="lc-attr"><input class="lc-lbl" '+d+'value="'+lcEsc(f.label)+'" oninput="lcExtraLabel(\''+f.id+'\',this.value)">'+(ro?'':' <button class="lc-mini" onclick="lcRemoveExtraField(\''+f.id+'\')">✕</button>')+'</td>'
+     +rec.suppliers.map(function(s){return '<td class="lc-cell"><input class="lc-in" '+d+'type="number" value="'+lcEsc((s.extraVals||{})[f.id])+'" oninput="lcExtraVal(\''+s.id+'\',\''+f.id+'\',this.value)"></td>';}).join('')+'</tr>';
+  }).join('');
+}
+function lcSubHead(t){return '<tr><td class="lc-sub" colspan="99">'+t+'</td></tr>';}
+function lcConst(label,key,val){return '<div><label class="fl">'+label+'</label><input class="fi" style="width:155px" '+(lcRO()?'disabled ':'')+'value="'+lcEsc(val)+'" oninput="lcRecInput(\''+key+'\',this.value)"></div>';}
+
+// ─── Section renderers ───
+function renderPackaging(){
+  var bar=document.getElementById('pk-recordbar'); if(bar)bar.innerHTML=lcRecordBarHTML('pk');
+  var host=document.getElementById('pk-editor'); if(!host)return;
+  var rec=lcActiveRecord();
+  if(!rec){host.innerHTML='<div style="font-size:13px;color:var(--ink4)">'+(lcRO()?'No packaging records to display yet.':'Create a shipment record above to start entering packaging details.')+'</div>';return;}
+  var h='';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px">'+lcConst('Packing factor (× MOQ)','packFactor',rec.packFactor)+lcConst('Weight factor (× MOQ)','weightFactor',rec.weightFactor)+lcConst('Min billed m³','minM3',rec.minM3)+'</div>';
+  h+='<div style="overflow:auto"><table class="lc-tbl"><thead><tr><th class="lc-attr">Packaging field</th>'+rec.suppliers.map(function(s){return lcColHead(s,rec);}).join('')+'</tr></thead><tbody>';
+  h+=lcInputRow(rec,'MOQ','moq','number');
+  h+=lcInputRow(rec,'Packing method','packMethod','text');
+  h+=lcInputRow(rec,'Packing qty / carton','packQty','number');
+  h+=lcDimRow(rec);
+  h+=lcInputRow(rec,'Ocean freight rate (per m³)','freightRate','number');
+  h+=lcCalcRow(rec,'Total carton = MOQ ÷ qty/carton','totalCarton');
+  h+=lcCalcRow(rec,'Size/m³ = L·W·H ÷ 1,000,000','sizeM3');
+  h+=lcCalcRow(rec,'Total m³ = size/m³ × cartons','totalM3');
+  h+=lcCalcRow(rec,'Billed m³ = max(min, total m³)','billedM3');
+  h+=lcFormulaRow(rec,'Packing charges = MOQ × factor','packCharge','lcFillPack');
+  h+=lcFormulaRow(rec,'Weight/carton = MOQ × factor','weightPerCartonInput','lcFillWeight');
+  h+=lcCalcRow(rec,'Total weights = cartons × wt/carton','totalWeights');
+  h+=lcCalcRow(rec,'Ocean freight = rate × billed m³','oceanFreight',true);
+  h+='</tbody></table></div>';
+  if(!lcRO()){h+='<div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap"><button class="btn btn-secondary btn-sm" onclick="lcAddSupplier()">➕ Add supplier</button><button class="btn btn-primary btn-sm" onclick="lcSaveRecord()">💾 Save</button><div style="margin-left:auto;font-size:11px;color:var(--green);align-self:center">→ Packing charges &amp; ocean freight flow into the Landed Cost Calculator</div></div>';}
+  host.innerHTML=h;lcRecalc();
+}
+function renderLanded(){
+  var bar=document.getElementById('lc-recordbar'); if(bar)bar.innerHTML=lcRecordBarHTML('lc');
+  var host=document.getElementById('lc-editor'); if(!host)return;
+  var rec=lcActiveRecord();
+  if(!rec){host.innerHTML='<div style="font-size:13px;color:var(--ink4)">'+(lcRO()?'No landed-cost records to display yet.':'Create a shipment record above to start.')+'</div>';return;}
+  var h='';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px;align-items:end">'+lcConst('Exchange rate (RMB→MYR)','exRate',rec.exRate)+'<div style="align-self:center;font-size:11px;color:var(--ink4);max-width:320px">Packing charges, ocean freight, m³ &amp; weight are pulled live from Packaging Details.</div></div>';
+  h+='<div style="overflow:auto"><table class="lc-tbl"><thead><tr><th class="lc-attr">Attribute</th>'+rec.suppliers.map(function(s){return lcColHead(s,rec);}).join('')+'</tr></thead><tbody>';
+  h+=lcSubHead('Item cost');
+  h+=lcInputRow(rec,'MOQ','moq','number');
+  h+=lcInputRow(rec,'Unit price (RMB)','unitPriceRMB','number');
+  h+=lcInputRow(rec,'Logo printing (RMB)','logo','number');
+  h+=lcInputRow(rec,'Delivery to Yiwu (RMB)','delivery','number');
+  h+=lcInputRow(rec,'Courier (RMB)','courier','number');
+  h+=lcInputRow(rec,'Mock-up (RMB)','mockup','number');
+  h+=lcCalcRow(rec,'Packing charges (RMB, from Packaging)','packing');
+  h+=lcExtraRows(rec);
+  h+=lcCalcRow(rec,'Total cost (RMB)','totalCostRMB');
+  h+=lcCalcRow(rec,'Total cost (MYR)','totalCostMYR');
+  h+=lcCalcRow(rec,'Unit price / pc (MYR)','unitPricePc');
+  h+=lcSubHead('Logistics (from Packaging)');
+  h+=lcCalcRow(rec,'Ocean freight (MYR)','oceanFreight');
+  h+=lcInputRow(rec,'Air freight (MYR)','airFreight','number');
+  h+=lcCalcRow(rec,'Tax (6% SST on ocean)','tax');
+  h+=lcSubHead('Landed cost');
+  h+=lcCalcRow(rec,'Landed cost / Subtotal (MYR)','landed',true);
+  h+=lcCalcRow(rec,'Average cost / pc (MYR)','avgPc');
+  h+=lcInputRow(rec,'Markup %','markupPct','number');
+  h+=lcCalcRow(rec,'Markup / pc (MYR)','markup');
+  h+=lcCalcRow(rec,'Grand total / pc (MYR)','grandTotalPc',true);
+  h+=lcCalcRow(rec,'Grand total (MYR)','grandTotalShip',true);
+  h+='</tbody></table></div>';
+  if(!lcRO()){h+='<div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap"><button class="btn btn-secondary btn-sm" onclick="lcAddSupplier()">➕ Add supplier</button><button class="btn btn-secondary btn-sm" onclick="lcAddExtraField()">➕ Add charge line</button><button class="btn btn-primary btn-sm" onclick="lcSaveRecord()">💾 Save record</button><div style="margin-left:auto;font-size:11px;color:var(--ink4);align-self:center">Each record is separate — never combined.</div></div>';}
+  host.innerHTML=h;lcRecalc();
+}
+document.addEventListener('DOMContentLoaded',function(){lcLoad();});
+
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeD();});
 </script>
 </body>
