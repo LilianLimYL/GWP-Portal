@@ -467,6 +467,8 @@ button{cursor:pointer}
           <button class="admin-nav-btn" onclick="adminNav(this,'a-compare')"><div class="admin-nav-ico" style="background:#fff1f2">📊</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Price Comparison</div><div style="font-size:11px;color:var(--ink4)">Upload Excel (backup)</div></div></button>
           <button class="admin-nav-btn" onclick="adminNav(this,'a-packaging');renderPackaging()"><div class="admin-nav-ico" style="background:#eef7f3">📦</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Packaging Details</div><div style="font-size:11px;color:var(--ink4)">Carton, volume &amp; freight</div></div></button>
           <button class="admin-nav-btn" onclick="adminNav(this,'a-landed');renderLanded()"><div class="admin-nav-ico" style="background:#eff3fe">🧮</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Landed Cost Calculator</div><div style="font-size:11px;color:var(--ink4)">Per-shipment landed cost</div></div></button>
+          <button class="admin-nav-btn edit-only" style="display:none" onclick="adminNav(this,'a-costing');renderCosting()"><div class="admin-nav-ico" style="background:#f5f3ff">🧰</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Costing Workspace</div><div style="font-size:11px;color:var(--ink4)">Compare · Packaging · Landed</div></div></button>
+          <button class="admin-nav-btn edit-only" style="display:none" onclick="adminNav(this,'a-backup');renderCosting()"><div class="admin-nav-ico" style="background:#f0fdfa">💾</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Backup &amp; Restore</div><div style="font-size:11px;color:var(--ink4)">Download all portal data</div></div></button>
           <button class="admin-nav-btn edit-only" style="display:none" onclick="adminNav(this,'a-update')"><div class="admin-nav-ico" style="background:#fffbeb">✏️</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Update Status</div><div style="font-size:11px;color:var(--ink4)">How to update data</div></div></button>
           <button class="admin-nav-btn edit-only" style="display:none" onclick="adminNav(this,'a-users')"><div class="admin-nav-ico" style="background:#f5f3ff">👥</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Brand Owners</div><div style="font-size:11px;color:var(--ink4)">Manage access</div></div></button>
           <button class="admin-nav-btn edit-only" style="display:none" onclick="adminNav(this,'a-usermgmt')"><div class="admin-nav-ico" style="background:#fdf4ff">👤</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">User Management</div><div style="font-size:11px;color:var(--ink4)">Add users, link to shipments</div></div></button>
@@ -601,6 +603,62 @@ button{cursor:pointer}
           </div>
 
           <!-- BRAND OWNERS -->
+          <!-- COSTING WORKSPACE (admin only) — NEW in v2 -->
+          <div class="admin-sec" id="a-costing">
+            <div class="admin-sec-title">🧰 Costing Workspace</div>
+            <div style="font-size:12px;color:var(--ink3);margin-bottom:14px;line-height:1.6">
+              Price Comparison, Packaging Details and Landed Cost in one record — replicating your Excel formulas exactly.
+              <strong>No shipment or Job No. is required</strong>: compare suppliers and estimate landed cost before anything is confirmed.
+              Once you confirm a supplier the estimate is frozen and the record can be linked to a Job No.
+            </div>
+            <div id="cst-backup-flag" style="display:none;padding:10px 14px;background:var(--amber-lt);border:1px solid var(--amber-bd);border-radius:var(--r);margin-bottom:14px;font-size:12px;color:var(--ink2)">
+              ⚠️ Records have changed since your last backup. These are stored in this browser only —
+              <a href="#" onclick="cstBackup();return false;" style="color:var(--blue);font-weight:600">download a backup now</a>.
+            </div>
+            <div id="cst-import"></div>
+            <div id="cst-bar" style="margin-bottom:16px"></div>
+            <div id="cst-body"></div>
+          </div>
+
+          <!-- BACKUP &amp; RESTORE (admin only) — NEW in v2 -->
+          <div class="admin-sec" id="a-backup">
+            <div class="admin-sec-title">💾 Backup &amp; Restore</div>
+            <div style="font-size:12px;color:var(--ink3);margin-bottom:16px;line-height:1.6">
+              Download a complete copy of everything in the portal. Read-only — backing up changes nothing.
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px">
+              <div style="padding:16px;border:1px solid var(--bd);border-radius:var(--r-lg);background:var(--surface)">
+                <div style="font-size:13px;font-weight:700;margin-bottom:6px">⬇️ Download full backup</div>
+                <div style="font-size:12px;color:var(--ink3);line-height:1.6;margin-bottom:12px">
+                  A timestamped ZIP containing:
+                  <ul style="margin:7px 0 0 17px;padding:0">
+                    <li><strong>JSON</strong> — exact restore file (costing v2 + landed v1 + shipments + comparisons)</li>
+                    <li><strong>XLSX</strong> — readable copy in your Towel-R1 layout, one sheet per record</li>
+                    <li><strong>README</strong> — restore instructions</li>
+                  </ul>
+                </div>
+                <button class="btn btn-primary" onclick="cstBackup()">⬇️ Download backup (.zip)</button>
+              </div>
+              <div style="padding:16px;border:1px solid var(--bd);border-radius:var(--r-lg);background:var(--surface)">
+                <div style="font-size:13px;font-weight:700;margin-bottom:6px">⬆️ Restore from backup</div>
+                <div style="font-size:12px;color:var(--ink3);line-height:1.6;margin-bottom:12px">
+                  Pick a backup <code style="background:var(--surface3);padding:1px 5px;border-radius:3px">.json</code>.
+                  You see a preview of exactly what changes before anything is applied.
+                  Merges by PC ID — <strong>never deletes</strong> and never silently overwrites.
+                </div>
+                <input type="file" id="cst-restore-file" accept=".json,application/json" style="display:none" onchange="cstRestoreRead(event)">
+                <button class="btn btn-secondary" onclick="cstPickRestore()">⬆️ Choose backup file…</button>
+                <div id="cst-restore-preview"></div>
+              </div>
+            </div>
+            <div style="margin-top:16px;padding:14px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r);font-size:11.5px;color:var(--ink3);line-height:1.7">
+              <strong>Where your data lives:</strong>
+              Shipments, uploaded Excel comparisons and Drive photos stay in <strong>Google Sheets / Drive</strong> — unchanged by this section.
+              Costing records (<code>gwp_costing_v2</code>) and your existing Landed Cost records (<code>gwp_lc_records_v1</code>) live in
+              <strong>this browser only</strong>, so the backup file is your safety net for those. Both keys are included in every backup.
+            </div>
+          </div>
+
           <div class="admin-sec" id="a-users">
             <div class="admin-sec-title">👥 Managing Brand Owner Access</div>
             <div class="guide-card">
@@ -776,6 +834,7 @@ button{cursor:pointer}
 <div id="toast-wrap"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 'use strict';
 
@@ -2252,6 +2311,890 @@ function renderLanded(){
 document.addEventListener('DOMContentLoaded',function(){lcLoad();});
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeD();});
+
+// ═══════════════════════════════════════════════════════════════════════
+// COSTING WORKSPACE  (v2)  —  Price Comparison · Packaging · Landed Cost
+// ─────────────────────────────────────────────────────────────────────
+// Storage key: gwp_costing_v2   (SEPARATE from gwp_lc_records_v1 — v1 is
+// read for optional import only and is NEVER written to.)
+// All formulas replicate the Excel "Towel-R1" sheet exactly.
+// Calculations run entirely in-portal and do NOT require a shipment.
+// ═══════════════════════════════════════════════════════════════════════
+var CST_KEY='gwp_costing_v2';
+var CST={version:2,seq:0,activeId:null,tab:'compare',lastBackup:'',records:[]};
+
+function cstRO(){return (typeof canEdit==='function')?!canEdit():false;}
+function cstPersist(){try{localStorage.setItem(CST_KEY,JSON.stringify(CST));}catch(e){toast('⚠ Browser storage full — download a backup','error');}cstBackupFlag();}
+function cstLoad(){try{var s=localStorage.getItem(CST_KEY);if(s){var p=JSON.parse(s);if(p&&p.records)CST=p;}}catch(e){}}
+function cstUID(){return 'c'+Math.random().toString(36).slice(2,9);}
+function cstNum(v){var n=parseFloat(v);return isNaN(n)?0:n;}
+function cstEsc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function cstFmt(n,dp){if(n===''||n===null||n===undefined||isNaN(n))return '—';return Number(n).toLocaleString('en-MY',{minimumFractionDigits:dp,maximumFractionDigits:dp});}
+function cstVal(id){var e=document.getElementById(id);return e?e.value:'';}
+
+// ─── Safe arithmetic evaluator (Excel-style "4.8+0.7" entry) ───
+function cstEval(expr){
+  if(expr===''||expr===null||expr===undefined)return 0;
+  var s=String(expr).replace(/^=/,'').trim();
+  if(s==='')return 0;
+  if(!/^[0-9+\-*/(). ]+$/.test(s))return parseFloat(s)||0;   // reject anything non-arithmetic
+  try{var r=Function('"use strict";return ('+s+')')();return (typeof r==='number'&&isFinite(r))?r:0;}catch(e){return 0;}
+}
+function cstIsExpr(v){return /[+\-*/]/.test(String(v||'').replace(/^-/,''));}
+
+// ─── PC ID generator ───
+function cstNextId(){
+  var yr=new Date().getFullYear();
+  var max=0;
+  CST.records.forEach(function(r){
+    var m=/^PC-(\d{4})-(\d+)$/.exec(r.pcid||'');
+    if(m&&m[1]==String(yr)){var n=parseInt(m[2],10);if(n>max)max=n;}
+  });
+  return 'PC-'+yr+'-'+String(max+1).padStart(3,'0');
+}
+
+// ─── Factories ───
+function cstNewSupplier(name){
+  return {id:cstUID(),name:name||'New Supplier',currency:'RMB',
+    unitPriceExpr:'',basePrice:'',addOn:'',
+    moq:'',logo:'',delivery:'',courier:'',mockup:'',
+    packMethod:'',packCharge:'',packQty:'',dimension:'',
+    L:'',W:'',H:'',weightPerCarton:'',
+    freightRate:'410',airFreight:'',markupPct:'20',
+    leadTime:'',transit:'25',orderDate:'',
+    pic:'',remark:'',statusNote:'',link:'',
+    attachments:[],extraVals:{}};
+}
+function cstNewRecord(product,round){
+  var r={id:cstUID(),pcid:cstNextId(),product:product||'',round:round||'R1',
+    status:'draft',jobNo:'',
+    createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),
+    exRateRMB:'0.6',exRateUSD:'4.1',minM3:'0.5',packFactor:'0.15',taxPct:'6',
+    splitUnitPrice:false,
+    extraFields:[],
+    confirmedSupId:null,estimate:null,actual:null,
+    suppliers:[cstNewSupplier('Supplier A'),cstNewSupplier('Supplier B'),cstNewSupplier('Supplier C')]};
+  CST.records.push(r);CST.activeId=r.id;cstPersist();return r;
+}
+function cstRec(){for(var i=0;i<CST.records.length;i++){if(CST.records[i].id===CST.activeId)return CST.records[i];}return null;}
+function cstSup(id){var r=cstRec();if(!r)return null;for(var i=0;i<r.suppliers.length;i++){if(r.suppliers[i].id===id)return r.suppliers[i];}return null;}
+function cstTouch(){var r=cstRec();if(r)r.updatedAt=new Date().toISOString();}
+
+// ═══════════════════════════════════════════════════════════════════════
+// CORE ENGINE — mirrors Excel Towel-R1 row by row
+// ═══════════════════════════════════════════════════════════════════════
+function cstUnitPrice(sup,rec){
+  if(rec.splitUnitPrice)return cstNum(sup.basePrice)+cstNum(sup.addOn);
+  return cstEval(sup.unitPriceExpr);
+}
+function cstCompute(sup,rec){
+  var moq=cstNum(sup.moq);
+  var ex=(sup.currency==='USD')?cstNum(rec.exRateUSD):cstNum(rec.exRateRMB);
+  var unitPrice=cstUnitPrice(sup,rec);                                        // row 4
+  var unitPriceMYR=unitPrice*ex;                                              // row 5  = row4 * rate
+  var packQty=cstNum(sup.packQty);
+  var packing=cstNum(sup.packCharge);                                         // row 12
+  var extras=0;(rec.extraFields||[]).forEach(function(f){extras+=cstNum((sup.extraVals||{})[f.id]);});
+  var totalCostFC=(moq*unitPrice)+cstNum(sup.logo)+cstNum(sup.delivery)
+                 +cstNum(sup.courier)+cstNum(sup.mockup)+packing+extras;       // row 13
+  var totalCostMYR=totalCostFC*ex;                                            // row 14 = row13 * rate
+  var unitPricePc=moq>0?totalCostMYR/moq:0;                                   // row 15 = row14 / MOQ
+  var sizeM3=(cstNum(sup.L)*cstNum(sup.W)*cstNum(sup.H))/1000000;             // col N  = L*W*H/1,000,000
+  var totalCarton=packQty>0?moq/packQty:0;                                    // row 19 = MOQ / packQty
+  var totalM3=sizeM3*totalCarton;                                             // col O  = N * cartons
+  var billedM3=Math.max(cstNum(rec.minM3),totalM3);                           // col P  = IF(O<0.5,0.5,O)
+  var weightPerCarton=cstNum(sup.weightPerCarton);                            // row 21 (manual)
+  var totalWeights=totalCarton*weightPerCarton;                               // row 22 = row19 * row21
+  var ocean=cstNum(sup.freightRate)*billedM3;                                 // row 17 = rate * billed m3
+  var air=cstNum(sup.airFreight);                                             // row 16
+  var tax=ocean*(cstNum(rec.taxPct)/100);                                     // row 23 = row17 * 6%
+  var landed=totalCostMYR+air+ocean+tax;                                      // row 24 = 14+16+17+23
+  var avgPc=moq>0?landed/moq:0;                                               // row 25 = row24 / MOQ
+  var mk=sup.markupPct===''?20:cstNum(sup.markupPct);
+  var markup=avgPc*(mk/100);                                                  // row 26
+  var grandPc=avgPc+markup;                                                   // row 27 = 25 + 26
+  var grandTotal=landed*(1+mk/100);
+  return {unitPrice:unitPrice,unitPriceMYR:unitPriceMYR,packing:packing,
+    totalCostFC:totalCostFC,totalCostMYR:totalCostMYR,unitPricePc:unitPricePc,
+    sizeM3:sizeM3,totalCarton:totalCarton,totalM3:totalM3,billedM3:billedM3,
+    weightPerCarton:weightPerCarton,totalWeights:totalWeights,
+    ocean:ocean,air:air,tax:tax,landed:landed,avgPc:avgPc,
+    markup:markup,grandPc:grandPc,grandTotal:grandTotal,ex:ex};
+}
+var CST_DP={unitPrice:2,unitPriceMYR:2,packing:2,totalCostFC:2,totalCostMYR:2,unitPricePc:2,
+  sizeM3:4,totalCarton:2,totalM3:4,billedM3:2,weightPerCarton:2,totalWeights:1,
+  ocean:2,air:2,tax:2,landed:2,avgPc:2,markup:2,grandPc:2,grandTotal:2};
+
+// ─── Dates: rows 29–33 ───
+function cstDates(sup){
+  var out={completion:'',eta:''};
+  if(!sup.orderDate)return out;
+  var d=new Date(sup.orderDate);if(isNaN(d))return out;
+  var lead=cstNum(sup.leadTime),tr=cstNum(sup.transit);
+  var c=new Date(d.getTime());c.setDate(c.getDate()+lead);
+  var e=new Date(d.getTime());e.setDate(e.getDate()+lead+tr);
+  out.completion=c.toISOString().slice(0,10);
+  out.eta=e.toISOString().slice(0,10);
+  return out;
+}
+function cstBest(rec){
+  var best=null,bv=Infinity;
+  rec.suppliers.forEach(function(s){
+    var c=cstCompute(s,rec);
+    if(cstNum(s.moq)>0&&c.grandPc>0&&c.grandPc<bv){bv=c.grandPc;best=s.id;}
+  });
+  return best;
+}
+
+// ─── Live recompute without losing input focus ───
+function cstRecalc(){
+  var rec=cstRec();if(!rec)return;
+  rec.suppliers.forEach(function(sup){
+    var c=cstCompute(sup,rec);
+    var d=cstDates(sup);
+    document.querySelectorAll('[data-cs="'+sup.id+'"]').forEach(function(el){
+      var k=el.getAttribute('data-ck');
+      if(k in c){el.textContent=cstFmt(c[k],CST_DP[k]);}
+      else if(k==='completion'){el.textContent=d.completion||'—';}
+      else if(k==='eta'){el.textContent=d.eta||'—';}
+    });
+  });
+  var best=cstBest(rec);
+  document.querySelectorAll('[data-cbest]').forEach(function(el){
+    el.style.display=(el.getAttribute('data-cbest')===best)?'inline-block':'none';
+  });
+  cstTouch();cstPersist();
+}
+
+// ─── Input handlers ───
+function cstIn(supId,key,v){if(cstRO())return;var s=cstSup(supId);if(s){s[key]=v;cstRecalc();}}
+function cstInR(key,v){if(cstRO())return;var r=cstRec();if(r){r[key]=v;cstRecalc();}}
+function cstInRRender(key,v){if(cstRO())return;var r=cstRec();if(r){r[key]=v;cstTouch();cstPersist();cstRender();}}
+function cstSupName(id,v){if(cstRO())return;var s=cstSup(id);if(s){s.name=v;cstTouch();cstPersist();}}
+function cstExtraVal(supId,fid,v){if(cstRO())return;var s=cstSup(supId);if(s){s.extraVals=s.extraVals||{};s.extraVals[fid]=v;cstRecalc();}}
+function cstExtraLabel(fid,v){if(cstRO())return;var r=cstRec();if(!r)return;(r.extraFields||[]).forEach(function(f){if(f.id===fid)f.label=v;});cstPersist();}
+function cstFillPack(id){if(cstRO())return;var r=cstRec(),s=cstSup(id);if(r&&s){s.packCharge=(cstNum(s.moq)*cstNum(r.packFactor)).toFixed(2);cstRender();}}
+function cstFillPackAll(){if(cstRO())return;var r=cstRec();if(!r)return;r.suppliers.forEach(function(s){s.packCharge=(cstNum(s.moq)*cstNum(r.packFactor)).toFixed(2);});cstRender();}
+
+// ─── Record / supplier management ───
+function cstCreate(){
+  if(cstRO())return;
+  var p=(cstVal('cst-newprod')||'').trim(),rd=(cstVal('cst-newround')||'R1').trim();
+  if(!p){toast('⚠ Enter a product name','error');return;}
+  var r=cstNewRecord(p,rd);
+  cstRender();toast('✓ '+r.pcid+' created — '+p,'success');
+}
+function cstSelect(id){CST.activeId=id;cstPersist();cstRender();}
+function cstDelete(){
+  if(cstRO())return;var r=cstRec();if(!r)return;
+  if(!confirm('Delete '+r.pcid+' ('+(r.product||'no product')+')?\n\nThis cannot be undone. Download a backup first if unsure.'))return;
+  CST.records=CST.records.filter(function(x){return x.id!==r.id;});
+  CST.activeId=CST.records.length?CST.records[0].id:null;
+  cstPersist();cstRender();toast('Record deleted','success');
+}
+function cstDuplicate(){
+  if(cstRO())return;var r=cstRec();if(!r)return;
+  var c=JSON.parse(JSON.stringify(r));
+  c.id=cstUID();c.pcid=cstNextId();c.status='draft';c.jobNo='';c.confirmedSupId=null;c.estimate=null;c.actual=null;
+  c.round='R'+((parseInt(String(r.round).replace(/\D/g,''),10)||1)+1);
+  c.createdAt=c.updatedAt=new Date().toISOString();
+  c.suppliers.forEach(function(s){s.id=cstUID();});
+  CST.records.push(c);CST.activeId=c.id;cstPersist();cstRender();
+  toast('✓ Duplicated as '+c.pcid+' ('+c.round+')','success');
+}
+function cstAddSup(){
+  if(cstRO())return;var r=cstRec();if(!r)return;
+  r.suppliers.push(cstNewSupplier('Supplier '+String.fromCharCode(65+r.suppliers.length)));
+  cstPersist();cstRender();
+}
+function cstRemoveSup(id){
+  if(cstRO())return;var r=cstRec();if(!r)return;
+  if(r.suppliers.length<=2){toast('⚠ Keep at least 2 suppliers to compare','error');return;}
+  var s=cstSup(id);
+  if(!confirm('Remove '+(s?s.name:'this supplier')+' from '+r.pcid+'?'))return;
+  r.suppliers=r.suppliers.filter(function(x){return x.id!==id;});
+  if(r.confirmedSupId===id){r.confirmedSupId=null;r.status='draft';}
+  cstPersist();cstRender();
+}
+function cstAddExtra(){
+  if(cstRO())return;var r=cstRec();if(!r)return;
+  r.extraFields=r.extraFields||[];
+  r.extraFields.push({id:cstUID(),label:'Other charge'});
+  cstPersist();cstRender();
+}
+function cstRemoveExtra(fid){
+  if(cstRO())return;var r=cstRec();if(!r)return;
+  r.extraFields=(r.extraFields||[]).filter(function(f){return f.id!==fid;});
+  cstPersist();cstRender();
+}
+
+// ─── Confirm supplier → freeze estimate ───
+function cstConfirmSup(id){
+  if(cstRO())return;var r=cstRec();if(!r)return;
+  var s=cstSup(id);if(!s)return;
+  if(r.confirmedSupId===id){
+    if(!confirm('Un-confirm '+s.name+'?\n\nThe frozen estimate is kept for reference.'))return;
+    r.confirmedSupId=null;r.status='draft';cstPersist();cstRender();return;
+  }
+  if(!confirm('Confirm '+s.name+' for '+r.pcid+'?\n\nThe current figures are frozen as the ESTIMATE. Actual costs can then be entered and compared.'))return;
+  r.confirmedSupId=id;r.status='confirmed';
+  r.estimate={supId:id,supName:s.name,at:new Date().toISOString(),c:cstCompute(s,r)};
+  if(!r.actual)r.actual={totalCostMYR:'',air:'',ocean:'',tax:'',landed:'',note:'',landedOverride:false};
+  cstPersist();cstRender();
+  toast('✓ '+s.name+' confirmed — estimate frozen','success');
+}
+function cstActual(key,v){if(cstRO())return;var r=cstRec();if(!r)return;r.actual=r.actual||{};r.actual[key]=v;cstTouch();cstPersist();cstRenderVariance();}
+function cstActualOverride(chk){if(cstRO())return;var r=cstRec();if(!r)return;r.actual=r.actual||{};r.actual.landedOverride=chk;cstPersist();cstRender();}
+function cstActualLanded(r){
+  var a=r.actual||{};
+  if(a.landedOverride&&a.landed!=='')return cstNum(a.landed);
+  return cstNum(a.totalCostMYR)+cstNum(a.air)+cstNum(a.ocean)+cstNum(a.tax);
+}
+function cstLinkJob(v){if(cstRO())return;var r=cstRec();if(r){r.jobNo=v;cstTouch();cstPersist();}}
+
+// ─── Attachments (reference only — never affect calculations) ───
+function cstPickFile(supId){if(cstRO())return;var i=document.getElementById('cst-file-'+supId);if(i)i.click();}
+async function cstUpload(ev,supId){
+  if(cstRO())return;
+  var files=Array.from(ev.target.files||[]);
+  var s=cstSup(supId);if(!s)return;
+  s.attachments=s.attachments||[];
+  for(var i=0;i<files.length;i++){
+    var f=files[i];
+    var dataUrl=await fileToDataURL(f);
+    var att={id:cstUID(),name:f.name,url:dataUrl,type:f.type||'',local:true};
+    s.attachments.push(att);cstPersist();cstRender();
+    try{
+      var res=await postToSheet('uploadPhoto',{name:f.name,dataUrl:dataUrl});
+      if(res&&res.ok&&res.data&&res.data.url){att.url=res.data.url;att.local=false;cstPersist();cstRender();}
+      else{toast('⚠ Drive upload unavailable — file kept in this browser only','warning');}
+    }catch(e){toast('⚠ Drive upload failed — file kept locally','warning');}
+  }
+  ev.target.value='';
+}
+function cstRemoveAtt(supId,attId){
+  if(cstRO())return;var s=cstSup(supId);if(!s)return;
+  s.attachments=(s.attachments||[]).filter(function(a){return a.id!==attId;});
+  cstPersist();cstRender();
+}
+function cstOpenLink(supId){
+  var s=cstSup(supId);if(!s||!s.link)return;
+  var u=String(s.link).trim();
+  if(!/^https?:\/\//i.test(u)){toast('⚠ Link must start with http:// or https://','error');return;}
+  window.open(u,'_blank','noopener,noreferrer');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// RENDERING
+// ═══════════════════════════════════════════════════════════════════════
+function cstTab(t){CST.tab=t;cstPersist();cstRender();}
+
+function cstRender(){
+  var host=document.getElementById('cst-body');if(!host)return;
+  cstRenderBar();
+  var rec=cstRec();
+  if(!rec){
+    host.innerHTML='<div style="padding:36px;text-align:center;color:var(--ink4);font-size:13px;background:var(--surface2);border:1px dashed var(--bd2);border-radius:var(--r-lg)">'
+      +'No costing record selected.'+(cstRO()?'':' Create one above to start comparing suppliers — no shipment or Job No. required.')+'</div>';
+    return;
+  }
+  var tabs=[['compare','📊 Price Comparison'],['packaging','📦 Packaging Details'],['landed','🧮 Landed Cost']];
+  var h='<div style="display:flex;gap:4px;border-bottom:1px solid var(--bd);margin-bottom:16px;flex-wrap:wrap">';
+  tabs.forEach(function(t){
+    var on=(CST.tab===t[0]);
+    h+='<button onclick="cstTab(\''+t[0]+'\')" style="padding:10px 16px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:'+(on?'700':'500')+';color:'+(on?'var(--blue)':'var(--ink3)')+';border-bottom:2px solid '+(on?'var(--blue)':'transparent')+';margin-bottom:-1px">'+t[1]+'</button>';
+  });
+  h+='</div>';
+  h+=cstSettingsHTML(rec);
+  if(CST.tab==='compare')h+=cstCompareHTML(rec);
+  else if(CST.tab==='packaging')h+=cstPackagingHTML(rec);
+  else h+=cstLandedHTML(rec);
+  host.innerHTML=h;
+  cstRecalc();
+}
+
+function cstRenderBar(){
+  var bar=document.getElementById('cst-bar');if(!bar)return;
+  var opts=CST.records.map(function(r){
+    return '<option value="'+r.id+'"'+(r.id===CST.activeId?' selected':'')+'>'+cstEsc(r.pcid)+' · '+cstEsc(r.product||'(no product)')+' · '+cstEsc(r.round)+(r.status==='confirmed'?' ✓':'')+'</option>';
+  }).join('');
+  var rec=cstRec();
+  var h='<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:end">';
+  h+='<div style="min-width:280px;flex:1"><label class="fl">Active costing record</label>'
+    +(CST.records.length?'<select class="fi" onchange="cstSelect(this.value)">'+opts+'</select>'
+      :'<div style="font-size:12px;color:var(--ink4);padding:9px 0">No records yet'+(cstRO()?'.':' — create one →')+'</div>')+'</div>';
+  if(!cstRO()){
+    h+='<div><label class="fl">New product</label><input class="fi" id="cst-newprod" placeholder="Exercise Towel" style="width:180px"></div>'
+      +'<div><label class="fl">Round</label><input class="fi" id="cst-newround" value="R1" style="width:70px"></div>'
+      +'<button class="btn btn-primary btn-sm" onclick="cstCreate()">➕ Create</button>';
+    if(rec){
+      h+='<button class="btn btn-secondary btn-sm" onclick="cstDuplicate()">⧉ Duplicate</button>'
+        +'<button class="btn btn-secondary btn-sm" onclick="cstDelete()">🗑 Delete</button>';
+    }
+  }
+  h+='</div>';
+  if(rec){
+    var badge=rec.status==='confirmed'
+      ?'<span style="background:var(--green-lt);color:var(--green);border:1px solid var(--green-bd);padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700">✓ CONFIRMED</span>'
+      :'<span style="background:var(--amber-lt);color:var(--amber);border:1px solid var(--amber-bd);padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700">DRAFT</span>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:12px;padding:10px 14px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r)">'
+      +'<span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--ink)">'+cstEsc(rec.pcid)+'</span>'
+      +badge
+      +'<span style="font-size:12px;color:var(--ink3)">'+cstEsc(rec.product||'—')+' · '+cstEsc(rec.round)+'</span>'
+      +'<span style="font-size:11px;color:var(--ink4)">Updated '+new Date(rec.updatedAt).toLocaleString('en-MY')+'</span>'
+      +'<div style="margin-left:auto;display:flex;align-items:center;gap:8px">'
+      +'<label class="fl" style="margin:0">Linked Job No.</label>'
+      +'<input class="fi" style="width:140px;padding:6px 10px" value="'+cstEsc(rec.jobNo)+'" placeholder="optional"'+(cstRO()?' readonly':'')+' onchange="cstLinkJob(this.value)">'
+      +'</div></div>';
+  }
+  bar.innerHTML=h;
+}
+
+function cstSettingsHTML(rec){
+  var ro=cstRO()?' readonly':'';
+  function f(label,key,w,hint){
+    return '<div><label class="fl">'+label+'</label><input class="fi" style="width:'+(w||90)+'px;padding:7px 10px" value="'+cstEsc(rec[key])+'"'+ro+' oninput="cstInR(\''+key+'\',this.value)">'
+      +(hint?'<div style="font-size:10px;color:var(--ink4);margin-top:3px">'+hint+'</div>':'')+'</div>';
+  }
+  return '<details style="margin-bottom:16px"><summary style="cursor:pointer;font-size:12px;font-weight:600;color:var(--ink3);padding:8px 0">⚙️ Rates &amp; factors for this record</summary>'
+    +'<div style="display:flex;flex-wrap:wrap;gap:14px;padding:14px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r);margin-top:6px">'
+    +f('Ex Rate RMB→MYR','exRateRMB',90,'Excel J1')
+    +f('Ex Rate USD→MYR','exRateUSD',90,'Excel G1')
+    +f('Min billed m³','minM3',90,'IF(&lt;0.5, 0.5)')
+    +f('Packing factor','packFactor',90,'MOQ × factor')
+    +f('Tax % (SST)','taxPct',80,'on freight')
+    +'<div style="display:flex;align-items:center;gap:8px;align-self:end;padding-bottom:4px">'
+    +'<label style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink3);cursor:pointer">'
+    +'<input type="checkbox"'+(rec.splitUnitPrice?' checked':'')+(cstRO()?' disabled':'')+' onchange="cstInRRender(\'splitUnitPrice\',this.checked)" style="width:15px;height:15px;accent-color:var(--blue)">'
+    +'Split unit price into Base + Add-on</label></div>'
+    +'</div></details>';
+}
+
+// ─── Shared table scaffolding ───
+function cstTableOpen(rec,label){
+  var best=cstBest(rec);
+  var h='<div style="overflow-x:auto;border:1px solid var(--bd);border-radius:var(--r-lg);background:var(--surface)">'
+   +'<table style="border-collapse:collapse;width:100%;min-width:'+(300+rec.suppliers.length*210)+'px;font-size:12.5px">'
+   +'<thead><tr><th style="position:sticky;left:0;background:var(--surface3);z-index:2;text-align:left;padding:12px 14px;border-bottom:2px solid var(--bd2);min-width:230px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3)">'+label+'</th>';
+  rec.suppliers.forEach(function(s){
+    var conf=(rec.confirmedSupId===s.id);
+    h+='<th style="padding:10px 12px;border-bottom:2px solid var(--bd2);border-left:1px solid var(--bd);min-width:200px;background:'+(conf?'var(--green-lt)':'var(--surface3)')+'">'
+      +'<input value="'+cstEsc(s.name)+'"'+(cstRO()?' readonly':'')+' onchange="cstSupName(\''+s.id+'\',this.value)" style="width:100%;border:none;background:transparent;font-weight:700;font-size:13px;color:var(--ink);text-align:center;font-family:var(--font)">'
+      +'<div style="display:flex;gap:5px;justify-content:center;align-items:center;margin-top:5px;min-height:20px">'
+      +'<span data-cbest="'+s.id+'" style="display:'+(best===s.id?'inline-block':'none')+';background:var(--green);color:#fff;font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:20px">★ BEST</span>'
+      +(conf?'<span style="background:var(--green-lt);color:var(--green);border:1px solid var(--green-bd);font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:20px">✓ CONFIRMED</span>':'')
+      +(cstRO()?'':'<button onclick="cstRemoveSup(\''+s.id+'\')" title="Remove supplier" style="border:none;background:none;color:var(--ink5);cursor:pointer;font-size:13px;padding:0 2px">×</button>')
+      +'</div></th>';
+  });
+  return h+'</tr></thead><tbody>';
+}
+function cstRowLabel(label,note,tone){
+  var c=tone==='calc'?'var(--blue)':(tone==='total'?'var(--ink)':'var(--ink2)');
+  return '<td style="position:sticky;left:0;background:'+(tone==='total'?'var(--surface3)':'var(--surface)')+';z-index:1;padding:8px 14px;border-bottom:1px solid var(--bd);font-weight:'+(tone==='total'?'700':'500')+';color:'+c+'">'+label
+   +(note?'<div style="font-size:10px;color:var(--ink4);font-weight:400;margin-top:1px">'+note+'</div>':'')+'</td>';
+}
+function cstInputCell(sup,key,ph,type){
+  var ro=cstRO()?' readonly':'';
+  return '<td style="padding:5px 8px;border-bottom:1px solid var(--bd);border-left:1px solid var(--bd)">'
+   +'<input class="fi" type="'+(type||'text')+'" style="width:100%;padding:6px 9px;font-size:12.5px" value="'+cstEsc(sup[key])+'" placeholder="'+(ph||'')+'"'+ro
+   +' oninput="cstIn(\''+sup.id+'\',\''+key+'\',this.value)"></td>';
+}
+function cstCalcCell(sup,k,tone){
+  var bg=tone==='total'?'background:var(--blue-lt);':(tone==='sub'?'background:var(--surface2);':'');
+  return '<td style="padding:8px 12px;border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);text-align:right;font-family:var(--mono);font-size:12.5px;font-weight:'+(tone==='total'?'700':'500')+';color:'+(tone==='total'?'var(--blue2)':'var(--ink2)')+';'+bg+'">'
+   +'<span data-cs="'+sup.id+'" data-ck="'+k+'">—</span></td>';
+}
+function cstTextCell(sup,k){
+  return '<td style="padding:8px 12px;border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);text-align:center;font-size:12px;color:var(--ink3)"><span data-cs="'+sup.id+'" data-ck="'+k+'">—</span></td>';
+}
+
+// ─── TAB 1 · PRICE COMPARISON (Excel rows 1–15, 34–35, 50–51) ───
+function cstCompareHTML(rec){
+  var ro=cstRO();
+  var h='<div style="font-size:12px;color:var(--ink3);margin-bottom:12px;line-height:1.6">Goods cost per supplier — Excel rows 1–15. Works with no shipment: enter quotes as soon as you receive them. <strong>Unit Price accepts arithmetic exactly like Excel</strong> (type <code style="background:var(--surface3);padding:1px 5px;border-radius:3px;font-family:var(--mono)">4.8+0.7</code>).</div>';
+  h+=cstTableOpen(rec,'Price Comparison');
+
+  h+='<tr>'+cstRowLabel('Currency','quote currency');
+  rec.suppliers.forEach(function(s){
+    h+='<td style="padding:5px 8px;border-bottom:1px solid var(--bd);border-left:1px solid var(--bd)">'
+     +'<select class="fi" style="width:100%;padding:6px 9px;font-size:12.5px"'+(ro?' disabled':'')+' onchange="cstIn(\''+s.id+'\',\'currency\',this.value)">'
+     +'<option value="RMB"'+(s.currency==='RMB'?' selected':'')+'>RMB</option>'
+     +'<option value="USD"'+(s.currency==='USD'?' selected':'')+'>USD</option></select></td>';
+  });
+  h+='</tr>';
+
+  h+='<tr>'+cstRowLabel('MOQ','Excel row 3');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'moq','300','number');});h+='</tr>';
+
+  if(rec.splitUnitPrice){
+    h+='<tr>'+cstRowLabel('Base Price','per pc');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'basePrice','4.80','number');});h+='</tr>';
+    h+='<tr>'+cstRowLabel('Add-on / pc','e.g. printing');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'addOn','0.70','number');});h+='</tr>';
+    h+='<tr>'+cstRowLabel('Unit Price','row 4 = base + add-on','calc');rec.suppliers.forEach(function(s){h+=cstCalcCell(s,'unitPrice');});h+='</tr>';
+  }else{
+    h+='<tr>'+cstRowLabel('Unit Price','Excel row 4 — maths allowed');
+    rec.suppliers.forEach(function(s){
+      h+='<td style="padding:5px 8px;border-bottom:1px solid var(--bd);border-left:1px solid var(--bd)">'
+       +'<input class="fi" style="width:100%;padding:6px 9px;font-size:12.5px;font-family:var(--mono)" value="'+cstEsc(s.unitPriceExpr)+'" placeholder="4.8+0.7"'+(ro?' readonly':'')
+       +' oninput="cstIn(\''+s.id+'\',\'unitPriceExpr\',this.value)">'
+       +'<div style="font-size:10px;color:var(--ink4);text-align:right;margin-top:2px">= <span data-cs="'+s.id+'" data-ck="unitPrice">—</span></div></td>';
+    });
+    h+='</tr>';
+  }
+
+  h+='<tr>'+cstRowLabel('Unit Price (MYR)','row 5 = row 4 × rate','calc');rec.suppliers.forEach(function(s){h+=cstCalcCell(s,'unitPriceMYR');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Logo Printing Charges','row 6 — flat, added once');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'logo','0','number');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Delivery to Yiwu','Excel row 7');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'delivery','0','number');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Courier Charges','Excel row 8');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'courier','0','number');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Mock-up Charges','Excel row 10');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'mockup','0','number');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Product Dimension','Excel row 9');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'dimension','34*74');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Packing Method','Excel row 11');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'packMethod','Single packing/Opp');});h+='</tr>';
+
+  h+='<tr>'+cstRowLabel('Packing Charges','row 12 = MOQ × '+cstEsc(rec.packFactor));
+  rec.suppliers.forEach(function(s){
+    h+='<td style="padding:5px 8px;border-bottom:1px solid var(--bd);border-left:1px solid var(--bd)"><div style="display:flex;gap:4px">'
+     +'<input class="fi" type="number" style="flex:1;padding:6px 9px;font-size:12.5px" value="'+cstEsc(s.packCharge)+'"'+(ro?' readonly':'')+' oninput="cstIn(\''+s.id+'\',\'packCharge\',this.value)">'
+     +(ro?'':'<button onclick="cstFillPack(\''+s.id+'\')" title="Fill from formula" style="border:1px solid var(--bd2);background:var(--surface);border-radius:var(--r-sm);cursor:pointer;padding:0 8px;font-size:11px">ƒ</button>')
+     +'</div></td>';
+  });
+  h+='</tr>';
+
+  (rec.extraFields||[]).forEach(function(fl){
+    h+='<tr><td style="position:sticky;left:0;background:var(--surface);z-index:1;padding:5px 14px;border-bottom:1px solid var(--bd)">'
+     +'<div style="display:flex;gap:5px;align-items:center">'
+     +'<input value="'+cstEsc(fl.label)+'"'+(ro?' readonly':'')+' onchange="cstExtraLabel(\''+fl.id+'\',this.value)" style="flex:1;border:1px dashed var(--bd2);background:transparent;font-size:12px;padding:4px 6px;border-radius:var(--r-sm);font-family:var(--font);color:var(--ink2)">'
+     +(ro?'':'<button onclick="cstRemoveExtra(\''+fl.id+'\')" style="border:none;background:none;color:var(--ink5);cursor:pointer;font-size:14px">×</button>')+'</div></td>';
+    rec.suppliers.forEach(function(s){
+      h+='<td style="padding:5px 8px;border-bottom:1px solid var(--bd);border-left:1px solid var(--bd)">'
+       +'<input class="fi" type="number" style="width:100%;padding:6px 9px;font-size:12.5px" value="'+cstEsc((s.extraVals||{})[fl.id]||'')+'"'+(ro?' readonly':'')
+       +' oninput="cstExtraVal(\''+s.id+'\',\''+fl.id+'\',this.value)"></td>';
+    });
+    h+='</tr>';
+  });
+
+  h+='<tr>'+cstRowLabel('Total Cost (RMB/USD)','row 13 = (MOQ×price)+6+7+8+10+12','calc');rec.suppliers.forEach(function(s){h+=cstCalcCell(s,'totalCostFC','sub');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Total Cost (MYR)','row 14 = row 13 × rate','calc');rec.suppliers.forEach(function(s){h+=cstCalcCell(s,'totalCostMYR','sub');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Unit Price/pc (MYR)','row 15 = row 14 ÷ MOQ','total');rec.suppliers.forEach(function(s){h+=cstCalcCell(s,'unitPricePc','total');});h+='</tr>';
+
+  h+='<tr>'+cstRowLabel('PIC of Supplier','Excel row 34');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'pic','售前002');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Remark','Excel row 35');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'remark','');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Updated Status','Excel row 51');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'statusNote','26 May 26 - via WeChat');});h+='</tr>';
+
+  // Product link (Excel row 50)
+  h+='<tr>'+cstRowLabel('🔗 Product Link','Excel row 50 — clickable');
+  rec.suppliers.forEach(function(s){
+    var ok=/^https?:\/\//i.test(String(s.link||'').trim());
+    h+='<td style="padding:5px 8px;border-bottom:1px solid var(--bd);border-left:1px solid var(--bd)"><div style="display:flex;gap:4px">'
+     +'<input class="fi" style="flex:1;min-width:0;padding:6px 9px;font-size:11.5px" value="'+cstEsc(s.link)+'" placeholder="https://detail.1688.com/..."'+(ro?' readonly':'')
+     +' oninput="cstIn(\''+s.id+'\',\'link\',this.value)">'
+     +(ok?'<button onclick="cstOpenLink(\''+s.id+'\')" title="Open in new tab" style="border:1px solid var(--blue-bd);background:var(--blue-lt);color:var(--blue);border-radius:var(--r-sm);cursor:pointer;padding:0 9px;font-size:12px">↗</button>':'')
+     +'</div></td>';
+  });
+  h+='</tr>';
+
+  // Attachments — reference only
+  h+='<tr>'+cstRowLabel('📎 Reference Attachments','reference only — no effect on calculations');
+  rec.suppliers.forEach(function(s){
+    h+='<td style="padding:8px;border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);vertical-align:top">';
+    if(!ro){
+      h+='<input type="file" id="cst-file-'+s.id+'" multiple accept="image/*,.pdf,.xlsx,.xls,.doc,.docx" style="display:none" onchange="cstUpload(event,\''+s.id+'\')">'
+       +'<button class="btn btn-secondary btn-sm" style="width:100%;justify-content:center;margin-bottom:6px" onclick="cstPickFile(\''+s.id+'\')">📎 Upload</button>';
+    }
+    h+='<div style="display:flex;flex-wrap:wrap;gap:5px">';
+    (s.attachments||[]).forEach(function(a){
+      var isImg=/^data:image|\.(png|jpe?g|gif|webp)$/i.test(a.url)||/^image\//.test(a.type||'');
+      h+='<div style="position:relative;width:52px">';
+      if(isImg)h+='<img src="'+cstEsc(a.url)+'" title="'+cstEsc(a.name)+'" onclick="viewPhoto(\''+encodeURI(a.url)+'\')" style="width:52px;height:52px;object-fit:cover;border-radius:6px;border:1px solid var(--bd);cursor:pointer">';
+      else h+='<div title="'+cstEsc(a.name)+'" onclick="window.open(\''+cstEsc(a.url)+'\',\'_blank\',\'noopener\')" style="width:52px;height:52px;border-radius:6px;border:1px solid var(--bd);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:19px;cursor:pointer">📄</div>';
+      if(a.local)h+='<span title="Stored in this browser only" style="position:absolute;bottom:-2px;left:0;background:var(--amber);color:#fff;font-size:8px;padding:0 3px;border-radius:3px">local</span>';
+      if(!ro)h+='<button onclick="cstRemoveAtt(\''+s.id+'\',\''+a.id+'\')" style="position:absolute;top:-5px;right:-5px;width:17px;height:17px;border-radius:50%;border:none;background:var(--red);color:#fff;font-size:10px;cursor:pointer;line-height:1">×</button>';
+      h+='</div>';
+    });
+    h+='</div></td>';
+  });
+  h+='</tr>';
+
+  h+='</tbody></table></div>';
+  if(!ro){
+    h+='<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">'
+     +'<button class="btn btn-secondary btn-sm" onclick="cstAddSup()">➕ Add supplier</button>'
+     +'<button class="btn btn-secondary btn-sm" onclick="cstAddExtra()">➕ Add charge row</button>'
+     +'<button class="btn btn-secondary btn-sm" onclick="cstFillPackAll()">ƒ Fill all packing charges</button>'
+     +'</div>';
+  }
+  return h;
+}
+
+// ─── TAB 2 · PACKAGING DETAILS (rows 18–22, cols N/O/P) ───
+function cstPackagingHTML(rec){
+  var h='<div style="font-size:12px;color:var(--ink3);margin-bottom:12px;line-height:1.6">Carton, volume and weight — Excel rows 18–22 and columns N/O/P. These feed the Landed Cost tab automatically; nothing is entered twice.</div>';
+  h+=cstTableOpen(rec,'Packaging Details');
+  h+='<tr>'+cstRowLabel('Packing Qty / carton','Excel row 18');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'packQty','200','number');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Total Carton','row 19 = MOQ ÷ qty per carton','calc');rec.suppliers.forEach(function(s){h+=cstCalcCell(s,'totalCarton');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Carton Length (cm)','Excel col K');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'L','67','number');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Carton Width (cm)','Excel col L');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'W','40','number');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Carton Height (cm)','Excel col M');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'H','80','number');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Size / m³','col N = (L×W×H) ÷ 1,000,000','calc');rec.suppliers.forEach(function(s){h+=cstCalcCell(s,'sizeM3');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Total m³','col O = size × total cartons','calc');rec.suppliers.forEach(function(s){h+=cstCalcCell(s,'totalM3');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Billed m³','col P = IF(total &lt; '+cstEsc(rec.minM3)+', '+cstEsc(rec.minM3)+', total)','calc');rec.suppliers.forEach(function(s){h+=cstCalcCell(s,'billedM3','sub');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Weight / carton (kg)','Excel row 21 — manual entry');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'weightPerCarton','22','number');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Total Weight (kg)','row 22 = cartons × weight/carton','total');rec.suppliers.forEach(function(s){h+=cstCalcCell(s,'totalWeights','total');});h+='</tr>';
+  h+='<tr><td colspan="'+(rec.suppliers.length+1)+'" style="padding:9px 14px;background:var(--surface3);border-bottom:1px solid var(--bd);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3)">Timeline — Excel rows 29–33</td></tr>';
+  h+='<tr>'+cstRowLabel('Order Date','Excel row 31');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'orderDate','','date');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Lead time (days)','Excel row 29');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'leadTime','12','number');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Transit Time (days)','Excel row 30');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'transit','25','number');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Product Completion','row 32 = order + lead','calc');rec.suppliers.forEach(function(s){h+=cstTextCell(s,'completion');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('ETA','row 33 = order + lead + transit','total');rec.suppliers.forEach(function(s){h+=cstTextCell(s,'eta');});h+='</tr>';
+  h+='</tbody></table></div>';
+  return h;
+}
+
+// ─── TAB 3 · LANDED COST (rows 16–17, 23–27) + Est vs Actual ───
+function cstLandedHTML(rec){
+  var ro=cstRO();
+  var h='<div style="font-size:12px;color:var(--ink3);margin-bottom:12px;line-height:1.6">Estimated landed cost per supplier — Excel rows 16–17 and 23–27. Available at any time, with or without a confirmed shipment.</div>';
+  h+=cstTableOpen(rec,'Landed Cost');
+  h+='<tr>'+cstRowLabel('Total Cost (MYR)','row 14 — from Price Comparison','calc');rec.suppliers.forEach(function(s){h+=cstCalcCell(s,'totalCostMYR');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Air Freight','Excel row 16');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'airFreight','0','number');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Ocean Freight Rate','per m³ — per supplier');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'freightRate','410','number');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Billed m³','col P — from Packaging','calc');rec.suppliers.forEach(function(s){h+=cstCalcCell(s,'billedM3');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Ocean Freight','row 17 = rate × billed m³','calc');rec.suppliers.forEach(function(s){h+=cstCalcCell(s,'ocean','sub');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Tax ('+cstEsc(rec.taxPct)+'% SST)','row 23 = ocean freight × '+cstEsc(rec.taxPct)+'%','calc');rec.suppliers.forEach(function(s){h+=cstCalcCell(s,'tax');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Subtotal / Landed (MYR)','row 24 = 14 + 16 + 17 + 23','total');rec.suppliers.forEach(function(s){h+=cstCalcCell(s,'landed','total');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Average Cost/pc (MYR)','row 25 = row 24 ÷ MOQ','calc');rec.suppliers.forEach(function(s){h+=cstCalcCell(s,'avgPc','sub');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Markup %','Excel row 26');rec.suppliers.forEach(function(s){h+=cstInputCell(s,'markupPct','20','number');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Markup (MYR)','row 26 = row 25 × markup %','calc');rec.suppliers.forEach(function(s){h+=cstCalcCell(s,'markup');});h+='</tr>';
+  h+='<tr>'+cstRowLabel('Grand Total (MYR)/pc','row 27 = row 25 + row 26','total');rec.suppliers.forEach(function(s){h+=cstCalcCell(s,'grandPc','total');});h+='</tr>';
+  if(!ro){
+    h+='<tr>'+cstRowLabel('Decision','');
+    rec.suppliers.forEach(function(s){
+      var conf=(rec.confirmedSupId===s.id);
+      h+='<td style="padding:8px;border-bottom:1px solid var(--bd);border-left:1px solid var(--bd);text-align:center">'
+       +'<button class="btn '+(conf?'btn-secondary':'btn-primary')+' btn-sm" style="width:100%;justify-content:center" onclick="cstConfirmSup(\''+s.id+'\')">'
+       +(conf?'✓ Confirmed — undo':'Confirm supplier')+'</button></td>';
+    });
+    h+='</tr>';
+  }
+  h+='</tbody></table></div>';
+  h+='<div id="cst-variance">'+cstVarianceHTML(rec)+'</div>';
+  return h;
+}
+
+function cstVarianceHTML(rec){
+  if(!rec.estimate){
+    return '<div style="margin-top:16px;padding:14px;background:var(--surface2);border:1px dashed var(--bd2);border-radius:var(--r);font-size:12px;color:var(--ink4)">'
+      +'Confirm a supplier to freeze the estimate. Actual costs can then be entered here and compared side by side.</div>';
+  }
+  var ro=cstRO(),e=rec.estimate.c,a=rec.actual||{};
+  var actLanded=cstActualLanded(rec);
+  var rows=[
+    ['Goods (Total Cost MYR)','totalCostMYR','totalCostMYR'],
+    ['Air Freight','air','air'],
+    ['Ocean Freight','ocean','ocean'],
+    ['Tax (SST)','tax','tax']
+  ];
+  var h='<div style="margin-top:20px;border:1px solid var(--bd);border-radius:var(--r-lg);overflow:hidden">'
+   +'<div style="padding:12px 16px;background:var(--surface3);border-bottom:1px solid var(--bd);display:flex;flex-wrap:wrap;gap:10px;align-items:center">'
+   +'<strong style="font-size:13px">Estimated vs Actual</strong>'
+   +'<span style="font-size:11px;color:var(--ink4)">Estimate frozen '+new Date(rec.estimate.at).toLocaleString('en-MY')+' · '+cstEsc(rec.estimate.supName)+'</span></div>'
+   +'<table style="border-collapse:collapse;width:100%;font-size:12.5px"><thead><tr>'
+   +'<th style="text-align:left;padding:9px 16px;border-bottom:1px solid var(--bd);font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3)">Cost line</th>'
+   +'<th style="text-align:right;padding:9px 16px;border-bottom:1px solid var(--bd);font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3)">Estimated</th>'
+   +'<th style="text-align:right;padding:9px 16px;border-bottom:1px solid var(--bd);font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3)">Actual</th>'
+   +'<th style="text-align:right;padding:9px 16px;border-bottom:1px solid var(--bd);font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3)">Variance</th></tr></thead><tbody>';
+  rows.forEach(function(r){
+    var est=e[r[1]]||0,act=cstNum(a[r[2]]);
+    var has=String(a[r[2]]||'')!=='';
+    var v=act-est,pct=est?(v/est*100):0;
+    var col=v>0?'var(--red)':(v<0?'var(--green)':'var(--ink4)');
+    h+='<tr><td style="padding:7px 16px;border-bottom:1px solid var(--bd)">'+r[0]+'</td>'
+     +'<td style="padding:7px 16px;border-bottom:1px solid var(--bd);text-align:right;font-family:var(--mono)">'+cstFmt(est,2)+'</td>'
+     +'<td style="padding:4px 10px;border-bottom:1px solid var(--bd);text-align:right">'
+     +'<input class="fi" type="number" style="width:120px;padding:5px 8px;font-size:12.5px;text-align:right" value="'+cstEsc(a[r[2]]||'')+'" placeholder="—"'+(ro?' readonly':'')+' oninput="cstActual(\''+r[2]+'\',this.value)"></td>'
+     +'<td style="padding:7px 16px;border-bottom:1px solid var(--bd);text-align:right;font-family:var(--mono);color:'+col+'">'
+     +(has?((v>0?'+':'')+cstFmt(v,2)+' <small>('+(v>0?'+':'')+cstFmt(pct,1)+'%)</small>'):'—')+'</td></tr>';
+  });
+  var ev=e.landed,av=actLanded;
+  var dv=av-ev,dp=ev?(dv/ev*100):0;
+  var dcol=dv>0?'var(--red)':(dv<0?'var(--green)':'var(--ink4)');
+  var anyActual=['totalCostMYR','air','ocean','tax'].some(function(k){return String(a[k]||'')!=='';})||a.landedOverride;
+  h+='<tr style="background:var(--surface3)"><td style="padding:10px 16px;font-weight:700">Total Landed Cost (MYR)</td>'
+   +'<td style="padding:10px 16px;text-align:right;font-family:var(--mono);font-weight:700">'+cstFmt(ev,2)+'</td>'
+   +'<td style="padding:10px 16px;text-align:right;font-family:var(--mono);font-weight:700">'+(anyActual?cstFmt(av,2):'—')+'</td>'
+   +'<td style="padding:10px 16px;text-align:right;font-family:var(--mono);font-weight:700;color:'+dcol+'">'+(anyActual?((dv>0?'+':'')+cstFmt(dv,2)+' ('+(dv>0?'+':'')+cstFmt(dp,1)+'%)'):'—')+'</td></tr>';
+  h+='</tbody></table>';
+  h+='<div style="padding:12px 16px;border-top:1px solid var(--bd);display:flex;flex-wrap:wrap;gap:12px;align-items:center">'
+   +'<label style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink3);cursor:pointer">'
+   +'<input type="checkbox"'+(a.landedOverride?' checked':'')+(ro?' disabled':'')+' onchange="cstActualOverride(this.checked)" style="width:15px;height:15px;accent-color:var(--amber)"> Manual override of actual total</label>'
+   +(a.landedOverride?'<input class="fi" type="number" style="width:150px" placeholder="Actual total" value="'+cstEsc(a.landed||'')+'"'+(ro?' readonly':'')+' oninput="cstActual(\'landed\',this.value)">':'')
+   +'<input class="fi" style="flex:1;min-width:200px" placeholder="Note on variance (optional)" value="'+cstEsc(a.note||'')+'"'+(ro?' readonly':'')+' oninput="cstActual(\'note\',this.value)">'
+   +'</div></div>';
+  return h;
+}
+function cstRenderVariance(){
+  var rec=cstRec();if(!rec)return;
+  var el=document.getElementById('cst-variance');
+  if(el&&rec.estimate){
+    var focus=document.activeElement,fv=focus?focus.getAttribute('oninput'):null;
+    el.innerHTML=cstVarianceHTML(rec);
+    if(fv){var m=el.querySelector('[oninput="'+fv.replace(/"/g,'\\"')+'"]');if(m){m.focus();m.setSelectionRange&&m.value&&m.setSelectionRange(m.value.length,m.value.length);}}
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// OPTIONAL IMPORT FROM v1  (reads gwp_lc_records_v1, never writes to it)
+// ═══════════════════════════════════════════════════════════════════════
+function cstV1Records(){
+  try{var s=localStorage.getItem('gwp_lc_records_v1');if(!s)return [];var p=JSON.parse(s);return (p&&p.records)?p.records:[];}catch(e){return [];}
+}
+function cstRenderImport(){
+  var box=document.getElementById('cst-import');if(!box)return;
+  var v1=cstV1Records();
+  if(!v1.length||cstRO()){box.innerHTML='';return;}
+  var already=CST.records.filter(function(r){return r.importedFrom;}).map(function(r){return r.importedFrom;});
+  var pending=v1.filter(function(r){return already.indexOf(r.id)<0;});
+  if(!pending.length){box.innerHTML='';return;}
+  var h='<div style="padding:12px 16px;background:var(--amber-lt);border:1px solid var(--amber-bd);border-radius:var(--r);margin-bottom:14px;font-size:12px;color:var(--ink2)">'
+   +'<strong>'+pending.length+' record'+(pending.length>1?'s':'')+' found in your existing Landed Cost section.</strong> '
+   +'Importing makes a <em>copy</em> — the original data is left completely untouched.<div style="margin-top:9px;display:flex;flex-wrap:wrap;gap:6px">';
+  pending.forEach(function(r){
+    h+='<button class="btn btn-secondary btn-sm" onclick="cstImportV1(\''+r.id+'\')">⤓ '+cstEsc(r.jobNo||'(no job)')+(r.product?' — '+cstEsc(r.product):'')+'</button>';
+  });
+  h+='<button class="btn btn-primary btn-sm" onclick="cstImportV1All()">⤓ Import all</button></div></div>';
+  box.innerHTML=h;
+}
+function cstImportV1(id){
+  if(cstRO())return;
+  var src=null;cstV1Records().forEach(function(r){if(r.id===id)src=r;});
+  if(!src){toast('⚠ Source record not found','error');return;}
+  var rec={id:cstUID(),pcid:cstNextId(),product:src.product||'',round:'R1',
+    status:'draft',jobNo:src.jobNo||'',importedFrom:src.id,
+    createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),
+    exRateRMB:src.exRate||'0.6',exRateUSD:'4.1',minM3:src.minM3||'0.5',
+    packFactor:src.packFactor||'0.15',taxPct:'6',splitUnitPrice:false,
+    extraFields:JSON.parse(JSON.stringify(src.extraFields||[])),
+    confirmedSupId:null,estimate:null,actual:null,suppliers:[]};
+  (src.suppliers||[]).forEach(function(s){
+    var n=cstNewSupplier(s.name);
+    n.moq=s.moq||'';n.unitPriceExpr=s.unitPriceRMB||'';n.logo=s.logo||'';n.delivery=s.delivery||'';
+    n.courier=s.courier||'';n.mockup=s.mockup||'';n.packMethod=s.packMethod||'';
+    n.packCharge=s.packCharge||'';n.packQty=s.packQty||'';n.L=s.L||'';n.W=s.W||'';n.H=s.H||'';
+    n.freightRate=s.freightRate||'410';n.airFreight=s.airFreight||'';n.markupPct=s.markupPct||'20';
+    n.weightPerCarton=s.weightPerCartonInput||'';
+    n.extraVals=JSON.parse(JSON.stringify(s.extraVals||{}));
+    if(src.lockedSupId===s.id)rec._lockName=s.name;
+    rec.suppliers.push(n);
+  });
+  while(rec.suppliers.length<2)rec.suppliers.push(cstNewSupplier('Supplier '+String.fromCharCode(65+rec.suppliers.length)));
+  CST.records.push(rec);CST.activeId=rec.id;cstPersist();cstRender();cstRenderImport();
+  toast('✓ Copied to '+rec.pcid+' — original untouched','success');
+}
+function cstImportV1All(){
+  if(cstRO())return;
+  var already=CST.records.filter(function(r){return r.importedFrom;}).map(function(r){return r.importedFrom;});
+  cstV1Records().forEach(function(r){if(already.indexOf(r.id)<0)cstImportV1(r.id);});
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// BACKUP & RESTORE
+// ═══════════════════════════════════════════════════════════════════════
+function cstHash(){try{return String(JSON.stringify(CST.records).length)+'|'+CST.records.length;}catch(e){return '';}}
+function cstBackupFlag(){
+  var el=document.getElementById('cst-backup-flag');if(!el)return;
+  var stale=(CST.records.length>0&&CST.lastBackup!==cstHash());
+  el.style.display=stale?'block':'none';
+}
+function cstDownload(blob,name){
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1500);
+}
+function cstStamp(){var d=new Date();return d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'-'+String(d.getHours()).padStart(2,'0')+String(d.getMinutes()).padStart(2,'0');}
+
+function cstBackupPayload(){
+  var v1raw=null;try{v1raw=localStorage.getItem('gwp_lc_records_v1');}catch(e){}
+  return {
+    exportedAt:new Date().toISOString(),
+    exportedBy:(typeof CU!=='undefined'&&CU)?(CU.email||CU.name||''):'',
+    portal:'GWP Portal',schema:'gwp-backup-v1',
+    costing_v2:CST,
+    landed_v1:v1raw?JSON.parse(v1raw):null,
+    shipments:(typeof DATA!=='undefined'&&DATA)?DATA:null,
+    comparisons:(typeof CMP_SAVED!=='undefined'&&CMP_SAVED)?CMP_SAVED:null
+  };
+}
+function cstBuildWorkbook(){
+  var wb=XLSX.utils.book_new();
+  var idx=[['PC ID','Product','Round','Status','Job No.','Suppliers','Created','Updated']];
+  CST.records.forEach(function(r){
+    idx.push([r.pcid,r.product,r.round,r.status,r.jobNo,r.suppliers.length,
+      (r.createdAt||'').slice(0,10),(r.updatedAt||'').slice(0,10)]);
+  });
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(idx),'Index');
+  CST.records.forEach(function(r,i){
+    var comp=r.suppliers.map(function(s){return cstCompute(s,r);});
+    var dts=r.suppliers.map(function(s){return cstDates(s);});
+    var A=[];
+    A.push(['Manufacturer'].concat(r.suppliers.map(function(s){return s.name;})));
+    A.push(['Product Name'].concat(r.suppliers.map(function(){return r.product;})));
+    A.push(['MOQ'].concat(r.suppliers.map(function(s){return cstNum(s.moq);})));
+    A.push(['Unit Price ('+'quote)'].concat(comp.map(function(c){return c.unitPrice;})));
+    A.push(['Unit Price (MYR)'].concat(comp.map(function(c){return c.unitPriceMYR;})));
+    A.push(['Logo Printing Charges'].concat(r.suppliers.map(function(s){return cstNum(s.logo);})));
+    A.push(['Delivery Charges to Yiwu'].concat(r.suppliers.map(function(s){return cstNum(s.delivery);})));
+    A.push(['Courier Charges'].concat(r.suppliers.map(function(s){return cstNum(s.courier);})));
+    A.push(['Dimension (cm)'].concat(r.suppliers.map(function(s){return s.dimension;})));
+    A.push(['Mock up Charges'].concat(r.suppliers.map(function(s){return cstNum(s.mockup);})));
+    A.push(['Packing Method'].concat(r.suppliers.map(function(s){return s.packMethod;})));
+    A.push(['Packing Charges'].concat(comp.map(function(c){return c.packing;})));
+    A.push(['Total Cost (RMB/USD)'].concat(comp.map(function(c){return c.totalCostFC;})));
+    A.push(['Total Cost (MYR)'].concat(comp.map(function(c){return c.totalCostMYR;})));
+    A.push(['Unit Price/pc (MYR)'].concat(comp.map(function(c){return c.unitPricePc;})));
+    A.push(['Shipping Charges (Air Freight)'].concat(comp.map(function(c){return c.air;})));
+    A.push(['Shipping Charges (Ocean Freight)'].concat(comp.map(function(c){return c.ocean;})));
+    A.push(['Packing Quantity/carton'].concat(r.suppliers.map(function(s){return cstNum(s.packQty);})));
+    A.push(['Total Carton'].concat(comp.map(function(c){return c.totalCarton;})));
+    A.push(['Packing Dimension (cm)'].concat(r.suppliers.map(function(s){return [s.L,s.W,s.H].filter(Boolean).join('*');})));
+    A.push(['Weight/carton (kgs)'].concat(comp.map(function(c){return c.weightPerCarton;})));
+    A.push(['Total Weights (kgs)'].concat(comp.map(function(c){return c.totalWeights;})));
+    A.push(['Tax (SST)'].concat(comp.map(function(c){return c.tax;})));
+    A.push(['Subtotal (MYR)'].concat(comp.map(function(c){return c.landed;})));
+    A.push(['Average Cost/pc (MYR)'].concat(comp.map(function(c){return c.avgPc;})));
+    A.push(['Markup'].concat(comp.map(function(c){return c.markup;})));
+    A.push(['Grand Total (MYR)/pc'].concat(comp.map(function(c){return c.grandPc;})));
+    A.push([]);
+    A.push(['Lead time (days)'].concat(r.suppliers.map(function(s){return cstNum(s.leadTime);})));
+    A.push(['Transit Time (days)'].concat(r.suppliers.map(function(s){return cstNum(s.transit);})));
+    A.push(['Order Date'].concat(r.suppliers.map(function(s){return s.orderDate;})));
+    A.push(['Product Completion Date'].concat(dts.map(function(d){return d.completion;})));
+    A.push(['ETA'].concat(dts.map(function(d){return d.eta;})));
+    A.push(['PIC of the Supplier'].concat(r.suppliers.map(function(s){return s.pic;})));
+    A.push(['Remark'].concat(r.suppliers.map(function(s){return s.remark;})));
+    A.push(['Product Link'].concat(r.suppliers.map(function(s){return s.link;})));
+    A.push(['Updated Status'].concat(r.suppliers.map(function(s){return s.statusNote;})));
+    A.push(['Attachments'].concat(r.suppliers.map(function(s){return (s.attachments||[]).map(function(a){return a.name;}).join(', ');})));
+    A.push([]);
+    A.push(['Ex Rate RMB',cstNum(r.exRateRMB),'Ex Rate USD',cstNum(r.exRateUSD),'Min m³',cstNum(r.minM3),'Tax %',cstNum(r.taxPct)]);
+    if(r.estimate){
+      A.push([]);
+      A.push(['ESTIMATE (frozen '+(r.estimate.at||'').slice(0,10)+')',r.estimate.supName]);
+      A.push(['Estimated Landed (MYR)',r.estimate.c.landed]);
+      A.push(['Actual Landed (MYR)',cstActualLanded(r)]);
+      A.push(['Variance (MYR)',cstActualLanded(r)-r.estimate.c.landed]);
+      if(r.actual&&r.actual.note)A.push(['Variance note',r.actual.note]);
+    }
+    var name=(r.pcid+'-'+(r.round||'')).replace(/[\\\/\?\*\[\]:]/g,'').slice(0,31)||('Record'+i);
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(A),name);
+  });
+  if(CST.records.length===0)XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['No costing records']]),'Empty');
+  return wb;
+}
+async function cstBackup(){
+  try{
+    var payload=cstBackupPayload();
+    var stamp=cstStamp();
+    var json=JSON.stringify(payload,null,2);
+    var wbout=null;
+    try{wbout=XLSX.write(cstBuildWorkbook(),{bookType:'xlsx',type:'array'});}catch(e){toast('⚠ Excel copy failed — JSON still included','warning');}
+    var readme='GWP PORTAL BACKUP\n=================\nExported: '+new Date().toLocaleString('en-MY')
+      +'\n\nCONTENTS\n  gwp-portal-backup.json  — full data, use this to RESTORE into the portal\n'
+      +'  gwp-costing-records.xlsx — readable copy in your Towel-R1 layout (reference only)\n'
+      +'\nTO RESTORE: Admin Panel > Costing > Backup & Restore > Restore, then pick the .json file.\n'
+      +'Restore shows a preview and merges by PC ID — it never silently overwrites.\n'
+      +'\nNOTE: attachments already uploaded to Google Drive are referenced by link.\n'
+      +'Files marked "local" are embedded in the JSON.\n';
+    if(typeof JSZip!=='undefined'){
+      var zip=new JSZip();
+      zip.file('gwp-portal-backup.json',json);
+      if(wbout)zip.file('gwp-costing-records.xlsx',wbout);
+      zip.file('README.txt',readme);
+      var blob=await zip.generateAsync({type:'blob'});
+      cstDownload(blob,'gwp-portal-backup-'+stamp+'.zip');
+    }else{
+      cstDownload(new Blob([json],{type:'application/json'}),'gwp-portal-backup-'+stamp+'.json');
+      if(wbout)cstDownload(new Blob([wbout],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),'gwp-costing-records-'+stamp+'.xlsx');
+      toast('ZIP library unavailable — downloaded as separate files','warning');
+    }
+    CST.lastBackup=cstHash();cstPersist();cstBackupFlag();
+    toast('✅ Backup downloaded','success');
+  }catch(e){toast('⚠ Backup failed: '+e.message,'error');}
+}
+
+var CST_PENDING=null;
+function cstPickRestore(){var i=document.getElementById('cst-restore-file');if(i)i.click();}
+function cstRestoreRead(ev){
+  var f=(ev.target.files||[])[0];if(!f)return;
+  var rd=new FileReader();
+  rd.onload=function(e){
+    try{
+      var p=JSON.parse(e.target.result);
+      if(!p||!p.costing_v2||!p.costing_v2.records)throw new Error('Not a portal backup file');
+      CST_PENDING=p;cstRestorePreview();
+    }catch(err){toast('⚠ '+err.message,'error');}
+  };
+  rd.readAsText(f);ev.target.value='';
+}
+function cstRestorePreview(){
+  var box=document.getElementById('cst-restore-preview');if(!box||!CST_PENDING)return;
+  var inc=CST_PENDING.costing_v2.records||[];
+  var mine={};CST.records.forEach(function(r){mine[r.pcid]=r;});
+  var add=[],upd=[],same=[];
+  inc.forEach(function(r){
+    var ex=mine[r.pcid];
+    if(!ex)add.push(r);
+    else if(JSON.stringify(ex)!==JSON.stringify(r))upd.push(r);
+    else same.push(r);
+  });
+  var h='<div style="margin-top:14px;padding:14px;border:1px solid var(--bd);border-radius:var(--r);background:var(--surface)">'
+   +'<div style="font-size:13px;font-weight:700;margin-bottom:4px">Restore preview</div>'
+   +'<div style="font-size:11px;color:var(--ink4);margin-bottom:10px">From backup exported '+new Date(CST_PENDING.exportedAt).toLocaleString('en-MY')+'</div>'
+   +'<div style="display:flex;gap:18px;flex-wrap:wrap;font-size:12px;margin-bottom:10px">'
+   +'<span style="color:var(--green)"><strong>'+add.length+'</strong> new</span>'
+   +'<span style="color:var(--amber)"><strong>'+upd.length+'</strong> changed</span>'
+   +'<span style="color:var(--ink4)"><strong>'+same.length+'</strong> identical</span>'
+   +'<span style="color:var(--ink4)">'+CST.records.length+' currently in portal</span></div>';
+  if(add.length)h+='<div style="font-size:11.5px;color:var(--ink3);margin-bottom:5px"><strong>Will be added:</strong> '+add.map(function(r){return cstEsc(r.pcid+' '+(r.product||''));}).join(' · ')+'</div>';
+  if(upd.length)h+='<div style="font-size:11.5px;color:var(--ink3);margin-bottom:5px"><strong>Differ from your copy:</strong> '+upd.map(function(r){return cstEsc(r.pcid+' '+(r.product||''));}).join(' · ')+'</div>';
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">'
+   +'<button class="btn btn-primary btn-sm" onclick="cstRestoreApply(\'safe\')">✓ Add new only ('+add.length+')</button>'
+   +(upd.length?'<button class="btn btn-secondary btn-sm" onclick="cstRestoreApply(\'overwrite\')">⚠ Add new + replace '+upd.length+' changed</button>':'')
+   +'<button class="btn btn-secondary btn-sm" onclick="cstRestoreCancel()">Cancel</button></div>'
+   +'<div style="font-size:11px;color:var(--ink4);margin-top:9px">Nothing is deleted either way. Records in the portal but not in the backup are always kept.</div>'
+   +'</div>';
+  box.innerHTML=h;
+}
+function cstRestoreApply(mode){
+  if(cstRO()||!CST_PENDING)return;
+  var inc=CST_PENDING.costing_v2.records||[];
+  var byId={};CST.records.forEach(function(r,i){byId[r.pcid]=i;});
+  var added=0,replaced=0;
+  inc.forEach(function(r){
+    if(!(r.pcid in byId)){
+      var c=JSON.parse(JSON.stringify(r));c.id=cstUID();
+      CST.records.push(c);byId[c.pcid]=CST.records.length-1;added++;
+    }else if(mode==='overwrite'){
+      var i=byId[r.pcid];
+      if(JSON.stringify(CST.records[i])!==JSON.stringify(r)){
+        var keep=CST.records[i].id;
+        CST.records[i]=JSON.parse(JSON.stringify(r));CST.records[i].id=keep;replaced++;
+      }
+    }
+  });
+  if(!CST.activeId&&CST.records.length)CST.activeId=CST.records[0].id;
+  cstPersist();CST_PENDING=null;
+  var box=document.getElementById('cst-restore-preview');if(box)box.innerHTML='';
+  cstRender();cstRenderImport();
+  toast('✅ Restored — '+added+' added, '+replaced+' replaced, 0 deleted','success');
+}
+function cstRestoreCancel(){CST_PENDING=null;var b=document.getElementById('cst-restore-preview');if(b)b.innerHTML='';}
+
+// ─── Boot ───
+function renderCosting(){
+  cstLoad();
+  cstRenderImport();
+  cstRender();
+  cstBackupFlag();
+}
+document.addEventListener('DOMContentLoaded',function(){cstLoad();});
+
 </script>
 </body>
 </html>
