@@ -900,6 +900,7 @@ const USERS = [
 {key:'jiaw', name:'Jia Wen', email:'jiawen.theadspert@gmail.com', pwd:'JiaWen@2026', role:'handler', color:'#4f46e5', active:true},
 {key:'minzi', name:'Min Zi', email:'minzilim.wellness@gmail.com', pwd:'MinZi@2026', role:'handler', color:'#be185d', active:true},
 {key:'anson', name:'Anson', email:'ansontham.theadspert@gmail.com', pwd:'Anson@2026', role:'handler', color:'#0369a1', active:true},
+{key:'jiazhen', name:'Jia Zhen', email:'jiazhen.theadspert@gmail.com', pwd:'JiaZhen@2026', role:'handler', color:'#b91c1c', active:true},
 ];
 
 // ═══════════════════════════════════════════════════
@@ -2621,6 +2622,134 @@ host.innerHTML=h;
 cstRecalc();
 }
 
+// ─── Download supplier comparison (Excel / PDF) — admin only ───
+// Reads the live-rendered table for each tab so every computed figure
+// (landed cost, totals, etc.) is captured exactly as shown on screen.
+function cstCellText(cell){
+var ctl=cell.querySelector('input,select,textarea');
+if(ctl){
+if(ctl.tagName==='SELECT'){var o=ctl.options[ctl.selectedIndex];return o?o.text:ctl.value;}
+return ctl.value;
+}
+var c=cell.cloneNode(true);
+c.querySelectorAll('button,.cst-rlnote').forEach(function(b){b.remove();});
+return c.textContent.replace(/\s+/g,' ').trim();
+}
+function cstTableToAOA(table){
+var aoa=[];
+table.querySelectorAll('tr').forEach(function(tr){
+var row=[];
+tr.querySelectorAll('th,td').forEach(function(cell){
+var txt=cstCellText(cell);
+var cs=parseInt(cell.getAttribute('colspan')||'1',10);
+row.push(txt);
+for(var i=1;i<cs;i++)row.push('');
+});
+if(row.some(function(c){return String(c).trim()!=='';}))aoa.push(row);
+});
+return aoa;
+}
+// Capture all three tabs' tables for the active record without disturbing the view
+function cstCaptureSections(){
+var prevTab=CST.tab;
+var tabs=[['compare','Price Comparison'],['packaging','Packaging Details'],['landed','Landed Cost']];
+var out=[];
+tabs.forEach(function(t){
+CST.tab=t[0];
+cstRender(); // live render + synchronous recalc
+var table=document.querySelector('#cst-body table');
+out.push({name:t[1],aoa:table?cstTableToAOA(table):[]});
+});
+CST.tab=prevTab;
+cstRender();
+return out;
+}
+function cstDownloadComparison(fmt){
+if(typeof canViewAll==='function' && !canViewAll()){toast('⚠ Admins only','error');return;}
+var rec=cstRec();
+if(!rec){toast('⚠ Select a costing record first','warning');return;}
+var sections=cstCaptureSections();
+var pcid=rec.pcid||'costing';
+var product=rec.product||'';
+var round=rec.round||'';
+var when=new Date();
+var stamp=when.getFullYear()+('0'+(when.getMonth()+1)).slice(-2)+('0'+when.getDate()).slice(-2);
+var safe=(pcid+'_'+product+'_'+round).replace(/[^a-z0-9]+/gi,'-').replace(/^-+|-+$/g,'')||'comparison';
+var fname='Comparison_'+safe+'_'+stamp;
+var meta=[
+['Supplier Comparison — '+pcid],
+['Product',product,'Round',round],
+['Status',(rec.status==='confirmed'?'CONFIRMED':'Draft'),'Generated',when.toLocaleString('en-MY')],
+[]
+];
+
+if(fmt==='xlsx'){
+if(typeof XLSX==='undefined'){toast('⚠ Spreadsheet library not loaded','error');return;}
+var wb=XLSX.utils.book_new();
+sections.forEach(function(sec){
+var aoa=meta.concat(sec.aoa);
+var ws=XLSX.utils.aoa_to_sheet(aoa);
+var nCols=aoa.reduce(function(m,r){return Math.max(m,r.length);},0);
+var cols=[{wch:26}];
+for(var i=1;i<nCols;i++)cols.push({wch:15});
+ws['!cols']=cols;
+XLSX.utils.book_append_sheet(wb,ws,sec.name.slice(0,31));
+});
+XLSX.writeFile(wb,fname+'.xlsx');
+toast('✅ Excel downloaded','success');
+return;
+}
+
+// PDF via print-to-PDF (no extra library needed) — A4, print-optimized
+var esc=function(t){return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');};
+// Optimize layout to A4: pick orientation + column widths from supplier count
+var maxCols=sections.reduce(function(m,sec){return sec.aoa.reduce(function(mm,r){return Math.max(mm,r.length);},m);},1);
+var nSup=Math.max(1,maxCols-1);
+var orient='portrait'; // A4 portrait by default
+var firstColPct=Math.max(16,Math.min(34,Math.round(160/(nSup+1.6))));
+var fontPx=nSup>=6?8:(nSup>=4?8.5:9.5);
+var tablesHTML=sections.map(function(sec){
+if(!sec.aoa.length)return '';
+var head=sec.aoa[0]||[];
+var headHTML='<tr>'+head.map(function(c,ci){return '<th'+(ci===0?' class="attr"':'')+'>'+esc(c)+'</th>';}).join('')+'</tr>';
+var bodyHTML=sec.aoa.slice(1).map(function(r){
+return '<tr>'+r.map(function(c,ci){return '<td'+(ci===0?' class="attr"':'')+'>'+esc(c)+'</td>';}).join('')+'</tr>';
+}).join('');
+return '<section class="sec"><h2>'+esc(sec.name)+'</h2>'
++'<table><colgroup><col class="c-attr">'+Array(nSup).fill('<col class="c-sup">').join('')+'</colgroup>'
++'<thead>'+headHTML+'</thead><tbody>'+bodyHTML+'</tbody></table></section>';
+}).join('');
+var doc='<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+esc(fname)+'</title><style>'
++'@page{size:A4 '+orient+';margin:10mm}'
++'*{box-sizing:border-box}'
++'body{font-family:Arial,Helvetica,sans-serif;color:#111;margin:0;font-size:'+fontPx+'px;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
++'h1{font-size:15px;margin:0 0 2px}'
++'.sub{font-size:10px;color:#555;margin:0 0 1px}'
++'.head{margin-bottom:8px}'
++'h2{font-size:11.5px;margin:12px 0 4px;color:#1d4ed8;page-break-after:avoid}'
++'.sec{page-break-inside:auto}.sec:first-of-type h2{margin-top:4px}'
++'table{border-collapse:collapse;width:100%;table-layout:fixed;margin-bottom:4px}'
++'col.c-attr{width:'+firstColPct+'%}'
++'th,td{border:1px solid #cbd5e1;padding:2.5px 5px;vertical-align:top;overflow-wrap:break-word;word-break:break-word;line-height:1.2;text-align:right}'
++'th.attr,td.attr{background:#f7f8fa;font-weight:600;text-align:left}'
++'thead th{background:#eef2ff;font-weight:700;text-align:center}'
++'thead th.attr{text-align:left}'
++'tbody tr:nth-child(even) td{background:#fafbfc}'
++'tbody tr:nth-child(even) td.attr{background:#f2f4f7}'
++'tr{page-break-inside:avoid}'
++'</style></head><body>'
++'<div class="head"><h1>Supplier Comparison — '+esc(pcid)+'</h1>'
++'<div class="sub">'+esc(product)+(round?' · '+esc(round):'')+' · '+(rec.status==='confirmed'?'CONFIRMED':'Draft')+'</div>'
++'<div class="sub">Generated '+esc(when.toLocaleString('en-MY'))+'</div></div>'
++tablesHTML
++'<scr'+'ipt>window.onload=function(){setTimeout(function(){window.print();},250);};</scr'+'ipt>'
++'</body></html>';
+var w=window.open('','_blank');
+if(!w){toast('⚠ Allow pop-ups to export PDF','error');return;}
+w.document.open();w.document.write(doc);w.document.close();
+toast('🖨 PDF view opened — choose “Save as PDF”','success',4000);
+}
+
 function cstRenderBar(){
 var bar=document.getElementById('cst-bar');if(!bar)return;
 var opts=CST.records.map(function(r){
@@ -2650,6 +2779,10 @@ h+='<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-t
 +badge
 +'<span style="font-size:12px;color:var(--ink3)">'+cstEsc(rec.product||'—')+' · '+cstEsc(rec.round)+'</span>'
 +'<span style="font-size:11px;color:var(--ink4)">Updated '+new Date(rec.updatedAt).toLocaleString('en-MY')+'</span>'
++'<div style="display:flex;align-items:center;gap:6px" title="Download the full supplier comparison to share with brand owners">'
++'<button class="btn btn-secondary btn-sm" onclick="cstDownloadComparison(\'xlsx\')">⬇ Excel</button>'
++'<button class="btn btn-secondary btn-sm" onclick="cstDownloadComparison(\'pdf\')">⬇ PDF</button>'
++'</div>'
 +'<div style="margin-left:auto;display:flex;align-items:center;gap:8px">'
 +'<label class="fl" style="margin:0">Linked Job No.</label>'
 +'<input class="fi" style="width:140px;padding:6px 10px" value="'+cstEsc(rec.jobNo)+'" placeholder="optional"'+(cstRO()?' readonly':'')+' onchange="cstLinkJob(this.value)">'
@@ -2755,7 +2888,7 @@ return h+'</tr></thead><tbody>';
 function cstRowLabel(label,note,tone){
 var c=tone==='calc'?'var(--blue)':(tone==='total'?'var(--ink)':'var(--ink2)');
 return '<td style="position:sticky;left:0;background:'+(tone==='total'?'var(--surface3)':'var(--surface)')+';z-index:1;padding:8px 14px;border-bottom:1px solid var(--bd);font-weight:'+(tone==='total'?'700':'500')+';color:'+c+'">'+label
-+(note?'<div style="font-size:10px;color:var(--ink4);font-weight:400;margin-top:1px">'+note+'</div>':'')+'</td>';
++(note?'<div class="cst-rlnote" style="font-size:10px;color:var(--ink4);font-weight:400;margin-top:1px">'+note+'</div>':'')+'</td>';
 }
 function cstInputCell(sup,key,ph,type){
 var ro=cstRO()?' readonly':'';
