@@ -384,9 +384,12 @@ title="Show/hide password">👁</button>
 <nav class="tb-nav">
 <button class="tb-btn active" onclick="goPage('dashboard',this)">Dashboard</button>
 <button class="tb-btn" onclick="goPage('shipments',this)">Shipments</button>
+<button class="tb-btn" id="tools-tab" onclick="goPage('tools',this);gxShowTools()" style="display:none">🧮 Costing Tools</button>
+<button class="tb-btn" id="request-tab" onclick="goPage('request',this);gxShowRequests()" style="display:none;position:relative">📝 GWP Request<span id="request-tab-badge" style="display:none;margin-left:6px;min-width:16px;height:16px;padding:0 5px;background:var(--red,#dc2626);color:#fff;border-radius:9px;font-size:10px;font-weight:700;line-height:16px;text-align:center;vertical-align:middle"></span></button>
 <button class="tb-btn admin-tab" id="admin-tab" onclick="goPage('admin',this)" style="display:none">⚙ Admin</button>
 </nav>
 <div class="tb-right">
+<div class="tb-bell" id="tb-bell" onclick="gxToggleNotif(event)" title="Notifications" style="display:none;position:relative;cursor:pointer;font-size:19px;padding:4px 6px;line-height:1;user-select:none">🔔<span id="tb-bell-count" style="display:none;position:absolute;top:-2px;right:-3px;min-width:16px;height:16px;padding:0 4px;background:var(--red,#dc2626);color:#fff;border-radius:9px;font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center;line-height:16px;text-align:center"></span></div>
 <div class="tb-sync" id="sync-indicator">
 <div class="sync-dot"></div>
 <span id="sync-text">Live</span>
@@ -399,6 +402,15 @@ title="Show/hide password">👁</button>
 <button class="tb-logout" onclick="doLogout()">← Exit</button>
 </div>
 </header>
+
+<!-- NOTIFICATIONS DROPDOWN -->
+<div id="gx-notif-panel" style="display:none;position:fixed;top:56px;right:18px;width:360px;max-width:calc(100vw - 24px);max-height:70vh;overflow:auto;background:var(--surface);border:1px solid var(--bd);border-radius:12px;box-shadow:0 12px 40px rgba(9,9,15,.22);z-index:1200">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--surface)">
+<div style="font-size:14px;font-weight:700">Notifications</div>
+<div style="display:flex;gap:12px"><a href="#" onclick="gxMarkAllRead();return false;" style="font-size:12px;color:var(--ink3);text-decoration:none">Mark all read</a><a href="#" onclick="gxClearNotif();return false;" style="font-size:12px;color:var(--red,#dc2626);text-decoration:none">Clear</a></div>
+</div>
+<div id="gx-notif-list"></div>
+</div>
 
 <div class="main">
 
@@ -416,6 +428,7 @@ title="Show/hide password">👁</button>
 </div>
 <div id="sync-banner-zone"></div>
 <div id="alert-zone"></div>
+<div id="gx-admin-req-alert" style="display:none"></div>
 <div class="kpi-grid" id="kpi-grid"></div>
 <div class="dash-grid">
 <div style="display:flex;flex-direction:column;gap:16px">
@@ -464,8 +477,8 @@ title="Show/hide password">👁</button>
 <button class="admin-nav-btn active" onclick="adminNav(this,'a-records')"><div class="admin-nav-ico" style="background:#eff3fe">📋</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">All Records</div><div style="font-size:11px;color:var(--ink4)">View current data</div></div></button>
 <button class="admin-nav-btn edit-only" style="display:none" onclick="adminNav(this,'a-add')"><div class="admin-nav-ico" style="background:#f0fdf6">➕</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Add Shipment</div><div style="font-size:11px;color:var(--ink4)">How to add new rows</div></div></button>
 <button class="admin-nav-btn" onclick="adminNav(this,'a-compare')"><div class="admin-nav-ico" style="background:#fff1f2">📊</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Price Comparison</div><div style="font-size:11px;color:var(--ink4)">Upload spreadsheet (backup)</div></div></button>
-<button class="admin-nav-btn" onclick="adminNav(this,'a-packaging');renderPackaging()"><div class="admin-nav-ico" style="background:#eef7f3">📦</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Packaging Details</div><div style="font-size:11px;color:var(--ink4)">Carton, volume &amp; freight</div></div></button>
-<button class="admin-nav-btn" onclick="adminNav(this,'a-landed');renderLanded()"><div class="admin-nav-ico" style="background:#eff3fe">🧮</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Landed Cost Calculator</div><div style="font-size:11px;color:var(--ink4)">Per-shipment landed cost</div></div></button>
+<button class="admin-nav-btn" onclick="lcUse('admin');adminNav(this,'a-packaging');renderPackaging()"><div class="admin-nav-ico" style="background:#eef7f3">📦</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Packaging Details</div><div style="font-size:11px;color:var(--ink4)">Carton, volume &amp; freight</div></div></button>
+<button class="admin-nav-btn" onclick="lcUse('admin');adminNav(this,'a-landed');renderLanded()"><div class="admin-nav-ico" style="background:#eff3fe">🧮</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Landed Cost Calculator</div><div style="font-size:11px;color:var(--ink4)">Per-shipment landed cost</div></div></button>
 <button class="admin-nav-btn edit-only" style="display:none" onclick="adminNav(this,'a-costing');renderCosting()"><div class="admin-nav-ico" style="background:#f5f3ff">🧰</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Costing Workspace</div><div style="font-size:11px;color:var(--ink4)">Compare · Packaging · Landed</div></div></button>
 <button class="admin-nav-btn edit-only" style="display:none" onclick="adminNav(this,'a-backup');renderCosting()"><div class="admin-nav-ico" style="background:#f0fdfa">💾</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Backup &amp; Restore</div><div style="font-size:11px;color:var(--ink4)">Download all portal data</div></div></button>
 <button class="admin-nav-btn edit-only" style="display:none" onclick="adminNav(this,'a-update')"><div class="admin-nav-ico" style="background:#fffbeb">✏️</div><div><div style="font-size:13px;font-weight:600;color:var(--ink)">Update Status</div><div style="font-size:11px;color:var(--ink4)">How to update data</div></div></button>
@@ -714,6 +727,15 @@ Costing records (<code>gwp_costing_v2</code>) and your existing Landed Cost reco
 <label class="fl">Company / Brand</label>
 <input class="fi" id="nu-brand" placeholder="e.g. Bugucare">
 </div>
+<div class="fg">
+<label class="fl">Role / Access Level</label>
+<select class="fi" id="nu-role">
+<option value="handler">Brand Owner / User (own shipments only)</option>
+<option value="md">MD (view all)</option>
+<option value="ceo">CEO (view all)</option>
+</select>
+<span class="fh">Brand owners see only their own shipments &amp; costing tools. MD/CEO can view all.</span>
+</div>
 </div>
 <div class="fg" style="margin-bottom:14px">
 <label class="fl">Avatar Colour</label>
@@ -816,6 +838,82 @@ Costing records (<code>gwp_costing_v2</code>) and your existing Landed Cost reco
 </div>
 </div>
 
+<!-- ═══ COSTING TOOLS (brand owners / users — private workspace) ═══ -->
+<div class="page" id="page-tools">
+<div class="page-header">
+<div class="ph-left"><div class="page-title">Costing Tools</div><div class="page-sub">Your private workspace — compare suppliers &amp; estimate landed cost.</div></div>
+<div class="ph-right"><span style="font-size:11px;color:var(--green);background:var(--green-lt);border:1px solid var(--green-bd);padding:6px 12px;border-radius:20px">🔒 Private to you — never shared with admin or other users</span></div>
+</div>
+<div style="display:flex;gap:6px;border-bottom:1px solid var(--bd);margin-bottom:18px;flex-wrap:wrap">
+<button class="gx-ttab active" id="gxtt-compare" onclick="gxToolsTab('compare')" style="padding:10px 16px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:600;border-bottom:2px solid var(--blue);color:var(--blue);margin-bottom:-1px">📊 Price Comparison</button>
+<button class="gx-ttab" id="gxtt-packaging" onclick="gxToolsTab('packaging')" style="padding:10px 16px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:500;border-bottom:2px solid transparent;color:var(--ink3);margin-bottom:-1px">📦 Packaging Details</button>
+<button class="gx-ttab" id="gxtt-landed" onclick="gxToolsTab('landed')" style="padding:10px 16px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:500;border-bottom:2px solid transparent;color:var(--ink3);margin-bottom:-1px">🧮 Landed Cost Calculator</button>
+</div>
+
+<!-- USER PRICE COMPARISON -->
+<div class="gx-tsec" id="gxts-compare">
+<div class="form-card">
+<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:end">
+<div style="flex:1;min-width:200px"><label class="fl">Comparison Title</label><input class="fi" id="ucmp-title" placeholder="e.g. Shaker Bottle — R1"></div>
+<div><label class="fl">Upload spreadsheet (.xlsx / .csv)</label><input class="fi" id="ucmp-file" type="file" accept=".xlsx,.xls,.csv" onchange="gxUCompareFile(event)"></div>
+</div>
+<div style="font-size:11px;color:var(--ink4);margin-top:8px;line-height:1.6">Attributes down the side, each supplier as a column. First sheet is read. Saved only in your browser.</div>
+<div id="ucmp-preview" style="margin-top:16px;display:none">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-size:13px;font-weight:700">Comparison Table</div><div style="font-size:11px;color:var(--ink4)" id="ucmp-dims"></div></div>
+<div class="tbl-card" style="overflow:auto;max-height:520px"><table class="tbl" id="ucmp-table"></table></div>
+<div style="display:flex;gap:10px;margin-top:18px"><button class="btn btn-primary" onclick="gxUCompareSave()">💾 Save Comparison</button><button class="btn btn-secondary" onclick="gxUCompareReset()">Clear</button></div>
+</div>
+</div>
+<div class="form-card">
+<div style="font-size:13px;font-weight:700;margin-bottom:12px">Saved Comparisons</div>
+<div id="ucmp-saved-list"><div style="font-size:12px;color:var(--ink4)">No comparisons saved yet.</div></div>
+</div>
+</div>
+
+<!-- USER PACKAGING -->
+<div class="gx-tsec" id="gxts-packaging" style="display:none">
+<div style="font-size:12px;color:var(--ink3);margin-bottom:14px;line-height:1.6">Carton, volume, weight &amp; ocean-freight — the same formulas admin uses. These figures flow into your Landed Cost Calculator. Each record is separate.</div>
+<div class="form-card"><div id="pk-recordbar-u"></div></div>
+<div class="form-card"><div id="pk-editor-u"></div></div>
+</div>
+
+<!-- USER LANDED COST -->
+<div class="gx-tsec" id="gxts-landed" style="display:none">
+<div style="font-size:12px;color:var(--ink3);margin-bottom:14px;line-height:1.6">Multi-supplier comparison &amp; landed cost per record, with all formulas built in. Packaging figures pull from your Packaging Details tab.</div>
+<div class="form-card"><div id="lc-recordbar-u"></div></div>
+<div class="form-card"><div id="lc-editor-u"></div></div>
+</div>
+</div>
+
+<!-- ═══ GWP REQUEST SUBMISSION ═══ -->
+<div class="page" id="page-request">
+<div class="page-header">
+<div class="ph-left"><div class="page-title" id="gx-req-title">GWP Request</div><div class="page-sub" id="gx-req-sub">Submit a new GWP purchase request.</div></div>
+<div class="ph-right" id="gx-req-headbtns"></div>
+</div>
+
+<!-- USER VIEW: submit + my requests -->
+<div id="gx-req-user" style="display:none">
+<div class="form-card"><div id="gx-req-form"></div></div>
+<div class="form-card">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-size:13px;font-weight:700">My Requests</div><span style="font-size:11px;color:var(--ink4)" id="gx-req-mycount"></span></div>
+<div id="gx-req-mylist"><div style="font-size:12px;color:var(--ink4)">No requests submitted yet.</div></div>
+</div>
+</div>
+
+<!-- ADMIN VIEW: inbox -->
+<div id="gx-req-admin" style="display:none">
+<div class="form-card">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:8px">
+<div style="font-size:13px;font-weight:700">Incoming GWP Requests</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-secondary btn-sm" onclick="gxReqExportAll()">⬇ Export all (Excel)</button></div>
+</div>
+<div style="font-size:11px;color:var(--ink4);margin-bottom:12px;line-height:1.6">Set status to move each request through <strong>Pending → Reviewing → Approved → Completed</strong>. The requestor sees status changes in their notifications.</div>
+<div id="gx-req-inbox"></div>
+</div>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -901,6 +999,7 @@ const USERS = [
 {key:'minzi', name:'Min Zi', email:'minzilim.wellness@gmail.com', pwd:'MinZi@2026', role:'handler', color:'#be185d', active:true},
 {key:'anson', name:'Anson', email:'ansontham.theadspert@gmail.com', pwd:'Anson@2026', role:'handler', color:'#0369a1', active:true},
 {key:'jiazhen', name:'Jia Zhen', email:'jiazhen.theadspert@gmail.com', pwd:'JiaZhen@2026', role:'handler', color:'#b91c1c', active:true},
+{key:'avelyn', name:'Avelyn', email:'avelyn.wellness@gmail.com', pwd:'Avelyn@2026', role:'handler', color:'#ea580c', active:true},
 ];
 
 // ═══════════════════════════════════════════════════
@@ -1025,8 +1124,12 @@ return true;
 
 // POST an action to the Apps Script. Returns {ok, data|error}.
 var LC_READ_ACTIONS=['listComparisons'];
-async function postToSheet(action, payload){
-if(LC_READ_ACTIONS.indexOf(action)>=0){ if(!canViewAll()){ toast('🔒 Restricted','error'); return {ok:false, error:'no-access'}; } }
+var GX_PUBLIC_ACTIONS=['saveRequest','notifyRequest'];   // any logged-in user may call
+var GX_VIEWALL_ACTIONS=['listRequests','listUsers'];      // admin / ceo / md may call
+async function postToSheet(action, payload, opts){
+opts=opts||{};
+if(GX_PUBLIC_ACTIONS.indexOf(action)>=0){ if(typeof CU==='undefined'||!CU){ return {ok:false, error:'not-logged-in'}; } }
+else if(GX_VIEWALL_ACTIONS.indexOf(action)>=0 || LC_READ_ACTIONS.indexOf(action)>=0){ if(!canViewAll()){ if(!opts.silent)toast('🔒 Restricted','error'); return {ok:false, error:'no-access'}; } }
 else if(!requireAdmin()) return {ok:false, error:'not-admin'};
 try{
 const body=JSON.stringify({action, secret:SHARED_SECRET, payload});
@@ -1037,7 +1140,7 @@ let data; try{ data=JSON.parse(txt); }catch(e){ throw new Error('Bad response: '
 if(data && data.ok===false) throw new Error(data.error||'Write failed');
 return {ok:true, data};
 }catch(err){
-toast('⚠️ Save failed: '+err.message,'error',5000);
+if(!opts.silent) toast('⚠️ Save failed: '+err.message,'error',5000);
 return {ok:false, error:err.message};
 }
 }
@@ -1283,6 +1386,9 @@ document.getElementById('app').style.display='block';
 
 renderDash();renderTable(filtered);renderAdminTable();
 
+// New-feature wiring (costing tools, requests, notifications) — never affects admin data
+try{ gxOnLogin(); }catch(e){ console&&console.warn&&console.warn('gxOnLogin',e); }
+
 // Start auto-refresh
 startAutoRefresh();
 }
@@ -1309,6 +1415,7 @@ if(CU){
 if(canViewAll()){myShips=[...ALL_SHIPS];}
 else{myShips=ALL_SHIPS.filter(s=>s.emails.some(e=>e.toLowerCase()===CU.email.toLowerCase()));}
 applyF();renderDash();renderAdminTable();renderUMGrid();populateQuickShips();
+try{ gxCheckShipmentChanges(); gxUpdateAdminReqUI(); gxSyncPullRequests(); }catch(e){}
 if(!silent)toast('✅ Data refreshed','success');
 }
 }
@@ -1863,9 +1970,14 @@ toast('⚠ A user with this email already exists', 'warning'); return;
 // Generate unique key
 const key = name.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'') + '_' + Date.now().toString().slice(-4);
 
-// Add to USERS array
-const newUser = { key, name, email, pwd, role:'handler', color: newUserColor, brand, active: true };
+// Role / access level
+const roleEl = document.getElementById('nu-role');
+const role = (roleEl && roleEl.value) ? roleEl.value : 'handler';
+
+// Add to USERS array (marked custom so it persists in this browser)
+const newUser = { key, name, email, pwd, role, color: newUserColor, brand, active: true, _custom: true };
 USERS.push(newUser);
+try{ gxPersistUsers(); }catch(e){}
 
 // Show confirmation and credentials
 const fb = document.getElementById('nu-feedback');
@@ -1874,7 +1986,8 @@ if (fb) { fb.style.display = 'block'; fb.textContent = '✅ User "' + name + '" 
 const pb = document.getElementById('nu-pw-box');
 const pd = document.getElementById('nu-pw-details');
 if (pb && pd) {
-pd.innerHTML = 'Portal link: https://lilianlimyl.github.io/GWP-Portal/<br>Email: ' + email + '<br>Password: ' + pwd;
+pd.innerHTML = 'Portal link: https://lilianlimyl.github.io/GWP-Portal/<br>Email: ' + email + '<br>Password: ' + pwd
+ + '<br><button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="gxSendCreds(\'' + key + '\')">✉️ Send access info to user</button>';
 pb.style.display = 'block';
 }
 
@@ -1889,9 +2002,9 @@ renderUsersList();
 
 toast('✅ User "' + name + '" created — now link them to shipments', 'success', 5000);
 
-// Remind to re-upload
+// Persistence note: saved in THIS browser now (works here immediately).
 setTimeout(() => {
-toast('📌 Remember: re-upload index.html to GitHub to save new user permanently', '', 6000);
+toast('💾 Saved in this browser. To let them log in on any device, apply the backend upgrade (see guide).', '', 7000);
 }, 4000);
 }
 
@@ -2000,10 +2113,11 @@ const user = USERS.find(u => u.key === userKey);
 if (!user) { toast('User not found', 'error'); return; }
 if (user.role === 'admin') { toast('Cannot disable admin account', 'error'); return; }
 user.active = user.active === false ? true : false;
+user._custom = true;
+try{ gxPersistUsers(); }catch(e){}
 renderUMGrid();
 renderUsersList();
 toast(user.active ? '✅ ' + user.name + ' re-enabled' : '🚫 ' + user.name + ' disabled', '');
-toast('📌 Re-upload index.html to GitHub to save this change permanently', '', 5000);
 }
 
 function renderUMGrid() {
@@ -2043,9 +2157,16 @@ ${ships.length ? ships.map(s => `
 <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.product}</span>
 <span class="badge ${(STATUS_MAP[s.status]||{cls:'b-pending'}).cls}" style="font-size:9px;padding:2px 7px">${(STATUS_MAP[s.status]||{lbl:s.status}).lbl}</span>
 </div>`).join('') : `<div style="font-size:12px;color:var(--ink4);padding:6px 0">No shipments linked yet</div>`}
-<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
-<button class="btn btn-secondary btn-sm" onclick="openLinkForUser('${u.key}')">🔗 Manage Links</button>
+<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center">
+<button class="btn btn-secondary btn-sm" onclick="openLinkForUser('${u.key}')">🔗 Links</button>
+<button class="btn btn-secondary btn-sm" onclick="gxSendCreds('${u.key}')">✉️ Send info</button>
 <button class="btn btn-secondary btn-sm" onclick="toggleUserActive('${u.key}')">${isActive ? '🚫 Disable' : '✅ Enable'}</button>
+<button class="btn btn-secondary btn-sm" onclick="gxRemoveUser('${u.key}')">🗑 Remove</button>
+<select onchange="gxSetUserRole('${u.key}',this.value)" title="Access level" style="font-size:11px;padding:4px 6px;border:1px solid var(--bd2);border-radius:6px;background:var(--surface);color:var(--ink)">
+<option value="handler"${u.role==='handler'?' selected':''}>Brand Owner</option>
+<option value="md"${u.role==='md'?' selected':''}>MD (view all)</option>
+<option value="ceo"${u.role==='ceo'?' selected':''}>CEO (view all)</option>
+</select>
 </div>
 </div>`;
 }).join('');
@@ -2097,12 +2218,20 @@ if(pwdEl) pwdEl.addEventListener('blur',()=>pwdEl.style.borderColor='var(--bd2)'
 // Storage: in-portal (localStorage). Each shipment is its own record.
 // CEO/MD role = view-only (lcRO()); Admin = full edit.
 // ═══════════════════════════════════════════════════
-var LC_KEY='gwp_lc_records_v1';
-var LC_STATE={activeId:null,records:[]};
-function lcRO(){return (typeof canEdit==='function')?!canEdit():false;}
+// ─── Context-aware storage: 'admin' bucket (unchanged legacy key) vs per-user private bucket ───
+// This keeps Admin's landed-cost records 100% separate from anything a brand owner does.
+var LC_ADMIN_KEY='gwp_lc_records_v1';
+var LC_KEY=LC_ADMIN_KEY;              // active storage key (reassigned by lcUse)
+var LC_STATE={activeId:null,records:[]}; // active state (reassigned by lcUse)
+var LC_ACTIVE_STORE='admin';          // 'admin' | 'user'
+var LC_SFX='';                        // DOM id suffix: '' for admin, '-u' for user page
+var LC_STORES={admin:{key:LC_ADMIN_KEY,state:LC_STATE},user:{key:null,state:{activeId:null,records:[]}}};
+function lcUse(store){LC_ACTIVE_STORE=(store==='user'?'user':'admin');var st=LC_STORES[LC_ACTIVE_STORE];LC_KEY=st.key;LC_STATE=st.state;LC_SFX=(LC_ACTIVE_STORE==='user'?'-u':'');}
+function lcSetUserKey(k){LC_STORES.user.key=k;}
+function lcRO(){if(LC_ACTIVE_STORE==='user')return false;return (typeof canEdit==='function')?!canEdit():false;}
 function lcRoleLabel(){if(typeof CU==='undefined'||!CU)return '';return CU.role==='md'?'MD':(CU.role==='ceo'?'CEO':(CU.role==='admin'?'Admin':''));}
-function lcPersist(){try{localStorage.setItem(LC_KEY,JSON.stringify(LC_STATE));}catch(e){}}
-function lcLoad(){try{var s=localStorage.getItem(LC_KEY);if(s){LC_STATE=JSON.parse(s);}}catch(e){}}
+function lcPersist(){LC_STORES[LC_ACTIVE_STORE].state=LC_STATE;if(!LC_KEY)return;try{localStorage.setItem(LC_KEY,JSON.stringify(LC_STATE));}catch(e){}}
+function lcLoad(){if(!LC_KEY){LC_STATE={activeId:null,records:[]};LC_STORES[LC_ACTIVE_STORE].state=LC_STATE;return;}try{var s=localStorage.getItem(LC_KEY);LC_STATE=(s?JSON.parse(s):{activeId:null,records:[]});}catch(e){LC_STATE={activeId:null,records:[]};}LC_STORES[LC_ACTIVE_STORE].state=LC_STATE;}
 function lcUID(){return 'x'+Math.random().toString(36).slice(2,9);}
 function lcNum(v){var n=parseFloat(v);return isNaN(n)?0:n;}
 function lcVal(id){var e=document.getElementById(id);return e?e.value:'';}
@@ -2250,8 +2379,8 @@ function lcConst(label,key,val){return '<div><label class="fl">'+label+'</label>
 
 // ─── Section renderers ───
 function renderPackaging(){
-var bar=document.getElementById('pk-recordbar'); if(bar)bar.innerHTML=lcRecordBarHTML('pk');
-var host=document.getElementById('pk-editor'); if(!host)return;
+var bar=document.getElementById('pk-recordbar'+LC_SFX); if(bar)bar.innerHTML=lcRecordBarHTML('pk'+LC_SFX);
+var host=document.getElementById('pk-editor'+LC_SFX); if(!host)return;
 var rec=lcActiveRecord();
 if(!rec){host.innerHTML='<div style="font-size:13px;color:var(--ink4)">'+(lcRO()?'No packaging records to display yet.':'Create a shipment record above to start entering packaging details.')+'</div>';return;}
 var h='';
@@ -2275,8 +2404,8 @@ if(!lcRO()){h+='<div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap
 host.innerHTML=h;lcRecalc();
 }
 function renderLanded(){
-var bar=document.getElementById('lc-recordbar'); if(bar)bar.innerHTML=lcRecordBarHTML('lc');
-var host=document.getElementById('lc-editor'); if(!host)return;
+var bar=document.getElementById('lc-recordbar'+LC_SFX); if(bar)bar.innerHTML=lcRecordBarHTML('lc'+LC_SFX);
+var host=document.getElementById('lc-editor'+LC_SFX); if(!host)return;
 var rec=lcActiveRecord();
 if(!rec){host.innerHTML='<div style="font-size:13px;color:var(--ink4)">'+(lcRO()?'No landed-cost records to display yet.':'Create a shipment record above to start.')+'</div>';return;}
 var h='';
@@ -3403,6 +3532,565 @@ cstRender();
 cstBackupFlag();
 }
 document.addEventListener('DOMContentLoaded',function(){cstLoad();});
+
+// ═══════════════════════════════════════════════════════════════════════
+//  GWP PORTAL EXTENSIONS (GX)  —  added features, isolated from admin data
+//  1) User Costing Tools (private per-user storage)
+//  2) GWP Request submission + tracking + Excel / A4 print
+//  3) Own-shipment + request notifications
+//  4) User Management persistence, roles, remove, send access info
+//  ALL user data lives under per-user localStorage keys, never touching
+//  admin keys (gwp_lc_records_v1, gwp_costing_v2) or the Google Sheet.
+// ═══════════════════════════════════════════════════════════════════════
+
+// —— Config ——
+// Address that receives new-request / update email alerts once the backend
+// (Apps Script) is switched on. Set this to your preferred address.
+var GX_ALERT_EMAIL = '';           // e.g. 'purchasing@yourcompany.com' (leave '' to use admin email)
+var GX_BACKEND_EMAIL_ENABLED = false; // becomes true after you deploy the Code.gs upgrade
+
+function gxEsc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function gxUID(p){return (p||'x')+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function gxCU(){return (typeof CU!=='undefined'&&CU)?CU:null;}
+function gxUserKey(){var u=gxCU();return u?u.key:'anon';}
+function gxAdminUser(){return (typeof USERS!=='undefined')?USERS.find(function(u){return u.role==='admin';}):null;}
+function gxNow(){return new Date().toISOString();}
+function gxFmtDT(iso){if(!iso)return '';var d=new Date(iso);if(isNaN(d.getTime()))return '';return d.toLocaleString('en-GB',{day:'numeric',month:'short',year:'2-digit',hour:'2-digit',minute:'2-digit'});}
+function gxReadLS(k,def){try{var s=localStorage.getItem(k);return s?JSON.parse(s):def;}catch(e){return def;}}
+function gxWriteLS(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true;}catch(e){toast('⚠ Browser storage full — export a copy','error');return false;}}
+
+// ─────────────────────────────────────────────────────────────
+//  TOP NAV / PAGE SHOW HELPERS
+// ─────────────────────────────────────────────────────────────
+function gxToolsTab(name){
+['compare','packaging','landed'].forEach(function(t){
+var sec=document.getElementById('gxts-'+t); if(sec)sec.style.display=(t===name?'':'none');
+var tab=document.getElementById('gxtt-'+t);
+if(tab){var on=(t===name);tab.style.fontWeight=on?'600':'500';tab.style.color=on?'var(--blue)':'var(--ink3)';tab.style.borderBottom='2px solid '+(on?'var(--blue)':'transparent');}
+});
+if(name==='packaging'||name==='landed'){ lcUse('user'); if(name==='packaging')renderPackaging(); else renderLanded(); }
+else { gxUCompareRenderSaved(); }
+}
+function gxShowTools(){ lcUse('user'); gxToolsTab('compare'); }
+
+// ─────────────────────────────────────────────────────────────
+//  USER PRICE COMPARISON (local only)  key: gwp_user_cmp_<userkey>
+// ─────────────────────────────────────────────────────────────
+var GX_UCMP_GRID=[], GX_UCMP_EDIT=null;
+function gxUCmpKey(){return 'gwp_user_cmp_'+gxUserKey();}
+function gxUCompareFile(ev){
+var file=ev.target.files&&ev.target.files[0]; if(!file)return;
+if(typeof XLSX==='undefined'){toast('⚠ Spreadsheet library not loaded','error');return;}
+var reader=new FileReader();
+reader.onload=function(e){
+try{
+var wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+var ws=wb.Sheets[wb.SheetNames[0]];
+GX_UCMP_GRID=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false}).filter(function(r){return r.some(function(c){return String(c).trim()!=='';});});
+gxUCompareRender();
+var t=document.getElementById('ucmp-title'); if(t&&!t.value.trim())t.value=(wb.SheetNames[0]||'Comparison');
+document.getElementById('ucmp-preview').style.display='block';
+toast('✅ Parsed — '+GX_UCMP_GRID.length+' rows','success');
+}catch(err){toast('⚠ Could not read file: '+err.message,'error',5000);}
+};
+reader.readAsArrayBuffer(file);
+}
+function gxUCompareRender(){
+var tbl=document.getElementById('ucmp-table'); if(!tbl)return;
+var maxCols=GX_UCMP_GRID.reduce(function(m,r){return Math.max(m,r.length);},0);
+var dd=document.getElementById('ucmp-dims'); if(dd)dd.textContent=GX_UCMP_GRID.length+' rows × '+maxCols+' cols';
+var html='';
+GX_UCMP_GRID.forEach(function(row,ri){
+html+='<tr>';
+for(var c=0;c<maxCols;c++){
+var v=row[c]!==undefined?String(row[c]):'';
+var isAttr=c===0, isHeader=ri===0;
+var style=isHeader?'background:var(--surface3);font-weight:700;position:sticky;top:0;z-index:1':(isAttr?'font-weight:600;background:var(--surface2);position:sticky;left:0':'');
+var tag=(isHeader||isAttr)?'th':'td';
+html+='<'+tag+' style="'+style+';font-size:12px;white-space:nowrap;padding:7px 10px">'+gxEsc(v)+'</'+tag+'>';
+}
+html+='</tr>';
+});
+tbl.innerHTML=html;
+}
+function gxUCompareSave(){
+var title=(document.getElementById('ucmp-title').value||'').trim();
+if(!title){toast('⚠ Enter a comparison title','warning');return;}
+if(!GX_UCMP_GRID.length){toast('⚠ Upload a spreadsheet first','warning');return;}
+var list=gxReadLS(gxUCmpKey(),[]);
+var rec={id:GX_UCMP_EDIT||gxUID('ucmp'),title:title,createdAt:gxNow(),grid:GX_UCMP_GRID};
+var idx=list.findIndex(function(r){return r.id===rec.id;});
+if(idx>=0)list[idx]=rec; else list.unshift(rec);
+gxWriteLS(gxUCmpKey(),list); GX_UCMP_EDIT=rec.id;
+toast('✅ Comparison saved (private to you)','success');
+gxUCompareRenderSaved();
+}
+function gxUCompareReset(){GX_UCMP_GRID=[];GX_UCMP_EDIT=null;var t=document.getElementById('ucmp-title');if(t)t.value='';var f=document.getElementById('ucmp-file');if(f)f.value='';document.getElementById('ucmp-preview').style.display='none';}
+function gxUCompareRenderSaved(){
+var host=document.getElementById('ucmp-saved-list'); if(!host)return;
+var list=gxReadLS(gxUCmpKey(),[]);
+if(!list.length){host.innerHTML='<div style="font-size:12px;color:var(--ink4)">No comparisons saved yet.</div>';return;}
+host.innerHTML=list.map(function(r){
+var d=r.createdAt?new Date(r.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'2-digit'}):'';
+return '<div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:8px">'
++'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">'+gxEsc(r.title)+'</div><div style="font-size:11px;color:var(--ink4)">'+d+'</div></div>'
++'<button class="btn btn-secondary btn-sm" onclick="gxUCompareOpen(\''+r.id+'\')">👁 Open</button>'
++'<button class="btn btn-secondary btn-sm" onclick="gxUCompareDelete(\''+r.id+'\')">🗑</button></div>';
+}).join('');
+}
+function gxUCompareOpen(id){var list=gxReadLS(gxUCmpKey(),[]);var r=list.find(function(x){return x.id===id;});if(!r)return;GX_UCMP_EDIT=r.id;GX_UCMP_GRID=r.grid||[];var t=document.getElementById('ucmp-title');if(t)t.value=r.title||'';gxUCompareRender();document.getElementById('ucmp-preview').style.display='block';document.getElementById('ucmp-preview').scrollIntoView({behavior:'smooth',block:'nearest'});}
+function gxUCompareDelete(id){if(!confirm('Delete this comparison?'))return;var list=gxReadLS(gxUCmpKey(),[]).filter(function(x){return x.id!==id;});gxWriteLS(gxUCmpKey(),list);gxUCompareRenderSaved();toast('Deleted','success');}
+
+// ─────────────────────────────────────────────────────────────
+//  GWP REQUEST SUBMISSION + TRACKING   key: gwp_requests_v1
+// ─────────────────────────────────────────────────────────────
+var GX_REQ_KEY='gwp_requests_v1';
+var GX_REQ_STATUSES=['Pending','Reviewing','Approved','Completed'];
+var GX_REQ_FIELDS=[
+{sec:'Requestor / Brand Owner',fields:[
+ {k:'companyName',label:'Company Name',type:'text',req:true},
+ {k:'brand',label:'Brand',type:'text'},
+ {k:'pic',label:'Contact Person (PIC)',type:'text',req:true},
+ {k:'contactNumber',label:'Contact Number',type:'text'},
+ {k:'email',label:'Email',type:'text',req:true}
+]},
+{sec:'Product / GWP Details',fields:[
+ {k:'gwpItemName',label:'GWP Item Name',type:'text',req:true},
+ {k:'purpose',label:'Purpose / Objective',type:'text'},
+ {k:'competitor',label:'Competitor Brand / Benchmarks (Name & Price)',type:'text'},
+ {k:'colour',label:'Colour',type:'text'},
+ {k:'prefSize',label:'Preferred Size',type:'text'},
+ {k:'prefMaterial',label:'Preferred Material',type:'text'},
+ {k:'coo',label:'Preferred Country of Origin (COO)',type:'text'},
+ {k:'targetSensory',label:'Target Sensory Profile',type:'text'}
+]},
+{sec:'Quantity & Pricing',fields:[
+ {k:'moq',label:'MOQ (Minimum Order Qty)',type:'number'},
+ {k:'quantityRequired',label:'Quantity Required',type:'number',req:true},
+ {k:'minUnitPrice',label:'Min Target Unit Price (Landed, RM)',type:'number'},
+ {k:'maxUnitPrice',label:'Max Target Unit Price (Landed, RM)',type:'number'},
+ {k:'targetRetail',label:'Target Retail Price (RM)',type:'number'},
+ {k:'sampleQty',label:'Sample Quantity',type:'number'}
+]},
+{sec:'Packaging',fields:[
+ {k:'packagingRequired',label:'Packaging Required',type:'yn'},
+ {k:'packaging',label:'Packaging Details',type:'textarea'}
+]},
+{sec:'Timeline',fields:[
+ {k:'targetLaunch',label:'Target Launch Date',type:'date'},
+ {k:'deliveryDate',label:'Required Delivery Date',type:'date',req:true}
+]},
+{sec:'Requirements & Notes',fields:[
+ {k:'designReq',label:'Design Requirements',type:'yn'},
+ {k:'stabilityReq',label:'Stability / Testing Requirements',type:'yn'},
+ {k:'sampleReq',label:'Sample Requirement',type:'yn'},
+ {k:'attachmentName',label:'Attachment / Reference (file name or link)',type:'text'},
+ {k:'notes',label:'Additional Notes / Remarks',type:'textarea'}
+]}
+];
+function gxReqAllFields(){var a=[];GX_REQ_FIELDS.forEach(function(g){g.fields.forEach(function(f){a.push(f);});});return a;}
+function gxReqFieldLabel(k){var f=gxReqAllFields().find(function(x){return x.k===k;});return f?f.label:k;}
+
+function gxShowRequests(){
+var u=gxCU(); if(!u)return;
+var isAdmin=(u.role==='admin');
+document.getElementById('gx-req-user').style.display=isAdmin?'none':'';
+document.getElementById('gx-req-admin').style.display=isAdmin?'':'none';
+document.getElementById('gx-req-title').textContent=isAdmin?'GWP Requests (Admin)':'GWP Request';
+document.getElementById('gx-req-sub').textContent=isAdmin?'Review incoming requests and update their status.':'Submit a new GWP purchase request and track its status.';
+var hb=document.getElementById('gx-req-headbtns');
+if(isAdmin){ hb.innerHTML='<button class="btn btn-secondary btn-sm" onclick="gxReqPrintBlank()">🖨 Blank A4 form</button>'; gxRenderInbox(); }
+else { hb.innerHTML='<button class="btn btn-secondary btn-sm" onclick="gxReqPrintBlank()">🖨 Blank A4 form</button>'; gxRenderReqForm(); gxRenderMyReqs(); }
+}
+function gxRenderReqForm(){
+var host=document.getElementById('gx-req-form'); if(!host)return;
+var u=gxCU();
+var h='<div style="font-size:13px;font-weight:700;margin-bottom:4px">New GWP Purchase Request</div>'
++'<div style="font-size:11px;color:var(--ink4);margin-bottom:16px">Fields marked <span style="color:var(--red,#dc2626)">*</span> are required. Your request is saved and tracked below.</div>';
+GX_REQ_FIELDS.forEach(function(g){
+h+='<div style="font-size:12px;font-weight:700;color:var(--blue2);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 10px">'+gxEsc(g.sec)+'</div>';
+h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+g.fields.forEach(function(f){
+var id='gxrf-'+f.k; var star=f.req?' <span style="color:var(--red,#dc2626)">*</span>':'';
+var span=(f.type==='textarea')?'grid-column:1/-1;':'';
+var pre='';
+if(f.k==='email'&&u)pre=u.email||''; if(f.k==='pic'&&u)pre=u.name||''; if(f.k==='brand'&&u&&u.brand)pre=u.brand;
+h+='<div style="'+span+'"><label class="fl">'+gxEsc(f.label)+star+'</label>';
+if(f.type==='textarea')h+='<textarea class="fi" id="'+id+'" rows="2"></textarea>';
+else if(f.type==='yn')h+='<select class="fi" id="'+id+'"><option value="">—</option><option>Yes</option><option>No</option></select>';
+else if(f.type==='date')h+='<input class="fi" id="'+id+'" type="date">';
+else if(f.type==='number')h+='<input class="fi" id="'+id+'" type="number" step="0.01">';
+else h+='<input class="fi" id="'+id+'" value="'+gxEsc(pre)+'">';
+h+='</div>';
+});
+h+='</div>';
+});
+h+='<label style="display:flex;align-items:flex-start;gap:8px;margin-top:16px;font-size:12px;color:var(--ink3);cursor:pointer"><input type="checkbox" id="gxrf-ack" style="width:15px;height:15px;margin-top:1px;accent-color:var(--blue)"> I agree and understand the service terms above.</label>';
+h+='<div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap"><button class="btn btn-primary" onclick="gxReqSubmit()">📨 Submit Request</button><button class="btn btn-secondary" onclick="gxReqClearForm()">Clear</button></div>';
+host.innerHTML=h;
+}
+function gxReqClearForm(){gxReqAllFields().forEach(function(f){var e=document.getElementById('gxrf-'+f.k);if(e)e.value='';});var a=document.getElementById('gxrf-ack');if(a)a.checked=false;}
+function gxReqCollect(){var o={};gxReqAllFields().forEach(function(f){var e=document.getElementById('gxrf-'+f.k);o[f.k]=e?e.value.trim():'';});return o;}
+function gxReqSubmit(){
+var u=gxCU(); if(!u)return;
+var data=gxReqCollect();
+var missing=gxReqAllFields().filter(function(f){return f.req&&!data[f.k];});
+if(missing.length){toast('⚠ Please fill: '+missing.map(function(f){return f.label;}).join(', '),'warning',5000);return;}
+if(!document.getElementById('gxrf-ack').checked){toast('⚠ Please tick the acknowledgement','warning');return;}
+var reqs=gxReadLS(GX_REQ_KEY,[]);
+var num='GWP-'+new Date().getFullYear()+'-'+String(reqs.length+1).padStart(4,'0');
+var rec={id:gxUID('req'),refNo:num,status:'Pending',createdAt:gxNow(),
+ requestor:{key:u.key,name:u.name,email:u.email,brand:u.brand||''},
+ fields:data,
+ history:[{status:'Pending',at:gxNow(),by:u.name}]};
+reqs.unshift(rec); gxWriteLS(GX_REQ_KEY,reqs);
+// notify admin (same-browser) + attempt backend email
+var admin=gxAdminUser();
+if(admin)gxAddNotif(admin.key,{type:'request',title:'New GWP request — '+num,body:(rec.requestor.name||'')+' · '+(data.gwpItemName||''),ref:rec.id});
+gxSyncPushRequest(rec);   // email-free cross-device sync (if enabled)
+gxTryBackendEmail(rec);   // email alert (if enabled)
+gxUpdateAdminReqUI();     // updates admin badge/dashboard if admin is on same browser
+gxReqClearForm();
+gxRenderMyReqs();
+toast('✅ Request '+num+' submitted','success',4000);
+gxReqPostSubmit(rec);
+}
+function gxReqPostSubmit(rec){
+// offer manual send channels (useful while backend email is off)
+var body='New GWP request '+rec.refNo+' has been submitted.';
+var when=setTimeout(function(){
+toast('📄 Tip: use “Excel” or “Print A4” on the request below to send it manually if needed','',6000);
+},1200);
+}
+function gxStatusColor(s){return s==='Completed'?'#065f46':s==='Approved'?'#0d9488':s==='Reviewing'?'#b45309':'#6b7280';}
+function gxStatusBadge(s){var c=gxStatusColor(s);return '<span style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:'+c+'1a;color:'+c+';border:1px solid '+c+'40">'+gxEsc(s)+'</span>';}
+function gxReqTracker(rec){
+return '<div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:8px 0">'+GX_REQ_STATUSES.map(function(s,i){
+var done=GX_REQ_STATUSES.indexOf(rec.status)>=i; var c=done?gxStatusColor(rec.status):'#cbd5e1';
+return '<span style="font-size:10px;font-weight:600;color:'+(done?'#fff':'#64748b')+';background:'+(done?c:'#f1f5f9')+';padding:3px 10px;border-radius:20px">'+s+'</span>'+(i<3?'<span style="color:'+(GX_REQ_STATUSES.indexOf(rec.status)>i?c:'#cbd5e1')+'">→</span>':'');
+}).join('')+'</div>';
+}
+function gxRenderMyReqs(){
+var u=gxCU(); if(!u)return;
+var host=document.getElementById('gx-req-mylist'); if(!host)return;
+var mine=gxReadLS(GX_REQ_KEY,[]).filter(function(r){return r.requestor&&r.requestor.key===u.key;});
+var ct=document.getElementById('gx-req-mycount'); if(ct)ct.textContent=mine.length+' request'+(mine.length!==1?'s':'');
+if(!mine.length){host.innerHTML='<div style="font-size:12px;color:var(--ink4)">No requests submitted yet.</div>';return;}
+host.innerHTML=mine.map(function(r){
+return '<div style="padding:12px 14px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:10px">'
++'<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><div style="font-size:13px;font-weight:700">'+gxEsc(r.fields.gwpItemName||'(item)')+' <span style="font-family:var(--mono);font-size:11px;color:var(--ink4)">'+gxEsc(r.refNo)+'</span></div>'+gxStatusBadge(r.status)+'</div>'
++gxReqTracker(r)
++'<div style="font-size:11px;color:var(--ink4)">Submitted '+gxFmtDT(r.createdAt)+' · Qty '+gxEsc(r.fields.quantityRequired||'—')+' · Deliver by '+gxEsc(r.fields.deliveryDate||'—')+'</div>'
++'<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn btn-secondary btn-sm" onclick="gxReqExportOne(\''+r.id+'\')">⬇ Excel</button><button class="btn btn-secondary btn-sm" onclick="gxReqPrint(\''+r.id+'\')">🖨 Print A4</button></div>'
++'</div>';
+}).join('');
+}
+var GX_SHOW_ARCHIVED=false;
+function gxToggleArchived(){GX_SHOW_ARCHIVED=!GX_SHOW_ARCHIVED;gxRenderInbox();}
+function gxRenderInbox(){
+var host=document.getElementById('gx-req-inbox'); if(!host)return;
+var all=gxReadLS(GX_REQ_KEY,[]);
+var archivedCount=all.filter(function(r){return r.archived;}).length;
+var reqs=all.filter(function(r){return GX_SHOW_ARCHIVED?r.archived:!r.archived;});
+var bar='<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">'
+ +'<div style="font-size:12px;color:var(--ink3)">'+(GX_SHOW_ARCHIVED?'Showing archived requests':'Showing active requests')+' ('+reqs.length+')</div>'
+ +'<button class="btn btn-secondary btn-sm" onclick="gxToggleArchived()">'+(GX_SHOW_ARCHIVED?'← Back to active':'🗄 Show archived ('+archivedCount+')')+'</button></div>';
+if(!reqs.length){host.innerHTML=bar+'<div class="empty-st" style="padding:34px 20px"><div class="empty-ico">'+(GX_SHOW_ARCHIVED?'🗄':'📭')+'</div><div class="empty-title">'+(GX_SHOW_ARCHIVED?'No archived requests':'No active requests')+'</div><div class="empty-sub">'+(GX_SHOW_ARCHIVED?'Archived requests are kept here for your history.':'Submitted requests appear here.')+'</div></div>';return;}
+host.innerHTML=bar+reqs.map(function(r){
+var opts=GX_REQ_STATUSES.map(function(s){return '<option'+(s===r.status?' selected':'')+'>'+s+'</option>';}).join('');
+var archBtn=r.archived
+ ? '<button class="btn btn-secondary btn-sm" onclick="gxReqUnarchive(\''+r.id+'\')">♻ Unarchive</button>'
+ : '<button class="btn btn-secondary btn-sm" onclick="gxReqArchive(\''+r.id+'\')">🗄 Archive</button>';
+return '<div style="padding:13px 15px;background:var(--surface2);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:10px'+(r.archived?';opacity:.72':'')+'">'
++'<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">'
++'<div style="font-size:13px;font-weight:700">'+gxEsc(r.fields.gwpItemName||'(item)')+' <span style="font-family:var(--mono);font-size:11px;color:var(--ink4)">'+gxEsc(r.refNo)+'</span>'+(r.archived?' <span style="font-size:10px;font-weight:600;color:var(--ink4);background:var(--surface3);padding:2px 7px;border-radius:10px">Archived</span>':'')+'</div>'
++'<div style="display:flex;align-items:center;gap:8px">'+gxStatusBadge(r.status)+'<select class="fi" style="width:auto;padding:5px 8px;font-size:12px" onchange="gxReqSetStatus(\''+r.id+'\',this.value)">'+opts+'</select></div></div>'
++'<div style="font-size:11px;color:var(--ink3);margin-top:6px">'+gxEsc(r.requestor?r.requestor.name:'')+(r.requestor&&r.requestor.brand?' · '+gxEsc(r.requestor.brand):'')+' · '+gxEsc(r.requestor?r.requestor.email:'')+'</div>'
++'<div style="font-size:11px;color:var(--ink4);margin-top:3px">Qty '+gxEsc(r.fields.quantityRequired||'—')+' · MOQ '+gxEsc(r.fields.moq||'—')+' · Deliver by '+gxEsc(r.fields.deliveryDate||'—')+' · Submitted '+gxFmtDT(r.createdAt)+'</div>'
++'<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn btn-secondary btn-sm" onclick="gxReqToggleDetail(\''+r.id+'\')">📋 Details</button><button class="btn btn-secondary btn-sm" onclick="gxReqExportOne(\''+r.id+'\')">⬇ Excel</button><button class="btn btn-secondary btn-sm" onclick="gxReqPrint(\''+r.id+'\')">🖨 Print A4</button>'+archBtn+'<button class="btn btn-secondary btn-sm" style="color:var(--red,#dc2626)" onclick="gxReqDelete(\''+r.id+'\')">🗑 Delete</button></div>'
++'<div id="gxreqd-'+r.id+'" style="display:none;margin-top:10px;border-top:1px solid var(--bd);padding-top:10px"></div>'
++'</div>';
+}).join('');
+}
+function gxReqToggleDetail(id){
+var box=document.getElementById('gxreqd-'+id); if(!box)return;
+if(box.style.display!=='none'){box.style.display='none';return;}
+var r=gxReadLS(GX_REQ_KEY,[]).find(function(x){return x.id===id;}); if(!r)return;
+var h='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;font-size:12px">';
+gxReqAllFields().forEach(function(f){var v=r.fields[f.k]; if(v)h+='<div><span style="color:var(--ink4)">'+gxEsc(f.label)+':</span> '+gxEsc(v)+'</div>';});
+h+='</div>';
+box.style.display=''; box.innerHTML=h;
+}
+function gxReqSetStatus(id,status){
+var reqs=gxReadLS(GX_REQ_KEY,[]); var r=reqs.find(function(x){return x.id===id;}); if(!r)return;
+if(r.status===status)return;
+r.status=status; r.history=r.history||[]; r.history.push({status:status,at:gxNow(),by:(gxCU()?gxCU().name:'Admin')});
+gxWriteLS(GX_REQ_KEY,reqs);
+if(r.requestor)gxAddNotif(r.requestor.key,{type:'request',title:'Request '+r.refNo+' → '+status,body:(r.fields.gwpItemName||''),ref:r.id});
+gxSyncPushStatus(r);
+gxTryBackendEmail(r,'status');
+toast('✅ '+r.refNo+' set to '+status,'success');
+gxRenderInbox();
+gxUpdateAdminReqUI();
+}
+function gxReqArchive(id){
+var reqs=gxReadLS(GX_REQ_KEY,[]); var r=reqs.find(function(x){return x.id===id;}); if(!r)return;
+r.archived=true; r.archivedAt=gxNow(); gxWriteLS(GX_REQ_KEY,reqs);
+gxSyncArchive(r); gxRenderInbox(); gxUpdateAdminReqUI();
+toast('🗄 Archived — kept in your history','success');
+}
+function gxReqUnarchive(id){
+var reqs=gxReadLS(GX_REQ_KEY,[]); var r=reqs.find(function(x){return x.id===id;}); if(!r)return;
+r.archived=false; gxWriteLS(GX_REQ_KEY,reqs);
+gxSyncArchive(r); gxRenderInbox(); gxUpdateAdminReqUI();
+toast('♻ Restored to active','success');
+}
+function gxReqDelete(id){
+var r=gxReadLS(GX_REQ_KEY,[]).find(function(x){return x.id===id;});
+var label=r?(r.refNo+' — '+((r.fields&&r.fields.gwpItemName)||'')):'this request';
+if(!confirm('⚠ PERMANENTLY delete '+label+'?\n\nThis cannot be undone. For real records, use Archive instead.\n\nDelete permanently?'))return;
+var reqs=gxReadLS(GX_REQ_KEY,[]).filter(function(x){return x.id!==id;});
+gxWriteLS(GX_REQ_KEY,reqs);
+gxSyncDeleteRequest(id);
+gxRenderInbox(); gxUpdateAdminReqUI();
+toast('🗑 Request deleted','success');
+}
+function gxSyncArchive(r){ if(!GX_BACKEND_SYNC_ENABLED)return; try{ if(typeof postToSheet==='function')postToSheet('setRequestArchived',{id:r.id,archived:!!r.archived},{silent:true}); }catch(e){} }
+function gxSyncDeleteRequest(id){ if(!GX_BACKEND_SYNC_ENABLED)return; try{ if(typeof postToSheet==='function')postToSheet('deleteRequest',{id:id},{silent:true}); }catch(e){} }
+
+// —— Request export (Excel) & print (A4) ——
+function gxReqExportOne(id){
+if(typeof XLSX==='undefined'){toast('⚠ Spreadsheet library not loaded','error');return;}
+var r=gxReadLS(GX_REQ_KEY,[]).find(function(x){return x.id===id;}); if(!r)return;
+var aoa=[['GWP Purchase Request'],['Reference No.',r.refNo],['Status',r.status],['Submitted',gxFmtDT(r.createdAt)],['Requestor',(r.requestor?r.requestor.name:'')],['',''] ];
+GX_REQ_FIELDS.forEach(function(g){aoa.push([g.sec,'']);g.fields.forEach(function(f){aoa.push([f.label,r.fields[f.k]||'']);});aoa.push(['','']);});
+var wb=XLSX.utils.book_new(); var ws=XLSX.utils.aoa_to_sheet(aoa); ws['!cols']=[{wch:38},{wch:46}];
+XLSX.utils.book_append_sheet(wb,ws,'Request'); XLSX.writeFile(wb,r.refNo+'.xlsx');
+toast('⬇ Excel downloaded','success');
+}
+function gxReqExportAll(){
+if(typeof XLSX==='undefined'){toast('⚠ Spreadsheet library not loaded','error');return;}
+var reqs=gxReadLS(GX_REQ_KEY,[]); if(!reqs.length){toast('No requests to export','warning');return;}
+var cols=['refNo','status','createdAt','requestorName','requestorEmail'].concat(gxReqAllFields().map(function(f){return f.k;}));
+var head=['Reference','Status','Submitted','Requestor','Email'].concat(gxReqAllFields().map(function(f){return f.label;}));
+var aoa=[head];
+reqs.forEach(function(r){
+var row=[r.refNo,r.status,gxFmtDT(r.createdAt),(r.requestor?r.requestor.name:''),(r.requestor?r.requestor.email:'')];
+gxReqAllFields().forEach(function(f){row.push(r.fields[f.k]||'');});
+aoa.push(row);
+});
+var wb=XLSX.utils.book_new(); var ws=XLSX.utils.aoa_to_sheet(aoa);
+XLSX.utils.book_append_sheet(wb,ws,'GWP Requests'); XLSX.writeFile(wb,'GWP-Requests-'+new Date().toISOString().slice(0,10)+'.xlsx');
+toast('⬇ Exported '+reqs.length+' requests','success');
+}
+function gxReqPrintDoc(r){
+var rows='';
+GX_REQ_FIELDS.forEach(function(g){
+rows+='<tr><td colspan="2" class="sec">'+gxEsc(g.sec)+'</td></tr>';
+g.fields.forEach(function(f){rows+='<tr><td class="lbl">'+gxEsc(f.label)+'</td><td class="val">'+(r?gxEsc(r.fields[f.k]||''):'')+'</td></tr>';});
+});
+var ref=r?r.refNo:'____________'; var status=r?r.status:'Pending';
+return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>GWP Request '+ref+'</title><style>'
++'@page{size:A4;margin:16mm}body{font-family:Arial,Helvetica,sans-serif;color:#111;font-size:12px}'
++'h1{font-size:18px;margin:0 0 2px}.hd{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #111;padding-bottom:8px;margin-bottom:14px}'
++'.meta{font-size:11px;color:#444}table{width:100%;border-collapse:collapse}td{border:1px solid #bbb;padding:6px 8px;vertical-align:top}'
++'.sec{background:#eef2ff;font-weight:700;text-transform:uppercase;font-size:11px;letter-spacing:.5px}.lbl{width:42%;background:#f7f7f9;font-weight:600}.val{width:58%;min-height:16px}'
++'.foot{margin-top:20px;display:flex;justify-content:space-between;font-size:11px}.sign{margin-top:34px;border-top:1px solid #111;width:200px;padding-top:4px}'
++'</style></head><body><div class="hd"><div><h1>GWP Purchase Request</h1><div class="meta">Reference: '+gxEsc(ref)+' &nbsp;•&nbsp; Status: '+gxEsc(status)+'</div></div><div class="meta">Date: '+(r?gxFmtDT(r.createdAt):new Date().toLocaleDateString('en-GB'))+'</div></div>'
++'<table>'+rows+'</table>'
++'<div class="foot"><div><div class="sign">Requestor signature</div></div><div><div class="sign">Approved by (Admin)</div></div></div>'
++'<script>window.onload=function(){setTimeout(function(){window.print();},250);}<\/script></body></html>';
+}
+function gxReqOpenPrint(html){var w=window.open('','_blank');if(!w){toast('⚠ Allow pop-ups to print','warning');return;}w.document.open();w.document.write(html);w.document.close();}
+function gxReqPrint(id){var r=gxReadLS(GX_REQ_KEY,[]).find(function(x){return x.id===id;});if(!r)return;gxReqOpenPrint(gxReqPrintDoc(r));}
+function gxReqPrintBlank(){gxReqOpenPrint(gxReqPrintDoc(null));}
+
+// —— Backend email hook (no-op until Code.gs upgrade is deployed) ——
+function gxTryBackendEmail(rec,kind){
+if(!GX_BACKEND_EMAIL_ENABLED){return;} // browser-only mode: skip silently
+try{
+var to=GX_ALERT_EMAIL||(gxAdminUser()?gxAdminUser().email:'');
+if(typeof postToSheet==='function'){
+postToSheet('notifyRequest',{to:to,kind:kind||'new',request:rec});
+}
+}catch(e){}
+}
+
+// ─────────────────────────────────────────────────────────────
+//  ADMIN IN-PORTAL REQUEST NOTIFICATIONS  (bell + tab badge + dashboard)
+//  Works with NO email. Same-browser immediately; cross-device once the
+//  (email-free) sheet sync below is switched on.
+// ─────────────────────────────────────────────────────────────
+// GWP REQUEST cloud sync (this module ONLY — costing is never synced).
+// Left ON so requests reach the admin portal as soon as the small Code.gs
+// snippet is deployed. Until then it fails silently and everything stays local
+// — no errors, no data loss. Set to false to fully disable request syncing.
+var GX_BACKEND_SYNC_ENABLED=true;
+function gxCountPending(){return gxReadLS(GX_REQ_KEY,[]).filter(function(r){return r.status==='Pending'&&!r.archived;}).length;}
+function gxIsAdminView(){var u=gxCU();return !!u&&(u.role==='admin'||u.role==='ceo'||u.role==='md');}
+function gxUpdateAdminReqUI(){
+if(!gxIsAdminView())return;
+var pending=gxCountPending();
+// tab badge
+var badge=document.getElementById('request-tab-badge');
+if(badge){ if(pending>0){badge.textContent=pending>99?'99+':pending;badge.style.display='inline-block';}else{badge.style.display='none';} }
+// dashboard reminder card
+var box=document.getElementById('gx-admin-req-alert'); if(!box)return;
+if(pending>0){
+var reqs=gxReadLS(GX_REQ_KEY,[]).filter(function(r){return r.status==='Pending'&&!r.archived;}).slice(0,4);
+box.style.display='';
+box.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;background:#fffbeb;border:1px solid var(--amber-bd,#fde68a);border-radius:var(--r);margin-bottom:16px">'
++'<div><div style="font-size:14px;font-weight:700;color:#92400e">📝 '+pending+' new GWP request'+(pending!==1?'s':'')+' awaiting review</div>'
++'<div style="font-size:12px;color:#a16207;margin-top:2px">'+reqs.map(function(r){return gxEsc((r.fields&&r.fields.gwpItemName)||r.refNo)+' ('+gxEsc(r.requestor?r.requestor.name:'')+')';}).join(' · ')+'</div></div>'
++'<button class="btn btn-primary btn-sm" onclick="goPage(\'request\',document.getElementById(\'request-tab\'));gxShowRequests()">Review requests →</button></div>';
+}else{ box.style.display='none'; box.innerHTML=''; }
+}
+
+// —— Optional shared-sheet sync (email-free cross-device) ——
+function gxMergeRequests(remote){
+if(!remote||!remote.length)return 0;
+var local=gxReadLS(GX_REQ_KEY,[]);
+var byId={}; local.forEach(function(r){byId[r.id]=r;});
+var added=0;
+remote.forEach(function(r){
+if(!byId[r.id]){ local.unshift(r); byId[r.id]=r; added++;
+  if(gxIsAdminView())gxAddNotif(gxUserKey(),{type:'request',title:'New GWP request — '+(r.refNo||''),body:(r.requestor?r.requestor.name:'')+' · '+((r.fields&&r.fields.gwpItemName)||''),ref:r.id});
+}
+else { if(byId[r.id].status!==r.status){ byId[r.id].status=r.status; byId[r.id].history=r.history||byId[r.id].history; } if(typeof r.archived!=='undefined'){ byId[r.id].archived=!!r.archived; } }
+});
+gxWriteLS(GX_REQ_KEY,local);
+return added;
+}
+function gxSyncPushRequest(rec){ if(!GX_BACKEND_SYNC_ENABLED)return; try{ if(typeof postToSheet==='function')postToSheet('saveRequest',{request:rec},{silent:true}); }catch(e){} }
+function gxSyncPushStatus(rec){ if(!GX_BACKEND_SYNC_ENABLED)return; try{ if(typeof postToSheet==='function')postToSheet('setRequestStatus',{id:rec.id,status:rec.status,by:(gxCU()?gxCU().name:'Admin')},{silent:true}); }catch(e){} }
+async function gxSyncPullRequests(){
+if(!GX_BACKEND_SYNC_ENABLED)return;
+try{
+if(typeof postToSheet!=='function')return;
+var res=await postToSheet('listRequests',{},{silent:true});
+if(res&&res.ok&&res.data&&res.data.records){ gxMergeRequests(res.data.records); gxUpdateAdminReqUI(); gxUpdateBell(); if(document.getElementById('page-request').classList.contains('active'))gxShowRequests(); }
+}catch(e){}
+}
+
+// ─────────────────────────────────────────────────────────────
+//  NOTIFICATIONS   key: gwp_notif_<userkey>
+// ─────────────────────────────────────────────────────────────
+function gxNotifKey(uk){return 'gwp_notif_'+(uk||gxUserKey());}
+function gxAddNotif(uk,n){var list=gxReadLS(gxNotifKey(uk),[]);list.unshift({id:gxUID('n'),ts:gxNow(),read:false,type:n.type||'info',title:n.title||'',body:n.body||'',ref:n.ref||''});if(list.length>100)list=list.slice(0,100);gxWriteLS(gxNotifKey(uk),list);if(uk===gxUserKey())gxUpdateBell();}
+function gxToggleNotif(ev){if(ev)ev.stopPropagation();var p=document.getElementById('gx-notif-panel');if(!p)return;if(p.style.display==='none'||!p.style.display){gxRenderNotif();p.style.display='block';}else{p.style.display='none';}}
+function gxRenderNotif(){
+var host=document.getElementById('gx-notif-list'); if(!host)return;
+var list=gxReadLS(gxNotifKey(),[]);
+if(!list.length){host.innerHTML='<div style="padding:26px 16px;text-align:center;font-size:12px;color:var(--ink4)">No notifications yet.</div>';return;}
+host.innerHTML=list.map(function(n){
+var ico=n.type==='request'?'📝':n.type==='shipment'?'🚚':'🔔';
+return '<div style="padding:11px 16px;border-bottom:1px solid var(--bd);'+(n.read?'':'background:var(--blue-lt,#eff3fe)')+'">'
++'<div style="font-size:13px;font-weight:600;display:flex;gap:7px"><span>'+ico+'</span><span style="flex:1">'+gxEsc(n.title)+'</span></div>'
++(n.body?'<div style="font-size:12px;color:var(--ink3);margin:3px 0 0 25px">'+gxEsc(n.body)+'</div>':'')
++'<div style="font-size:10px;color:var(--ink4);margin:4px 0 0 25px">'+gxFmtDT(n.ts)+'</div></div>';
+}).join('');
+}
+function gxUpdateBell(){
+var bell=document.getElementById('tb-bell'); var badge=document.getElementById('tb-bell-count'); if(!bell||!badge)return;
+var list=gxReadLS(gxNotifKey(),[]); var unread=list.filter(function(n){return !n.read;}).length;
+if(unread>0){badge.textContent=unread>99?'99+':unread;badge.style.display='flex';}else{badge.style.display='none';}
+}
+function gxMarkAllRead(){var list=gxReadLS(gxNotifKey(),[]);list.forEach(function(n){n.read=true;});gxWriteLS(gxNotifKey(),list);gxRenderNotif();gxUpdateBell();}
+function gxClearNotif(){gxWriteLS(gxNotifKey(),[]);gxRenderNotif();gxUpdateBell();}
+document.addEventListener('click',function(e){var p=document.getElementById('gx-notif-panel');var b=document.getElementById('tb-bell');if(!p||p.style.display==='none')return;if(p.contains(e.target)||(b&&b.contains(e.target)))return;p.style.display='none';});
+
+// —— Own-shipment change detection ——  snapshot key: gwp_ship_snap_<userkey>
+function gxCheckShipmentChanges(){
+var u=gxCU(); if(!u)return;
+if(u.role==='admin'||u.role==='ceo'||u.role==='md')return; // these see everything; alerts are for brand owners' own shipments
+if(typeof myShips==='undefined'||!myShips)return;
+var snapKey='gwp_ship_snap_'+u.key;
+var prev=gxReadLS(snapKey,null);
+var cur={};
+myShips.forEach(function(s){cur[s.jobNo||('id'+s.id)]={status:s.status||'',latest:(s.latestUpd||'')};});
+if(prev===null){gxWriteLS(snapKey,cur);return;} // first login: seed only, no noisy alerts
+Object.keys(cur).forEach(function(k){
+var c=cur[k], p=prev[k];
+var ship=myShips.filter(function(s){return (s.jobNo||('id'+s.id))===k;})[0];
+var name=ship?ship.product:k;
+if(!p){gxAddNotif(u.key,{type:'shipment',title:'New shipment: '+name,body:(c.status||''),ref:k});}
+else if(p.status!==c.status){gxAddNotif(u.key,{type:'shipment',title:'Status update: '+name,body:(p.status||'—')+' → '+(c.status||'—'),ref:k});}
+else if(p.latest!==c.latest&&c.latest){gxAddNotif(u.key,{type:'shipment',title:'Shipment update: '+name,body:c.latest,ref:k});}
+});
+gxWriteLS(snapKey,cur);
+gxUpdateBell();
+}
+
+// ─────────────────────────────────────────────────────────────
+//  USER MANAGEMENT — persistence + roles + remove + send access
+//  Custom users saved to gwp_users_override (this browser). The backend
+//  guide explains how to make them work for everyone / auto-email.
+// ─────────────────────────────────────────────────────────────
+var GX_USERS_KEY='gwp_users_override';
+function gxLoadUsers(){
+var extra=gxReadLS(GX_USERS_KEY,null); if(!extra)return;
+try{
+extra.forEach(function(su){
+var i=USERS.findIndex(function(u){return u.email.toLowerCase()===su.email.toLowerCase();});
+if(i>=0){ if(!USERS[i].seed) USERS[i]=Object.assign({},USERS[i],su); } // don't override seeded admin creds silently
+else USERS.push(su);
+});
+}catch(e){}
+}
+function gxPersistUsers(){
+// persist only non-seed users (those added/edited in-portal)
+var seedEmails=['lilian930308@gmail.com','leesiuchong85@gmail.com','zhenghong.theadspert@gmail.com'];
+var custom=USERS.filter(function(u){return u.role!=='admin'&&seedEmails.indexOf(u.email.toLowerCase())<0&&u._custom;});
+gxWriteLS(GX_USERS_KEY,custom);
+}
+function gxSendCreds(userKey){
+var u=USERS.find(function(x){return x.key===userKey;}); if(!u)return;
+var portal='https://lilianlimyl.github.io/GWP-Portal/';
+var subject=encodeURIComponent('Your GWP Portal access');
+var body=encodeURIComponent('Hello '+u.name+',\n\nYour GWP Portal access is ready.\n\nPortal: '+portal+'\nEmail: '+u.email+'\nPassword: '+u.pwd+'\n\nPlease keep these details private.\n\nThank you.');
+window.open('mailto:'+encodeURIComponent(u.email)+'?subject='+subject+'&body='+body,'_blank');
+if(navigator.clipboard){navigator.clipboard.writeText('Portal: '+portal+'\nEmail: '+u.email+'\nPassword: '+u.pwd).then(function(){toast('✅ Access info copied + email drafted','success');},function(){});}
+else toast('✅ Email draft opened','success');
+}
+function gxRemoveUser(userKey){
+var u=USERS.find(function(x){return x.key===userKey;}); if(!u)return;
+if(u.role==='admin'){toast('Cannot remove admin','error');return;}
+if(!confirm('Remove user "'+u.name+'"? They will no longer be able to log in.'))return;
+var i=USERS.findIndex(function(x){return x.key===userKey;}); if(i>=0)USERS.splice(i,1);
+gxPersistUsers();
+if(typeof renderUMGrid==='function')renderUMGrid();
+if(typeof renderUsersList==='function')renderUsersList();
+toast('🗑 User removed','success');
+}
+function gxSetUserRole(userKey,role){
+var u=USERS.find(function(x){return x.key===userKey;}); if(!u)return;
+if(u.role==='admin'){toast('Admin role is fixed','error');return;}
+u.role=role; u._custom=true; gxPersistUsers();
+if(typeof renderUMGrid==='function')renderUMGrid();
+toast('✅ '+u.name+' role set to '+role,'success');
+}
+
+// ─────────────────────────────────────────────────────────────
+//  LOGIN WIRING  (called from doLogin after CU is set)
+// ─────────────────────────────────────────────────────────────
+function gxOnLogin(){
+var u=gxCU(); if(!u)return;
+// show new nav for everyone
+['tools-tab','request-tab','tb-bell'].forEach(function(id){var e=document.getElementById(id);if(e)e.style.display=(id==='tb-bell'?'block':'');});
+// per-user costing bucket
+lcSetUserKey('gwp_lc_user_'+u.key);
+LC_STORES.user.state={activeId:null,records:[]};
+lcUse('user'); lcLoad(); lcUse('admin'); // load user's records into the user store, keep admin active
+// request view + notifications
+gxRenderNotif(); gxUpdateBell();
+gxCheckShipmentChanges();
+gxUpdateAdminReqUI();        // admin: show pending-request badge + dashboard card on login
+gxSyncPullRequests();        // admin: pull any requests from shared sheet (if sync enabled)
+}
+window.gxOnLogin=gxOnLogin;
+
+// boot: merge any in-browser custom users so they can log in
+document.addEventListener('DOMContentLoaded',function(){ if(typeof USERS!=='undefined')gxLoadUsers(); });
 
 </script>
 </body>
