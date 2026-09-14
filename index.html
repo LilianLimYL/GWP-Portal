@@ -1003,6 +1003,7 @@ const USERS = [
 {key:'yves', name:'Angela/Yves', email:'gennextlearning@gmail.com', pwd:'IsoKae@2026', role:'handler', color:'#c026d3', active:true},
 {key:'yongsing', name:'Yong Sing', email:'ysing0301@gmail.com', pwd:'YongSing@2026', role:'handler', color:'#0891b2', active:true},
 {key:'janice', name:'Janice', email:'ongsoocheen91@gmail.com', pwd:'Janice@2026', role:'handler', color:'#65a30d', active:true},
+{key:'anden', name:'Anden', email:'goldwavesmarketing@gmail.com', pwd:'GoldWaves@2026', role:'handler', color:'#0284c7', active:true},
 ];
 
 // ═══════════════════════════════════════════════════
@@ -3728,6 +3729,13 @@ h+='</div>';
 });
 h+='</div>';
 });
+h+='<div style="margin-top:18px;border:1px solid var(--bd);border-radius:var(--r);overflow:hidden">'
++'<div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--surface2);font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--ink3);text-transform:uppercase"><span>Service</span><span>Fee</span></div>'
++'<div style="padding:12px 14px">'
++'<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><span style="font-size:13px;font-weight:700;color:var(--ink)">Product Sourcing</span><span style="font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap">RM 300 <span style="font-size:11px;font-weight:500;color:var(--ink4)">per SKU</span></span></div>'
++'<div style="font-size:12px;color:var(--ink3);margin-top:4px;line-height:1.6">The sourcing fee covers supplier sourcing, quotation comparison, and initial coordination.</div>'
++'<div style="font-size:12px;color:var(--ink3);margin-top:8px;line-height:1.6">Any additional charges such as samples, mock-ups, tooling, or shipping costs will be charged separately where applicable.</div>'
++'</div></div>';
 h+='<label style="display:flex;align-items:flex-start;gap:8px;margin-top:16px;font-size:12px;color:var(--ink3);cursor:pointer"><input type="checkbox" id="gxrf-ack" style="width:15px;height:15px;margin-top:1px;accent-color:var(--blue)"> I agree and understand the service terms above.</label>';
 h+='<div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap"><button class="btn btn-primary" onclick="gxReqSubmit()">📨 Submit Request</button><button class="btn btn-secondary" onclick="gxReqClearForm()">Clear</button></div>';
 host.innerHTML=h;
